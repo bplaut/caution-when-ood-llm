@@ -5,7 +5,7 @@ import torch as t
 
 def set_params():
     parser = argparse.ArgumentParser(description='Use an LLM to generate text via HuggingFace.')
-    parser.add_argument('-m', '--model', type=str, help='Which LLM to use. Current choices are Mistral-7B, Zephyr-7B-alpha, Zephyr-7B-beta, gpt2, Llama-13B-chat-hf',required=True)
+    parser.add_argument('-m', '--model', type=str, help='Which LLM to use. Check this file for currently supported options and/or add your add.',required=True)
     parser.add_argument('-p', '--prompts', type=str, help='List of prompts, separated by |. For example "Hello my name is Ben|What a time to be alive"', required=True)
     parser.add_argument('-n', '--max_new_tokens', type=int, help='Number of new tokens to generate on top of the prompt', default=10)
     parser.add_argument('-t', '--num_top_tokens', type=int, help='For each token, print out the top candidates considered by the model and their probabilities', default=0)
@@ -22,8 +22,10 @@ def set_params():
         model_name = 'HuggingFaceH4/zephyr-7b-alpha'
     elif args.model == 'gpt2':
         model_name = 'gpt2'
-    elif args.model == 'Llama-13B-chat-hf':
+    elif args.model == 'Llama-13B-chat':
         model_name = 'meta-llama/Llama-2-13b-chat-hf'
+    elif args.model == 'Llama-13B':
+        model_name = 'meta-llama/Llama-2-13b-hf'
     else:
         raise Exception("Unrecognized model name. Try python generate_text -h")
     prompts = args.prompts.split('|')
