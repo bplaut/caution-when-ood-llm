@@ -1,15 +1,14 @@
 Currently the only file is generate_text.py, which streamlines text generation via Hugging Face.
 
+```
 usage: generate_text.py [-h] -m MODEL [-p PROMPTS] [-n MAX_NEW_TOKENS]
                         [-t NUM_TOP_TOKENS] [-c] [-s] [-r NUM_RESPONSES] [-i]
-
-Use an LLM to generate text via HuggingFace.
 
 options:
   -h, --help            show this help message and exit
   -m MODEL, --model MODEL
                         Which LLM to use. Check this file for currently supported options
-                        and/or add your own.
+                        and/or add your own.           
   -p PROMPTS, --prompts PROMPTS
                         List of prompts, separated by |. For example "Hello my name is
                         Ben|What a time to be alive". If not provided, you will be asked
@@ -30,3 +29,4 @@ options:
   -i, --interactive_mode
                         Run the LLM in interactive mode where you can go back and forth
                         with the LLM indefinitely. Only relevant in chat mode.
+```
