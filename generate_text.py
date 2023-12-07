@@ -54,7 +54,7 @@ class Generator(object):
             num_responses = self.args.num_responses
             
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
-        output = self.model.generate(**model_inputs, max_new_tokens=self.args.max_new_tokens, do_sample=self.args.do_sample, output_scores=True, num_return_sequences=num_responses, return_dict_in_generate=True, renormalize_logits=True)
+        output = self.model.generate(**model_inputs, max_new_tokens=self.args.max_new_tokens, do_sample=self.args.do_sample, output_scores=True, num_return_sequences=num_responses, return_dict_in_generate=True, renormalize_logits=False)
         text_outputs = self.tokenizer.batch_decode(output.sequences, skip_special_tokens=True)
 
         print('\n')
@@ -66,16 +66,19 @@ class Generator(object):
 
             if self.args.num_top_tokens > 0:
                 for j in range(len(token_ids)):
-                    print('Token %d:' % (j+1), repr(self.tokenizer.decode(token_ids[j])))
-                    all_probs_for_token = t.exp(output.scores[j][i])
-                    (sorted_probs, token_ids_by_prob) = t.sort(all_probs_for_token, descending=True)
-                    print("Top tokens:", self.tokenizer.batch_decode(token_ids_by_prob[:self.args.num_top_tokens]))
+                    # This isn't that efficient right now, I should be sorting/exping/etc in batch
+                    print('\nToken %d:' % (j+1), repr(self.tokenizer.decode(token_ids[j])))
+                    (sorted_scores, top_token_ids) = t.sort(output.scores[j][i], descending=True)
+                    sorted_probs = t.exp(sorted_scores) / t.sum(t.exp(sorted_scores))
+                    print("Top tokens:", self.tokenizer.batch_decode(top_token_ids[:self.args.num_top_tokens]))
                     print("Top probs:", sorted_probs[:self.args.num_top_tokens])
-
+                    print("Top logits:", sorted_scores[:self.args.num_top_tokens])
+                    
                     if self.tokenizer.decode(token_ids[j]) == self.tokenizer.pad_token:
                         # If we have prompts/responses of different lengths, some will get padded
-                        break 
-            print('\n\n')
+                        break
+                    
+            print('\n')
         return text_outputs
 
 def main():
