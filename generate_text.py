@@ -17,17 +17,17 @@ class Generator(object):
         
         args = parser.parse_args()
                             
-        if args.model == 'Mistral-7B':
+        if args.model == 'Mistral-7b':
             model_name = 'mistralai/Mistral-7B-v0.1'
-        elif args.model == 'Zephyr-7B-beta':
+        elif args.model == 'Zephyr-7b-beta':
             model_name = 'HuggingFaceH4/zephyr-7b-beta'
-        elif args.model == 'Zephyr-7B-alpha':
+        elif args.model == 'Zephyr-7b-alpha':
             model_name = 'HuggingFaceH4/zephyr-7b-alpha'
         elif args.model == 'gpt2':
             model_name = 'gpt2'
-        elif args.model == 'Llama-13B-chat':
+        elif args.model == 'Llama-13b-chat':
             model_name = 'meta-llama/Llama-2-13b-chat-hf'
-        elif args.model == 'Llama-13B':
+        elif args.model == 'Llama-13b':
             model_name = 'meta-llama/Llama-2-13b-hf'
         else:
             raise Exception("Unrecognized model name. Try python generate_text -h")
@@ -82,6 +82,7 @@ class Generator(object):
         return text_outputs
 
 def main():
+    t.set_printoptions(sci_mode=False)
     generator = Generator()
     prompts = generator.prepare_for_chat(generator.initial_prompts) if generator.args.chat_mode else generator.initial_prompts
     
