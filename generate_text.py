@@ -6,7 +6,7 @@ import torch as t
 class Generator(object):
     def __init__(self):
         parser = argparse.ArgumentParser(description='Use an LLM to generate text via HuggingFace.')
-        parser.add_argument('-m', '--model', type=str, help='Which LLM to use. Check this file for currently supported options and/or add your add.',required=True)
+        parser.add_argument('-m', '--model', type=str, help='Which LLM to use. Check this file for currently supported options and/or add your own.',required=True)
         parser.add_argument('-p', '--prompts', type=str, help='List of prompts, separated by |. For example "Hello my name is Ben|What a time to be alive". If not provided, you will be asked for a prompt by command line.', default=None)
         parser.add_argument('-n', '--max_new_tokens', type=int, help='Number of new tokens to generate on top of the prompt', default=10)
         parser.add_argument('-t', '--num_top_tokens', type=int, help='For each token, print out the top candidates considered by the model and their probabilities', default=0)
