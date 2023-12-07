@@ -32,7 +32,9 @@ class Generator(object):
         elif args.model == 'Llama-7b':
             model_name = 'meta-llama/Llama-2-7b-hf'
         elif args.model == 'Llama-7b-chat':
-            model_name = 'meta-llama/Llama-2-7b-chat-hf'            
+            model_name = 'meta-llama/Llama-2-7b-chat-hf'
+        elif args.model == 'Llama-70b-chat':
+            model_name = 'meta-llama/Llama-2-70b-chat-hf'
         else:
             raise Exception("Unrecognized model name. Try python generate_text -h")
         self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", load_in_4bit=True)
