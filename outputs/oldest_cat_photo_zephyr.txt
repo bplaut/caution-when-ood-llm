@@ -1,0 +1,358 @@
+PROMPT 1: "<|user|>
+What is the oldest known photo of a cat?</s>
+<|assistant|>
+"
+
+OUTPUT 1: "<|user|>
+What is the oldest known photo of a cat? 
+<|assistant|>
+The oldest known photograph of a cat is believed to be a portrait taken by British photographer Harry Pointer in 1864. The photograph, titled "Cat (Felis Domestica) Looking at the Camera," shows a black and white cat sitting on a table and staring directly at the camera. The photograph is part of a collection of early cat photographs held by the National Cat Museum in Clackamas, Oregon."
+
+Token 1: 'The'
+Top tokens: ['The', 'As', 'Acc', 'One', 'I', 'There', 'The', 'In']
+Top probs: tensor([9.7058e-01, 1.6963e-02, 9.8173e-03, 8.7817e-04, 5.4954e-04, 5.4102e-04,
+        2.7633e-04, 5.3152e-05], device='cuda:0')
+Token 2: 'oldest'
+Top tokens: ['oldest', 'earliest', 'claim', 'title', 'world', 'first', 'Old', 'old']
+Top probs: tensor([9.9726e-01, 1.7529e-03, 4.9057e-04, 1.6052e-04, 7.1228e-05, 5.8135e-05,
+        2.9232e-05, 1.5525e-05], device='cuda:0')
+Token 3: 'known'
+Top tokens: ['known', 'surviving', '-', 'confirmed', 'known', 'know', 'photograph', 'photo']
+Top probs: tensor([9.9939e-01, 2.4720e-04, 1.1318e-04, 6.3985e-05, 6.0108e-05, 5.0222e-05,
+        1.2212e-05, 1.0445e-05], device='cuda:0')
+Token 4: 'photograph'
+Top tokens: ['photograph', 'photo', 'surviving', 'existing', 'photographs', 'phot', 'photos', 'picture']
+Top probs: tensor([5.3771e-01, 4.5993e-01, 9.9826e-04, 2.6659e-04, 2.1089e-04, 1.5672e-04,
+        1.1027e-04, 8.1305e-05], device='cuda:0')
+Token 5: 'of'
+Top tokens: ['of', 'believed', 'ic', 'that', '(', 'dep', ',', 'thought']
+Top probs: tensor([9.8126e-01, 1.1073e-02, 5.4386e-03, 4.6060e-04, 3.5041e-04, 2.5042e-04,
+        2.0599e-04, 1.6945e-04], device='cuda:0')
+Token 6: 'a'
+Top tokens: ['a', 'an', 'what', 'any', 'cat', 'cats', 'domestic', 'the']
+Top probs: tensor([9.9983e-01, 1.6865e-04, 3.4460e-06, 9.8729e-07, 3.3070e-07, 1.6117e-07,
+        7.7937e-08, 6.9319e-08], device='cuda:0')
+Token 7: 'cat'
+Top tokens: ['cat', 'domestic', 'cat', 'dom', 'living', 'Cat', 'f', 'recogn']
+Top probs: tensor([9.9635e-01, 3.0736e-03, 1.7613e-04, 1.2392e-04, 6.1347e-05, 4.3163e-05,
+        2.5573e-05, 1.8564e-05], device='cuda:0')
+Token 8: 'is'
+Top tokens: ['is', 'dates', 'was', ',', 'goes', 'belongs', 'that', 'date']
+Top probs: tensor([8.9159e-01, 5.0300e-02, 4.8753e-02, 5.7324e-03, 9.3579e-04, 9.2850e-04,
+        4.3859e-04, 2.3660e-04], device='cuda:0')
+Token 9: 'believed'
+Top tokens: ['believed', 'a', 'commonly', '"', 'thought', 'widely', 'from', 'estimated']
+Top probs: tensor([0.8365, 0.0660, 0.0174, 0.0157, 0.0136, 0.0080, 0.0079, 0.0055],
+       device='cuda:0')
+Token 10: 'to'
+Top tokens: ['to', 'by', 'be', 'to', '*', 'dating', ',', '(']
+Top probs: tensor([1.0000e+00, 1.3082e-06, 8.2506e-07, 5.8505e-07, 1.5961e-08, 8.1520e-09,
+        7.2505e-09, 6.7057e-09], device='cuda:0')
+Token 11: 'be'
+Top tokens: ['be', 'have', 'date', 'belong', 'dep', 'dating', 'a', 'date']
+Top probs: tensor([9.9156e-01, 5.0431e-03, 3.3594e-03, 7.2348e-06, 6.6911e-06, 5.3765e-06,
+        3.8725e-06, 3.1117e-06], device='cuda:0')
+Token 12: 'a'
+Top tokens: ['a', 'an', '"', 'from', 'taken', 'captured', 'the', 'one']
+Top probs: tensor([9.3908e-01, 3.0662e-02, 2.0109e-02, 4.3829e-03, 2.3829e-03, 1.2656e-03,
+        8.1712e-04, 3.3273e-04], device='cuda:0')
+Token 13: 'portrait'
+Top tokens: ['portrait', 'dag', 'photograph', 'picture', 'photo', '', 'blur', 'glass']
+Top probs: tensor([0.5334, 0.2105, 0.0705, 0.0452, 0.0313, 0.0296, 0.0278, 0.0082],
+       device='cuda:0')
+Token 14: 'taken'
+Top tokens: ['taken', 'of', 'titled', 'by', 'called', 'captured', 'from', 'photograph']
+Top probs: tensor([0.4560, 0.4088, 0.0689, 0.0180, 0.0148, 0.0145, 0.0044, 0.0040],
+       device='cuda:0')
+Token 15: 'by'
+Top tokens: ['by', 'in', 'around', 'sometime', 'of', 'between', 'somewhere', 'at']
+Top probs: tensor([6.5817e-01, 3.0133e-01, 3.8914e-02, 1.0616e-03, 1.4940e-04, 8.7825e-05,
+        5.4959e-05, 5.1630e-05], device='cuda:0')
+Token 16: 'British'
+Top tokens: ['British', 'English', 'French', 'the', 'an', 'a', 'Louis', 'Alexander']
+Top probs: tensor([0.3403, 0.1658, 0.1232, 0.1223, 0.0464, 0.0397, 0.0385, 0.0198],
+       device='cuda:0')
+Token 17: 'photographer'
+Top tokens: ['photographer', 'scientist', 'photograph', 'photography', 'amateur', 'invent', 'civil', 'physician']
+Top probs: tensor([0.9474, 0.0188, 0.0087, 0.0055, 0.0029, 0.0019, 0.0017, 0.0012],
+       device='cuda:0')
+Token 18: 'Harry'
+Top tokens: ['Harry', 'William', 'Thomas', 'Henry', 'Hugh', 'Alexander', 'John', 'Frederick']
+Top probs: tensor([0.8206, 0.0381, 0.0323, 0.0254, 0.0177, 0.0045, 0.0042, 0.0041],
+       device='cuda:0')
+Token 19: 'Pointer'
+Top tokens: ['Pointer', 'N', 'Po', 'Wh', 'Pointer', 'Sp', 'Gordon', 'Pope']
+Top probs: tensor([0.5802, 0.2344, 0.1024, 0.0089, 0.0063, 0.0053, 0.0036, 0.0036],
+       device='cuda:0')
+Token 20: 'in'
+Top tokens: ['in', 'around', ',', 'sometime', '(', '.', 'circa', 'between']
+Top probs: tensor([9.8615e-01, 1.3214e-02, 1.8997e-04, 8.6298e-05, 8.2992e-05, 4.9946e-05,
+        4.6554e-05, 4.3734e-05], device='cuda:0')
+Token 21: ''
+Top tokens: ['', 'the', 'around', 'approximately', 'about', 'circa', 'or', 'England']
+Top probs: tensor([8.8212e-01, 8.7341e-02, 2.7916e-02, 1.3056e-03, 4.4077e-04, 3.2755e-04,
+        6.9740e-05, 6.9740e-05], device='cuda:0')
+Token 22: '1'
+Top tokens: ['1', '2', '¹', 'around', '7', 'fifteen', '0', '6']
+Top probs: tensor([1.0000e+00, 1.5961e-08, 4.1799e-09, 3.2174e-09, 2.9640e-09, 2.9067e-09,
+        2.8173e-09, 2.6883e-09], device='cuda:0')
+Token 23: '8'
+Top tokens: ['8', '9', 'eight', 'eight', 'Eight', '7', 'VIII', "'"]
+Top probs: tensor([9.9883e-01, 1.1695e-03, 2.5583e-06, 2.5729e-07, 1.3453e-07, 7.2573e-08,
+        5.8314e-08, 5.7410e-08], device='cuda:0')
+Token 24: '6'
+Top tokens: ['6', '5', '9', '7', '8', '4', '3', '2']
+Top probs: tensor([5.8888e-01, 4.0473e-01, 2.5221e-03, 2.4066e-03, 1.3928e-03, 5.4857e-05,
+        8.5450e-06, 2.3361e-06], device='cuda:0')
+Token 25: '4'
+Top tokens: ['4', '0', '3', '1', '5', '6', '2', '7']
+Top probs: tensor([0.4863, 0.3729, 0.1004, 0.0204, 0.0147, 0.0018, 0.0017, 0.0008],
+       device='cuda:0')
+Token 26: '.'
+Top tokens: ['.', ',', 'or', '-', 'in', 'titled', 'called', 'of']
+Top probs: tensor([9.8891e-01, 5.7891e-03, 3.5666e-03, 1.3537e-03, 7.5187e-05, 5.5874e-05,
+        4.3856e-05, 3.8402e-05], device='cuda:0')
+Token 27: 'The'
+Top tokens: ['The', 'However', 'In', 'Pointer', 'It', 'This', 'Tit', 'Although']
+Top probs: tensor([9.7753e-01, 1.3944e-02, 2.7457e-03, 2.5196e-03, 2.1383e-03, 3.6583e-04,
+        1.3670e-04, 1.0319e-04], device='cuda:0')
+Token 28: 'photograph'
+Top tokens: ['photograph', 'photo', 'image', 'black', 'picture', 'cat', 'portrait', 'subject']
+Top probs: tensor([6.5841e-01, 1.9161e-01, 8.5692e-02, 4.0795e-02, 1.1597e-02, 6.8711e-03,
+        1.0703e-03, 6.1945e-04], device='cuda:0')
+Token 29: ','
+Top tokens: [',', 'shows', 'dep', 'is', 'features', 'titled', 'was', 'capt']
+Top probs: tensor([0.5665, 0.2475, 0.1169, 0.0255, 0.0238, 0.0070, 0.0033, 0.0025],
+       device='cuda:0')
+Token 30: 'titled'
+Top tokens: ['titled', 'which', 'entitled', 'called', 'known', 'named', 'dep', 'now']
+Top probs: tensor([9.5536e-01, 2.4676e-02, 1.2216e-02, 5.1321e-03, 9.3463e-04, 5.7581e-04,
+        3.1799e-04, 1.3784e-04], device='cuda:0')
+Token 31: '"'
+Top tokens: ['"', '“', 'simply', "'", '"\'', '"[', '"(', 'The']
+Top probs: tensor([9.9906e-01, 3.6238e-04, 2.7141e-04, 1.8800e-04, 4.5004e-05, 1.9205e-05,
+        1.1379e-05, 7.8819e-06], device='cuda:0')
+Token 32: 'Cat'
+Top tokens: ['Cat', 'K', 'Stud', 'F', 'The', 'A', 'Two', 'M']
+Top probs: tensor([0.4875, 0.0665, 0.0551, 0.0472, 0.0367, 0.0279, 0.0248, 0.0146],
+       device='cuda:0')
+Token 33: '('
+Top tokens: ['(', ',', 'on', 'in', 'Cl', ',"', 'Looking', 'and']
+Top probs: tensor([0.1774, 0.1494, 0.1258, 0.0658, 0.0489, 0.0425, 0.0405, 0.0372],
+       device='cuda:0')
+Token 34: 'F'
+Top tokens: ['F', 'Stud', 'T', 'M', 'The', 'Tab', 'Call', 'Dead']
+Top probs: tensor([0.3181, 0.1799, 0.0451, 0.0431, 0.0305, 0.0261, 0.0242, 0.0171],
+       device='cuda:0')
+Token 35: 'el'
+Top tokens: ['el', '.', 'él', 'elo', 'EL', 'eline', 'ancy', 'eli']
+Top probs: tensor([9.9582e-01, 1.8487e-03, 4.6743e-04, 4.2229e-04, 1.7331e-04, 1.6798e-04,
+        7.9346e-05, 7.1683e-05], device='cuda:0')
+Token 36: 'is'
+Top tokens: ['is', 'ix', 'inus', 'us', 'idae', 'ic', 'ina', 'iss']
+Top probs: tensor([9.9068e-01, 9.1239e-03, 3.6997e-05, 2.5428e-05, 1.4602e-05, 1.1196e-05,
+        9.3543e-06, 5.2473e-06], device='cuda:0')
+Token 37: 'Dom'
+Top tokens: ['Dom', 'dom', 'domestic', '),', 'C', 'c', ')"', ')']
+Top probs: tensor([0.7172, 0.0798, 0.0617, 0.0417, 0.0352, 0.0231, 0.0117, 0.0097],
+       device='cuda:0')
+Token 38: 'est'
+Top tokens: ['est', 'estic', 'us', 'EST', 'es', 'st', 'é', 'Est']
+Top probs: tensor([9.2810e-01, 7.1567e-02, 2.0259e-04, 1.5024e-05, 1.2751e-05, 9.1839e-06,
+        8.4937e-06, 6.9324e-06], device='cuda:0')
+Token 39: 'ica'
+Top tokens: ['ica', 'icas', 'ics', 'icus', 'ia', 'ico', 'i', 'ici']
+Top probs: tensor([9.9990e-01, 3.0240e-05, 2.7107e-05, 6.1918e-06, 5.6377e-06, 3.4194e-06,
+        3.2884e-06, 3.1873e-06], device='cuda:0')
+Token 40: ')'
+Top tokens: [')', ')"', '),', ')",', ',', ').', '):', ')-']
+Top probs: tensor([0.4345, 0.2219, 0.2085, 0.1179, 0.0070, 0.0032, 0.0025, 0.0004],
+       device='cuda:0')
+Token 41: 'Looking'
+Top tokens: ['Looking', '-', 'in', 'Sleep', 'from', '–', 'on', ',"']
+Top probs: tensor([0.3237, 0.1163, 0.0906, 0.0266, 0.0246, 0.0214, 0.0174, 0.0148],
+       device='cuda:0')
+Token 42: 'at'
+Top tokens: ['at', 'Out', 'Direct', 'Through', 'out', 'Over', 'Down', 'Along']
+Top probs: tensor([0.3679, 0.2320, 0.1232, 0.0522, 0.0350, 0.0317, 0.0224, 0.0135],
+       device='cuda:0')
+Token 43: 'the'
+Top tokens: ['the', 'and', 'a', "'", '(', 'Camera', 'an', 'its']
+Top probs: tensor([0.6549, 0.2246, 0.0981, 0.0039, 0.0030, 0.0019, 0.0019, 0.0013],
+       device='cuda:0')
+Token 44: 'Camera'
+Top tokens: ['Camera', 'Artist', 'Phot', 'Spect', 'Cam', 'Camera', 'View', 'Left']
+Top probs: tensor([9.5478e-01, 9.3603e-03, 6.8481e-03, 5.0102e-03, 3.4977e-03, 1.4243e-03,
+        1.0584e-03, 9.3406e-04], device='cuda:0')
+Token 45: ',"'
+Top tokens: [',"', '",', '"', '(', ',', ':', '.', ';']
+Top probs: tensor([7.7333e-01, 1.0304e-01, 9.0930e-02, 2.4473e-02, 3.5257e-03, 6.4208e-04,
+        5.8007e-04, 4.2439e-04], device='cuda:0')
+Token 46: 'shows'
+Top tokens: ['shows', 'dep', 'features', 'is', 'was', 'capt', 'showed', 'depicted']
+Top probs: tensor([0.4399, 0.4399, 0.0853, 0.0153, 0.0084, 0.0045, 0.0014, 0.0010],
+       device='cuda:0')
+Token 47: 'a'
+Top tokens: ['a', 'Pointer', 'an', 'the', 'his', 'Po', 'what', 'two']
+Top probs: tensor([9.7157e-01, 2.1803e-02, 4.8649e-03, 1.5308e-03, 9.1931e-05, 8.3053e-05,
+        9.8421e-06, 8.0329e-06], device='cuda:0')
+Token 48: 'black'
+Top tokens: ['black', 'tab', 'domestic', 'white', 'cat', 'g', 'gray', 'brown']
+Top probs: tensor([0.3378, 0.2340, 0.1047, 0.0854, 0.0573, 0.0397, 0.0298, 0.0120],
+       device='cuda:0')
+Token 49: 'and'
+Top tokens: ['and', 'cat', '-', 'domestic', 'tab', ',', 'tom', 'British']
+Top probs: tensor([7.5093e-01, 1.5137e-01, 8.4912e-02, 4.3959e-03, 2.0126e-03, 1.5192e-03,
+        1.4610e-03, 4.4211e-04], device='cuda:0')
+Token 50: 'white'
+Top tokens: ['white', 'gray', 'brown', 'orange', 'white', 'grey', 'tab', 'tan']
+Top probs: tensor([9.9938e-01, 2.0654e-04, 8.9530e-05, 8.8833e-05, 7.1380e-05, 5.8258e-05,
+        3.6457e-05, 2.5651e-05], device='cuda:0')
+Token 51: 'cat'
+Top tokens: ['cat', 'domestic', 'tab', 'cats', 't', 'k', 'Pers', 'Tab']
+Top probs: tensor([0.8657, 0.0705, 0.0421, 0.0022, 0.0022, 0.0013, 0.0012, 0.0012],
+       device='cuda:0')
+Token 52: 'sitting'
+Top tokens: ['sitting', 'named', 'staring', 'looking', 'with', 'seated', 'per', 'pos']
+Top probs: tensor([0.5795, 0.1097, 0.0946, 0.0625, 0.0535, 0.0221, 0.0206, 0.0093],
+       device='cuda:0')
+Token 53: 'on'
+Top tokens: ['on', 'in', 'upright', 'calm', 'next', 'and', 'comfort', 'still']
+Top probs: tensor([0.7869, 0.1032, 0.0704, 0.0085, 0.0072, 0.0032, 0.0024, 0.0017],
+       device='cuda:0')
+Token 54: 'a'
+Top tokens: ['a', 'what', 'the', 'its', 'an', 'Pointer', 'top', 'cush']
+Top probs: tensor([9.7439e-01, 1.5998e-02, 3.1997e-03, 2.2338e-03, 1.5352e-03, 1.0634e-03,
+        8.1536e-04, 1.1474e-04], device='cuda:0')
+Token 55: 'table'
+Top tokens: ['table', 'wooden', 'chair', 'windows', 'cush', 'pillow', 'white', 'st']
+Top probs: tensor([0.6903, 0.1163, 0.0598, 0.0434, 0.0066, 0.0047, 0.0045, 0.0043],
+       device='cuda:0')
+Token 56: 'and'
+Top tokens: ['and', 'with', ',', '.', 'in', 'looking', 'next', 'top']
+Top probs: tensor([0.3608, 0.2681, 0.2329, 0.0528, 0.0205, 0.0190, 0.0122, 0.0057],
+       device='cuda:0')
+Token 57: 'staring'
+Top tokens: ['staring', 'looking', 'gaz', 'appears', 'was', 'is', 'facing', 'pe']
+Top probs: tensor([0.5769, 0.2641, 0.1190, 0.0081, 0.0073, 0.0072, 0.0048, 0.0031],
+       device='cuda:0')
+Token 58: 'directly'
+Top tokens: ['directly', 'at', 'straight', 'int', 'into', 'right', 'towards', 'up']
+Top probs: tensor([6.5686e-01, 2.3421e-01, 4.7583e-02, 3.5638e-02, 1.8345e-02, 2.0582e-03,
+        7.4544e-04, 4.5925e-04], device='cuda:0')
+Token 59: 'at'
+Top tokens: ['at', 'into', 'towards', 'ahead', 'in', 'toward', 'back', 'into']
+Top probs: tensor([9.1109e-01, 8.8812e-02, 3.7957e-05, 1.0623e-05, 1.0058e-05, 9.5224e-06,
+        6.6999e-06, 3.7878e-06], device='cuda:0')
+Token 60: 'the'
+Top tokens: ['the', 'Pointer', 'a', 'Po', 'camera', 'Camera', 'its', 'the']
+Top probs: tensor([9.9968e-01, 3.1015e-04, 7.3359e-07, 6.8378e-07, 6.1774e-07, 4.3805e-07,
+        2.2726e-07, 2.1855e-07], device='cuda:0')
+Token 61: 'camera'
+Top tokens: ['camera', 'photographer', 'lens', 'camera', 'view', 'photograph', 'cameras', 'Camera']
+Top probs: tensor([9.9793e-01, 1.1503e-03, 2.8411e-04, 2.3739e-04, 2.0624e-04, 8.5975e-05,
+        3.7854e-05, 1.4256e-05], device='cuda:0')
+Token 62: '.'
+Top tokens: ['.', 'lens', "'", ',', 'with', '’', 'in', 'a']
+Top probs: tensor([8.1264e-01, 1.5032e-01, 3.5151e-02, 1.1477e-03, 4.2554e-04, 1.4706e-04,
+        5.8956e-05, 1.3679e-05], device='cuda:0')
+Token 63: 'The'
+Top tokens: ['The', 'Pointer', 'It', 'However', 'This', '</s>', 'Another', 'Although']
+Top probs: tensor([0.8805, 0.0316, 0.0292, 0.0279, 0.0160, 0.0027, 0.0024, 0.0019],
+       device='cuda:0')
+Token 64: 'photograph'
+Top tokens: ['photograph', 'photo', 'original', 'image', 'print', 'negative', 'picture', 'authentic']
+Top probs: tensor([0.4539, 0.1618, 0.1497, 0.1139, 0.0501, 0.0406, 0.0121, 0.0055],
+       device='cuda:0')
+Token 65: 'is'
+Top tokens: ['is', 'was', 'has', ',', 'measures', 'became', "'", 'ic']
+Top probs: tensor([5.9740e-01, 2.8664e-01, 9.1615e-02, 2.0602e-02, 5.3214e-04, 5.0777e-04,
+        4.0483e-04, 2.7179e-04], device='cuda:0')
+Token 66: 'part'
+Top tokens: ['part', 'held', 'currently', 'now', 'a', 'considered', 'hous', 'in']
+Top probs: tensor([0.7534, 0.0729, 0.0311, 0.0301, 0.0274, 0.0179, 0.0170, 0.0169],
+       device='cuda:0')
+Token 67: 'of'
+Top tokens: ['of', 'the', 'a', 'Pointer', 'part', 'o', 'from', 'Of']
+Top probs: tensor([1.0000e+00, 7.5711e-07, 2.0698e-07, 2.0377e-07, 1.4677e-07, 1.0655e-07,
+        1.0009e-07, 9.7011e-08], device='cuda:0')
+Token 68: 'a'
+Top tokens: ['a', 'the', 'Pointer', 'an', 'The', 'Harry', 'Po', 'Harper']
+Top probs: tensor([5.9906e-01, 2.6171e-01, 1.2171e-01, 1.0972e-02, 2.0941e-03, 1.7911e-03,
+        5.0918e-04, 2.2950e-04], device='cuda:0')
+Token 69: 'collection'
+Top tokens: ['collection', 'series', 'larger', 'private', 'book', 'scientific', 'wider', 'rare']
+Top probs: tensor([0.4117, 0.3633, 0.1799, 0.0220, 0.0070, 0.0029, 0.0020, 0.0018],
+       device='cuda:0')
+Token 70: 'of'
+Top tokens: ['of', 'held', 'called', 'owned', 'at', 'titled', 'that', 'known']
+Top probs: tensor([0.5572, 0.1753, 0.0754, 0.0506, 0.0495, 0.0234, 0.0133, 0.0125],
+       device='cuda:0')
+Token 71: 'early'
+Top tokens: ['early', 'over', 'Pointer', 'animal', '', 'cat', 'scientific', 'more']
+Top probs: tensor([0.2373, 0.1906, 0.1656, 0.1112, 0.0550, 0.0529, 0.0216, 0.0206],
+       device='cuda:0')
+Token 72: 'cat'
+Top tokens: ['cat', 'photograph', 'animal', 'photography', 'photographs', 'pet', 'camera', 'Victorian']
+Top probs: tensor([0.2584, 0.2109, 0.2076, 0.1310, 0.1156, 0.0096, 0.0079, 0.0065],
+       device='cuda:0')
+Token 73: 'photographs'
+Top tokens: ['photographs', 'port', 'photography', 'photos', '-', 'and', 'images', 'pictures']
+Top probs: tensor([0.5853, 0.1930, 0.1227, 0.0263, 0.0213, 0.0174, 0.0151, 0.0113],
+       device='cuda:0')
+Token 74: 'held'
+Top tokens: ['held', 'by', 'that', 'taken', 'at', 'discovered', 'hous', 'in']
+Top probs: tensor([0.2799, 0.1711, 0.1698, 0.1698, 0.0324, 0.0295, 0.0190, 0.0172],
+       device='cuda:0')
+Token 75: 'by'
+Top tokens: ['by', 'in', 'at', 'within', 'by', 'and', 'arch', 'the']
+Top probs: tensor([9.5229e-01, 2.3840e-02, 2.3840e-02, 8.7151e-06, 5.2040e-06, 4.5214e-06,
+        2.7210e-06, 2.0063e-06], device='cuda:0')
+Token 76: 'the'
+Top tokens: ['the', 'The', 'London', 'England', 'Britain', 'New', 'Christ', 'a']
+Top probs: tensor([9.7801e-01, 1.1933e-02, 2.9242e-03, 2.1731e-03, 9.2736e-04, 3.4925e-04,
+        1.8548e-04, 1.1338e-04], device='cuda:0')
+Token 77: 'National'
+Top tokens: ['National', 'British', 'University', 'Victoria', 'Royal', 'Cat', 'Wilson', 'F']
+Top probs: tensor([0.4408, 0.1023, 0.0665, 0.0665, 0.0611, 0.0171, 0.0116, 0.0096],
+       device='cuda:0')
+Token 78: 'Cat'
+Top tokens: ['Cat', 'Port', 'Media', 'G', 'Gallery', 'Library', 'Museum', 'Science']
+Top probs: tensor([0.6853, 0.1392, 0.0751, 0.0604, 0.0052, 0.0050, 0.0034, 0.0029],
+       device='cuda:0')
+Token 79: 'Museum'
+Top tokens: ['Museum', 'Centre', 'Collection', 'Gallery', 'Center', 'Club', 'hedral', 'Collections']
+Top probs: tensor([0.2497, 0.2256, 0.1900, 0.1551, 0.0528, 0.0360, 0.0191, 0.0154],
+       device='cuda:0')
+Token 80: 'in'
+Top tokens: ['in', ',', '.', 'and', '(', 'at', "'", 'of']
+Top probs: tensor([9.8263e-01, 1.1440e-02, 3.0313e-03, 1.6610e-03, 2.7758e-04, 1.9838e-04,
+        1.9078e-04, 1.6836e-04], device='cuda:0')
+Token 81: 'Cl'
+Top tokens: ['Cl', 'St', 'Clay', 'T', 'England', 'Peru', 'Clinton', 'Missouri']
+Top probs: tensor([0.1741, 0.1524, 0.0606, 0.0407, 0.0388, 0.0335, 0.0257, 0.0253],
+       device='cuda:0')
+Token 82: 'ack'
+Top tokens: ['ack', 'a', 'arks', 'ive', 'erm', 'ary', 'id', 'ither']
+Top probs: tensor([0.4453, 0.1126, 0.0905, 0.0477, 0.0417, 0.0185, 0.0182, 0.0152],
+       device='cuda:0')
+Token 83: 'amas'
+Top tokens: ['amas', 'mann', 'am', 'man', 'ama', 'mas', 'as', 'aman']
+Top probs: tensor([9.1043e-01, 8.7371e-02, 6.4153e-04, 5.4873e-04, 3.1022e-04, 1.2340e-04,
+        8.5476e-05, 7.6024e-05], device='cuda:0')
+Token 84: ','
+Top tokens: [',', 'County', '.', 'Township', 'in', '(', 'Oregon', 'City']
+Top probs: tensor([9.9986e-01, 1.0720e-04, 1.3844e-05, 4.0289e-06, 3.6683e-06, 1.6152e-06,
+        1.5412e-06, 1.0388e-06], device='cuda:0')
+Token 85: 'Oregon'
+Top tokens: ['Oregon', 'O', 'USA', 'OR', 'Portland', 'United', 'Washington', 'O']
+Top probs: tensor([9.9994e-01, 3.4001e-05, 8.3976e-06, 6.4387e-06, 3.0414e-06, 2.5412e-06,
+        2.1567e-06, 8.5119e-07], device='cuda:0')
+Token 86: '.'
+Top tokens: ['.', ',', 'in', '(', '.,', 'and', 'USA', 'that']
+Top probs: tensor([5.6459e-01, 4.2617e-01, 9.1257e-03, 1.0138e-04, 3.3101e-06, 2.6185e-06,
+        1.9308e-06, 9.6329e-07], device='cuda:0')
+Token 87: '</s>'
+Top tokens: ['</s>', 'However', 'The', 'Prior', 'Another', 'Other', 'Before', 'Pointer']
+Top probs: tensor([0.4019, 0.1783, 0.1357, 0.1090, 0.0677, 0.0325, 0.0182, 0.0140],
+       device='cuda:0')

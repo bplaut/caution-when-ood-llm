@@ -1,0 +1,115 @@
+PROMPT 1: "<|user|>
+I'm trying to learn the Spanish language. How do I say 'hello' in Spanish? Make your response as brief as possible.</s>
+<|assistant|>
+"
+
+OUTPUT 1: "<|user|>
+I'm trying to learn the Spanish language. How do I say 'hello' in Spanish? Make your response as brief as possible. 
+<|assistant|>
+"Hola" is how you say "hello" in Spanish."
+
+
+Token 1: '"'
+Top tokens: ['"', 'H', '¡', 'Hol', 'The', '"', 'Hol', "'"]
+Top probs: tensor([    0.8882,     0.1044,     0.0021,     0.0017,     0.0011,     0.0007,
+            0.0007,     0.0003], device='cuda:0')
+Top logits: tensor([19.6875, 17.5469, 13.6250, 13.4375, 12.9922, 12.5156, 12.5156, 11.7578],
+       device='cuda:0')
+
+Token 2: 'H'
+Top tokens: ['H', 'Hol', 'Hol', '¡', '¿', 'h', 'hol', 'Hello']
+Top probs: tensor([    0.9961,     0.0020,     0.0015,     0.0002,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([23.1875, 17.0000, 16.7188, 14.5312, 12.2734, 11.8750, 11.5469, 11.0938],
+       device='cuda:0')
+
+Token 3: 'ola'
+Top tokens: ['ola', 'olas', 'OL', 'olo', 'ól', 'olly', 'ol', 'ol']
+Top probs: tensor([    0.9999,     0.0001,     0.0000,     0.0000,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([25.5312, 15.7578, 15.5156, 14.5703, 13.6797, 13.0469, 12.2578, 12.1875],
+       device='cuda:0')
+
+Token 4: '"'
+Top tokens: ['"', '!"', '."', ',"', '*"', '"—', '\'"', '".']
+Top probs: tensor([    0.9972,     0.0028,     0.0000,     0.0000,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([25.1406, 19.2656, 14.6094, 12.2031, 11.7969, 11.7344, 11.6250, 11.2812],
+       device='cuda:0')
+
+Token 5: 'is'
+Top tokens: ['is', '(', 'pronounced', '</s>', 'pron', '-', 'in', '("']
+Top probs: tensor([    0.8983,     0.0889,     0.0064,     0.0034,     0.0012,     0.0004,
+            0.0002,     0.0002], device='cuda:0')
+Top logits: tensor([20.1094, 17.7969, 15.1641, 14.5391, 13.5234, 12.4141, 11.6328, 11.4922],
+       device='cuda:0')
+
+Token 6: 'how'
+Top tokens: ['how', 'the', 'what', '"', 'a', 'Spanish', 'How', 'pronounced']
+Top probs: tensor([    0.8049,     0.1942,     0.0006,     0.0001,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([21.4844, 20.0625, 14.3438, 12.3047, 11.4844, 11.3047, 11.1250, 10.8750],
+       device='cuda:0')
+
+Token 7: 'you'
+Top tokens: ['you', 'to', 'you', 'one', 'You', 'we', 'say', 'they']
+Top probs: tensor([    0.9994,     0.0005,     0.0000,     0.0000,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([25.3281, 17.7969, 13.9375, 12.9844, 12.0234, 11.9688, 10.6250, 10.3984],
+       device='cuda:0')
+
+Token 8: 'say'
+Top tokens: ['say', 'Say', 'would', 'say', "'", 'can', 'pron', 'saying']
+Top probs: tensor([    0.9994,     0.0002,     0.0001,     0.0001,     0.0001,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([23.7188, 15.0625, 14.6328, 14.5859, 14.0156, 13.4766, 12.9531, 12.8281],
+       device='cuda:0')
+
+Token 9: '"'
+Top tokens: ['"', "'", 'hell', 'Hello', 'hello', 'hi', '"\'', 'Hello']
+Top probs: tensor([    0.8626,     0.1323,     0.0050,     0.0000,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([27.0000, 25.1250, 21.8594, 17.2188, 14.3125, 13.9219, 12.8828, 12.7812],
+       device='cuda:0')
+
+Token 10: 'hello'
+Top tokens: ['hello', 'Hello', 'hell', 'hell', 'hi', 'Hello', 'he', 'Hi']
+Top probs: tensor([    0.9996,     0.0003,     0.0001,     0.0000,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([31.4375, 23.2344, 21.7344, 21.4375, 20.9688, 18.1094, 14.5391, 14.5078],
+       device='cuda:0')
+
+Token 11: '"'
+Top tokens: ['"', "'", '/', '”', '"', "''", '(', '\'"']
+Top probs: tensor([    1.0000,     0.0000,     0.0000,     0.0000,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([29.4219, 15.9609, 15.6250, 13.5234, 12.5000, 12.0938, 11.7344, 11.7031],
+       device='cuda:0')
+
+Token 12: 'in'
+Top tokens: ['in', '(', 'in', 'en', 'or', 'In', 'is', '("']
+Top probs: tensor([    1.0000,     0.0000,     0.0000,     0.0000,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([25.9062, 14.9531, 13.5312, 12.6250, 10.8984, 10.7969, 10.4844, 10.0391],
+       device='cuda:0')
+
+Token 13: 'Spanish'
+Top tokens: ['Spanish', 'Span', 'españ', 'span', 'Spain', 'English', 'Span', 'span']
+Top probs: tensor([    1.0000,     0.0000,     0.0000,     0.0000,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([27.7656, 17.2812, 15.0156, 14.8281, 14.2422, 13.5625, 13.5000, 12.6094],
+       device='cuda:0')
+
+Token 14: '.'
+Top tokens: ['.', '(', '!', ',', ':)', '-', '</s>', '("']
+Top probs: tensor([    0.9956,     0.0028,     0.0012,     0.0004,     0.0000,     0.0000,
+            0.0000,     0.0000], device='cuda:0')
+Top logits: tensor([23.1719, 17.3125, 16.4219, 15.2812, 11.2500, 11.1953, 10.7891, 10.4531],
+       device='cuda:0')
+
+Token 15: '</s>'
+Top tokens: ['</s>', '', '(', 'It', '\n', 'The', 'That', 'Remember']
+Top probs: tensor([0.8171, 0.0666, 0.0487, 0.0273, 0.0094, 0.0066, 0.0056, 0.0022],
+       device='cuda:0')
+Top logits: tensor([16.8438, 14.3359, 14.0234, 13.4453, 12.3750, 12.0312, 11.8672, 10.9297],
+       device='cuda:0')

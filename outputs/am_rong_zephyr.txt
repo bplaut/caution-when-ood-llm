@@ -1,0 +1,306 @@
+PROMPT 1: "<|user|>
+What profession does Am Rong and Alexandre Rockwell have in common?</s>
+<|assistant|>
+"
+
+OUTPUT 1: "<|user|>
+What profession does Am Rong and Alexandre Rockwell have in common? 
+<|assistant|>
+Am Rong and Alexandre Rockwell both have a profession in the film industry. Am Rong is a Chinese actress and model, and Alexandre Rockwell is an American film director, screenwriter, and actor. They have worked together in the film "French Exit" (2021), in which Am Rong played the lead role."
+
+Token 1: 'Am'
+Top tokens: ['Am', 'B', 'The', 'Ne', 'They', 'As', 'I', 'In']
+Top probs: tensor([0.7572, 0.2204, 0.0061, 0.0054, 0.0039, 0.0024, 0.0011, 0.0008],
+       device='cuda:0')
+Token 2: 'R'
+Top tokens: ['R', 'R', 'ir', 'Р', 'os', 'ong', 'Rock', 'én']
+Top probs: tensor([9.9943e-01, 1.6340e-04, 1.3027e-04, 4.7924e-05, 2.3540e-05, 1.9668e-05,
+        9.8128e-06, 8.1351e-06], device='cuda:0')
+Token 3: 'ong'
+Top tokens: ['ong', 'Cong', 'ONG', 'Kong', 'ongo', 'ö', 'ony', 'ok']
+Top probs: tensor([9.9993e-01, 5.1844e-05, 1.0051e-05, 1.9946e-06, 1.7061e-06, 1.3287e-06,
+        1.1910e-06, 8.6459e-07], device='cuda:0')
+Token 4: 'and'
+Top tokens: ['and', ',', 'is', '(', "'", 'was', 'W', 'has']
+Top probs: tensor([9.9787e-01, 1.2633e-03, 5.9675e-04, 2.1445e-04, 7.6303e-06, 6.9475e-06,
+        3.0351e-06, 1.6373e-06], device='cuda:0')
+Token 5: 'Alexand'
+Top tokens: ['Alexand', 'Alexander', 'Aleks', 'Alex', 'Александ', 'Alex', 'Ale', 'film']
+Top probs: tensor([9.9997e-01, 2.7109e-05, 5.5506e-06, 8.3150e-07, 4.9651e-07, 5.2742e-08,
+        1.1677e-08, 7.4805e-09], device='cuda:0')
+Token 6: 're'
+Top tokens: ['re', 'ре', 'r', 'ere', 'ré', 'RE', 'ar', 'vre']
+Top probs: tensor([9.9999e-01, 2.8573e-06, 8.9909e-07, 6.3755e-07, 5.8050e-07, 4.1812e-07,
+        2.3091e-07, 2.1862e-07], device='cuda:0')
+Token 7: 'Rock'
+Top tokens: ['Rock', 'Roc', 'R', 'RO', 'Roche', 'Ro', '"', 'Rod']
+Top probs: tensor([1.0000e+00, 1.8448e-06, 3.7188e-07, 7.0975e-08, 6.5130e-08, 6.2635e-08,
+        5.6146e-08, 4.4069e-08], device='cuda:0')
+Token 8: 'well'
+Top tokens: ['well', 'w', 'well', 'wall', 'Well', 'wood', 'ww', 'we']
+Top probs: tensor([9.9999e-01, 2.6633e-06, 1.2980e-06, 4.7379e-07, 2.2733e-07, 7.3228e-08,
+        6.5130e-08, 3.8588e-08], device='cuda:0')
+Token 9: 'both'
+Top tokens: ['both', 'have', 'share', ',', 'are', 'do', "'", 'Both']
+Top probs: tensor([9.1328e-01, 3.8892e-02, 2.1145e-02, 1.4308e-02, 9.9106e-03, 1.4166e-03,
+        3.8128e-04, 1.4472e-04], device='cuda:0')
+Token 10: 'have'
+Top tokens: ['have', 'work', 'primarily', 'worked', 'profession', 'are', 'profess', 'belong']
+Top probs: tensor([8.6868e-01, 1.1044e-01, 9.9565e-03, 2.5973e-03, 1.7167e-03, 1.6127e-03,
+        8.8369e-04, 7.2690e-04], device='cuda:0')
+Token 11: 'a'
+Top tokens: ['a', 'careers', 'the', 'profess', 'profession', 'background', 'experience', 'professional']
+Top probs: tensor([7.2544e-01, 1.6187e-01, 7.5275e-02, 3.1379e-02, 2.5758e-03, 1.0992e-03,
+        1.0246e-03, 3.5686e-04], device='cuda:0')
+Token 12: 'profession'
+Top tokens: ['profession', 'background', 'career', 'professional', 'profess', 'prof', 'prominent', 'careers']
+Top probs: tensor([8.1483e-01, 8.5883e-02, 8.0679e-02, 1.7178e-02, 1.1419e-03, 5.0170e-05,
+        1.9801e-05, 1.9342e-05], device='cuda:0')
+Token 13: 'in'
+Top tokens: ['in', 'as', 'related', 'primarily', 'that', 'of', 'associated', 'revol']
+Top probs: tensor([5.3730e-01, 4.5245e-01, 8.1584e-03, 9.0823e-04, 4.6027e-04, 2.3144e-04,
+        1.4037e-04, 6.1325e-05], device='cuda:0')
+Token 14: 'the'
+Top tokens: ['the', 'film', 'cinema', 'independent', 'films', 'Fil', 'fil', 'movies']
+Top probs: tensor([9.0959e-01, 8.7291e-02, 1.6495e-03, 5.1100e-04, 4.4397e-04, 8.4733e-05,
+        8.1487e-05, 4.1946e-05], device='cuda:0')
+Token 15: 'film'
+Top tokens: ['film', 'field', 'entertainment', 'movie', 'arts', 'world', 'art', 'realm']
+Top probs: tensor([7.6350e-01, 1.2271e-01, 9.4081e-02, 7.8443e-03, 5.1444e-03, 1.9833e-03,
+        1.2607e-03, 6.6434e-04], device='cuda:0')
+Token 16: 'industry'
+Top tokens: ['industry', 'Industry', 'and', 'making', 'indust', 'industries', 'or', 'sector']
+Top probs: tensor([9.9988e-01, 4.5041e-05, 4.2312e-05, 2.8407e-05, 1.1015e-06, 7.9335e-07,
+        6.0829e-07, 3.8665e-07], device='cuda:0')
+Token 17: '.'
+Top tokens: ['.', 'as', ',', '-', ';', 'specifically', ':', '–']
+Top probs: tensor([9.9332e-01, 5.9995e-03, 3.4380e-04, 2.2547e-04, 3.1978e-05, 2.8890e-05,
+        2.7783e-05, 9.1619e-06], device='cuda:0')
+Token 18: 'Am'
+Top tokens: ['Am', 'They', 'R', 'Specific', 'Rock', 'Both', 'While', 'Alexand']
+Top probs: tensor([0.5344, 0.3849, 0.0297, 0.0174, 0.0138, 0.0088, 0.0024, 0.0018],
+       device='cuda:0')
+Token 19: 'R'
+Top tokens: ['R', 'R', 'r', 'ar', 'Rh', 'i', 'Ro', 'is']
+Top probs: tensor([9.9974e-01, 6.1076e-05, 2.4105e-05, 2.2823e-05, 1.2802e-05, 1.1476e-05,
+        1.0781e-05, 9.7395e-06], device='cuda:0')
+Token 20: 'ong'
+Top tokens: ['ong', 'ONG', 'ongs', 'он', 'ond', 'ogn', 'ongo', 'Cong']
+Top probs: tensor([9.9999e-01, 2.6016e-06, 2.2253e-06, 4.1486e-07, 8.4946e-08, 7.7950e-08,
+        5.0723e-08, 3.4862e-08], device='cuda:0')
+Token 21: 'is'
+Top tokens: ['is', ',', 'primarily', 'has', 'works', 'was', '(', 'worked']
+Top probs: tensor([9.9776e-01, 1.0472e-03, 3.0956e-04, 2.4108e-04, 2.1611e-04, 1.3953e-04,
+        7.0709e-05, 4.0605e-05], device='cuda:0')
+Token 22: 'a'
+Top tokens: ['a', 'an', 'primarily', 'known', 'best', 'mainly', 'predomin', 'cred']
+Top probs: tensor([7.6959e-01, 1.9157e-01, 2.9840e-02, 5.9684e-03, 8.8713e-04, 7.8903e-04,
+        4.4608e-04, 2.0106e-04], device='cuda:0')
+Token 23: 'Chinese'
+Top tokens: ['Chinese', 'film', 'Th', 'Camb', 'Viet', 'Taiwan', 'French', 'Hong']
+Top probs: tensor([0.4081, 0.1206, 0.0646, 0.0646, 0.0621, 0.0523, 0.0503, 0.0192],
+       device='cuda:0')
+Token 24: 'actress'
+Top tokens: ['actress', '-', 'film', 'actor', 'American', 'director', 'writer', 'artist']
+Top probs: tensor([0.6587, 0.1932, 0.0673, 0.0357, 0.0149, 0.0082, 0.0025, 0.0019],
+       device='cuda:0')
+Token 25: 'and'
+Top tokens: ['and', ',', 'who', 'known', 'best', 'primarily', 'while', 'well']
+Top probs: tensor([4.6682e-01, 3.5792e-01, 1.1803e-01, 4.7688e-02, 4.1023e-03, 3.4276e-03,
+        6.4403e-04, 3.0185e-04], device='cuda:0')
+Token 26: 'model'
+Top tokens: ['model', 'Alexand', 'film', 'singer', 'director', 'fashion', 'musician', 'former']
+Top probs: tensor([0.3275, 0.2551, 0.1837, 0.1031, 0.0708, 0.0085, 0.0075, 0.0060],
+       device='cuda:0')
+Token 27: ','
+Top tokens: [',', 'who', 'known', 'best', 'primarily', 'while', 'well', 'currently']
+Top probs: tensor([7.2354e-01, 2.3860e-01, 3.1297e-02, 2.0482e-03, 2.0323e-03, 1.0219e-03,
+        3.6153e-04, 1.5671e-04], device='cuda:0')
+Token 28: 'and'
+Top tokens: ['and', 'known', 'while', 'but', 'best', 'primarily', 'who', 'whereas']
+Top probs: tensor([0.2847, 0.2288, 0.2116, 0.1081, 0.0828, 0.0398, 0.0216, 0.0094],
+       device='cuda:0')
+Token 29: 'Alexand'
+Top tokens: ['Alexand', 'she', 'one', 'her', 'has', 'while', 'Rock', 'in']
+Top probs: tensor([0.8142, 0.1554, 0.0090, 0.0058, 0.0036, 0.0032, 0.0022, 0.0021],
+       device='cuda:0')
+Token 30: 're'
+Top tokens: ['re', 'ре', 'ré', 'r', 'ere', 'vre', 'RE', 'ar']
+Top probs: tensor([1.0000e+00, 8.3153e-07, 4.1164e-07, 2.2206e-07, 1.6374e-07, 1.0009e-07,
+        4.1724e-08, 3.5135e-08], device='cuda:0')
+Token 31: 'Rock'
+Top tokens: ['Rock', 'Roc', 'is', 'R', '(', '"', 'Rose', 'Ro']
+Top probs: tensor([9.9999e-01, 2.4825e-06, 1.6667e-06, 1.2581e-06, 3.1072e-07, 2.0219e-07,
+        1.9750e-07, 7.2658e-08], device='cuda:0')
+Token 32: 'well'
+Top tokens: ['well', 'w', 'well', 'wall', 'wood', 'Well', 'will', 'wer']
+Top probs: tensor([9.9998e-01, 1.1479e-05, 3.2377e-06, 1.2385e-06, 1.0030e-06, 7.9966e-07,
+        2.9648e-07, 2.0377e-07], device='cuda:0')
+Token 33: 'is'
+Top tokens: ['is', ',', '(', 'was', "'", 'has', 'is', 'also']
+Top probs: tensor([9.9967e-01, 3.1015e-04, 7.6441e-06, 4.4937e-06, 3.4186e-06, 9.3461e-07,
+        6.1293e-07, 3.7468e-07], device='cuda:0')
+Token 34: 'an'
+Top tokens: ['an', 'a', 'also', 'primarily', 'American', 'the', 'both', 'known']
+Top probs: tensor([5.6947e-01, 4.2986e-01, 6.5644e-04, 7.9468e-06, 2.8115e-06, 1.8295e-06,
+        1.6019e-06, 1.2092e-06], device='cuda:0')
+Token 35: 'American'
+Top tokens: ['American', 'Italian', 'award', 'ac', 'Academy', 'French', 'English', 'Australian']
+Top probs: tensor([9.9870e-01, 3.3765e-04, 2.1296e-04, 1.5580e-04, 1.4867e-04, 7.8342e-05,
+        5.9600e-05, 4.7517e-05], device='cuda:0')
+Token 36: 'film'
+Top tokens: ['film', 'director', 'independent', 'actor', 'writer', 'screen', 'ind', '-']
+Top probs: tensor([0.6333, 0.1458, 0.1067, 0.0608, 0.0360, 0.0121, 0.0024, 0.0009],
+       device='cuda:0')
+Token 37: 'director'
+Top tokens: ['director', 'maker', 'actor', 'producer', 'writer', 'Director', 'writer', 'critic']
+Top probs: tensor([6.4619e-01, 3.5133e-01, 1.3176e-03, 5.6226e-04, 3.4640e-04, 8.1002e-05,
+        2.3207e-05, 1.6847e-05], device='cuda:0')
+Token 38: ','
+Top tokens: [',', 'and', '.', 'known', 'who', '-', '(', '/']
+Top probs: tensor([9.9461e-01, 5.3849e-03, 6.5052e-06, 9.2987e-07, 1.2683e-07, 1.2584e-07,
+        9.4992e-08, 6.1813e-08], device='cuda:0')
+Token 39: 'screen'
+Top tokens: ['screen', 'writer', 'producer', 'actor', 'cin', 'editor', 'film', 'screen']
+Top probs: tensor([3.6354e-01, 3.6354e-01, 2.4986e-01, 2.1832e-02, 3.5289e-04, 1.7469e-04,
+        1.3712e-04, 4.7758e-05], device='cuda:0')
+Token 40: 'writer'
+Top tokens: ['writer', 'play', 'writer', 'writ', 'writing', 'wright', 'write', 'Writer']
+Top probs: tensor([9.9993e-01, 5.7387e-05, 7.0715e-06, 2.0741e-06, 8.7137e-07, 8.5786e-07,
+        4.9649e-07, 1.7025e-07], device='cuda:0')
+Token 41: ','
+Top tokens: [',', 'and', '(', ',', 'producer', '&', '.', '-']
+Top probs: tensor([9.9993e-01, 6.6052e-05, 7.6140e-08, 6.8787e-08, 5.6582e-08, 5.5705e-08,
+        3.3263e-08, 2.7361e-08], device='cuda:0')
+Token 42: 'and'
+Top tokens: ['and', 'producer', 'editor', 'actor', 'cin', 'photographer', 'film', 'composer']
+Top probs: tensor([9.0253e-01, 6.2385e-02, 1.6530e-02, 1.4588e-02, 3.3063e-03, 1.1764e-04,
+        9.3792e-05, 8.1488e-05], device='cuda:0')
+Token 43: 'actor'
+Top tokens: ['actor', 'producer', 'editor', 'film', 'cin', 'photographer', 'occasional', 'actor']
+Top probs: tensor([6.7094e-01, 2.8857e-01, 2.6425e-02, 4.8501e-03, 3.7772e-03, 9.1845e-04,
+        6.9328e-04, 3.8889e-04], device='cuda:0')
+Token 44: '.'
+Top tokens: ['.', ',', 'known', 'who', 'best', ';', 'primarily', 'born']
+Top probs: tensor([9.9579e-01, 2.6275e-03, 1.3420e-03, 1.3288e-04, 2.8071e-05, 9.5506e-06,
+        9.4763e-06, 6.6155e-06], device='cuda:0')
+Token 45: 'They'
+Top tokens: ['They', 'Both', 'In', 'Their', 'While', 'Therefore', '</s>', 'So']
+Top probs: tensor([0.7644, 0.1119, 0.0474, 0.0153, 0.0140, 0.0088, 0.0069, 0.0063],
+       device='cuda:0')
+Token 46: 'have'
+Top tokens: ['have', 'both', 'share', 'worked', 'collabor', 'may', 'are', 'shared']
+Top probs: tensor([0.5108, 0.3796, 0.0582, 0.0314, 0.0052, 0.0040, 0.0024, 0.0019],
+       device='cuda:0')
+Token 47: 'worked'
+Top tokens: ['worked', 'collabor', 'both', 'acted', 'previously', 'appeared', 'crossed', 'each']
+Top probs: tensor([5.4804e-01, 3.6507e-01, 8.0196e-02, 9.9387e-04, 9.4098e-04, 8.1117e-04,
+        7.8010e-04, 3.5162e-04], device='cuda:0')
+Token 48: 'together'
+Top tokens: ['together', 'in', 'on', 'collabor', 'as', 'separately', 'alongside', 'independently']
+Top probs: tensor([9.7850e-01, 1.0372e-02, 7.4709e-03, 1.5660e-03, 9.2060e-04, 5.1641e-04,
+        2.1193e-04, 8.6301e-05], device='cuda:0')
+Token 49: 'in'
+Top tokens: ['in', 'on', 'as', 'multiple', 'several', ',', 'and', 'twice']
+Top probs: tensor([7.4256e-01, 2.1950e-01, 3.6970e-02, 3.4048e-04, 2.6517e-04, 1.8951e-04,
+        4.2616e-05, 1.6430e-05], device='cuda:0')
+Token 50: 'the'
+Top tokens: ['the', 'several', 'Rock', 'a', 'some', 'Am', 'various', 'multiple']
+Top probs: tensor([0.6982, 0.0888, 0.0725, 0.0556, 0.0494, 0.0098, 0.0050, 0.0047],
+       device='cuda:0')
+Token 51: 'film'
+Top tokens: ['film', '', 'movie', 'past', 'Chinese', 'films', 'short', 'feature']
+Top probs: tensor([0.3979, 0.3148, 0.1954, 0.0142, 0.0135, 0.0127, 0.0097, 0.0062],
+       device='cuda:0')
+Token 52: '"'
+Top tokens: ['"', ',', 'industry', "'", 'titled', '“', 'called', 'adaptation']
+Top probs: tensor([9.5854e-01, 1.5985e-02, 1.5134e-02, 2.4514e-03, 1.8504e-03, 7.9585e-04,
+        5.2193e-04, 3.7301e-04], device='cuda:0')
+Token 53: 'F'
+Top tokens: ['F', 'The', 'Gold', 'In', 'Ch', 'Two', 'L', 'X']
+Top probs: tensor([0.2207, 0.1277, 0.0851, 0.0825, 0.0496, 0.0396, 0.0259, 0.0236],
+       device='cuda:0')
+Token 54: 'rench'
+Top tokens: ['rench', 'our', 'ive', 'aces', 'reak', 'avorite', 'lesh', 'ole']
+Top probs: tensor([0.1684, 0.1582, 0.1440, 0.0457, 0.0443, 0.0406, 0.0295, 0.0284],
+       device='cuda:0')
+Token 55: 'Ex'
+Top tokens: ['Ex', 'Do', 'Kiss', 'Ro', 'F', 'Lou', 'Film', 'Doctor']
+Top probs: tensor([0.4272, 0.1215, 0.0760, 0.0535, 0.0171, 0.0168, 0.0128, 0.0110],
+       device='cuda:0')
+Token 56: 'it'
+Top tokens: ['it', 'c', 'IT', 'iti', 'am', 'itr', 'tr', 'ite']
+Top probs: tensor([9.9939e-01, 1.3027e-04, 9.2373e-05, 8.5431e-05, 5.1817e-05, 2.7520e-05,
+        2.4476e-05, 1.6433e-05], device='cuda:0')
+Token 57: '"'
+Top tokens: ['"', ',"', '",', '."', '".', '(', ':', "'"]
+Top probs: tensor([8.3872e-01, 1.4126e-01, 1.4658e-02, 3.3745e-03, 1.4858e-03, 3.4473e-04,
+        3.4401e-05, 1.5627e-05], device='cuda:0')
+Token 58: '('
+Top tokens: ['(', 'in', 'released', 'which', 'where', 'directed', 'as', 'with']
+Top probs: tensor([9.8894e-01, 5.5242e-03, 1.7656e-03, 1.5340e-03, 1.4638e-03, 2.7077e-04,
+        1.3094e-04, 7.5780e-05], device='cuda:0')
+Token 59: '2'
+Top tokens: ['2', 're', '1', 'set', 'in', 'also', 'direct', 'due']
+Top probs: tensor([9.9979e-01, 3.8523e-05, 3.3469e-05, 2.5863e-05, 1.3005e-05, 1.1934e-05,
+        1.0614e-05, 7.6450e-06], device='cuda:0')
+Token 60: '0'
+Top tokens: ['0', 'o', '1', 'oo', '2', '', '),', '-']
+Top probs: tensor([1.0000e+00, 8.3805e-07, 5.2036e-07, 1.8266e-07, 1.5624e-07, 5.8382e-08,
+        3.7401e-08, 3.2116e-08], device='cuda:0')
+Token 61: '2'
+Top tokens: ['2', '1', '0', '),', ')', '-', ').', '/']
+Top probs: tensor([9.9717e-01, 2.8009e-03, 2.3856e-05, 1.6328e-07, 1.2519e-07, 3.5173e-08,
+        2.1925e-08, 2.0597e-08], device='cuda:0')
+Token 62: '1'
+Top tokens: ['1', '0', '2', '),', ')', '3', ',', ').']
+Top probs: tensor([9.9011e-01, 9.7067e-03, 1.7097e-04, 4.5208e-06, 3.0590e-06, 9.1132e-07,
+        4.1076e-07, 2.3866e-07], device='cuda:0')
+Token 63: '),'
+Top tokens: ['),', ')', ').', ',', ');', ';', '):', '),']
+Top probs: tensor([8.7401e-01, 1.0603e-01, 1.9922e-02, 1.9643e-05, 1.3929e-05, 1.7164e-06,
+        1.3792e-06, 1.3367e-06], device='cuda:0')
+Token 64: 'in'
+Top tokens: ['in', 'where', 'with', 'which', 'directed', 'for', 'wherein', 'both']
+Top probs: tensor([0.7464, 0.1238, 0.0594, 0.0541, 0.0111, 0.0012, 0.0010, 0.0008],
+       device='cuda:0')
+Token 65: 'which'
+Top tokens: ['which', 'which', 'this', 'where', 'both', 'the', 'that', 'addition']
+Top probs: tensor([1.0000e+00, 1.0677e-06, 3.8369e-07, 2.2380e-07, 1.2953e-07, 1.1342e-07,
+        9.1848e-08, 7.5552e-08], device='cuda:0')
+Token 66: 'Am'
+Top tokens: ['Am', 'R', 'Rock', 'both', 'they', 'Alexand', 'she', 'Michel']
+Top probs: tensor([9.1651e-01, 6.0451e-02, 9.7153e-03, 5.2002e-03, 3.4913e-03, 3.0810e-03,
+        2.7994e-04, 2.0804e-04], device='cuda:0')
+Token 67: 'R'
+Top tokens: ['R', 'played', 'plays', 'R', 'Rh', 'Ro', 'Rou', 'Ron']
+Top probs: tensor([9.9979e-01, 4.1979e-05, 3.6758e-05, 2.0781e-05, 1.5809e-05, 1.5323e-05,
+        1.4736e-05, 1.3523e-05], device='cuda:0')
+Token 68: 'ong'
+Top tokens: ['ong', 'ONG', 'ongs', 'он', 'ond', 'Cong', 'ons', 'on']
+Top probs: tensor([1.0000e+00, 9.7215e-07, 2.3824e-07, 8.9721e-08, 1.5470e-08, 9.9880e-09,
+        7.1941e-09, 5.4730e-09], device='cuda:0')
+Token 69: 'played'
+Top tokens: ['played', 'plays', 'has', 'had', 'stars', 'star', 'appeared', 'appears']
+Top probs: tensor([0.2936, 0.2434, 0.2322, 0.1150, 0.0560, 0.0195, 0.0120, 0.0106],
+       device='cuda:0')
+Token 70: 'the'
+Top tokens: ['the', 'a', 'one', 'an', 'lead', 'leading', 'its', 'another']
+Top probs: tensor([5.5699e-01, 3.9497e-01, 4.7915e-02, 8.8954e-05, 8.4702e-06, 4.2925e-06,
+        1.8607e-06, 1.5668e-06], device='cuda:0')
+Token 71: 'lead'
+Top tokens: ['lead', 'leading', 'main', 'female', 'role', 'daughter', 'protagon', 'tit']
+Top probs: tensor([0.8613, 0.0966, 0.0148, 0.0127, 0.0084, 0.0015, 0.0009, 0.0009],
+       device='cuda:0')
+Token 72: 'role'
+Top tokens: ['role', 'female', 'actress', 'character', 'roles', 'protagon', ',', 'role']
+Top probs: tensor([9.7700e-01, 1.1920e-02, 6.3804e-03, 3.6927e-03, 5.9347e-04, 1.5482e-04,
+        4.3328e-05, 3.9760e-05], device='cuda:0')
+Token 73: '.'
+Top tokens: ['.', ',', 'and', 'of', 'alongside', 'while', 'as', 'opposite']
+Top probs: tensor([0.4168, 0.2302, 0.1463, 0.1038, 0.0453, 0.0206, 0.0195, 0.0087],
+       device='cuda:0')
+Token 74: '</s>'
+Top tokens: ['</s>', 'Therefore', 'Rock', 'This', 'Alexand', 'In', 'So', 'Both']
+Top probs: tensor([0.4916, 0.0983, 0.0754, 0.0635, 0.0560, 0.0479, 0.0340, 0.0300],
+       device='cuda:0')
