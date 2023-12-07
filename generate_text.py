@@ -46,7 +46,7 @@ class Generator(object):
         else:
             self.initial_prompts = [input("\nEnter an initial prompt:\n")]
             print('\n')
-
+            
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
         return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
@@ -75,8 +75,8 @@ class Generator(object):
                     (sorted_scores, top_token_ids) = t.sort(output.scores[j][i], descending=True)
                     sorted_probs = t.exp(sorted_scores) / t.sum(t.exp(sorted_scores))
                     print("Top tokens:", self.tokenizer.batch_decode(top_token_ids[:self.args.num_top_tokens]))
-                    print("Top probs:", sorted_probs[:self.args.num_top_tokens])
-                    print("Top logits:", sorted_scores[:self.args.num_top_tokens])
+                    print("Top probs:", t_to_str(sorted_probs[:self.args.num_top_tokens]))
+                    print("Top logits:", t_to_str(sorted_scores[:self.args.num_top_tokens]))
                     
                     if self.tokenizer.decode(token_ids[j]) == self.tokenizer.pad_token:
                         # If we have prompts/responses of different lengths, some will get padded
@@ -85,6 +85,14 @@ class Generator(object):
             print('\n')
         return text_outputs
 
+def t_to_str(T):
+    # Get rid of a bunch of stuff in the tensor format that I don't like
+    s = str(T).replace(",\n       device='cuda:0')", "")
+    s = s.replace("tensor(", "")
+    s = s.replace("\n", "")
+    s = s.replace("    ", "")
+    return s.replace(", device='cuda:0')", "")
+    
 def main():
     t.set_printoptions(sci_mode=False)
     generator = Generator()
