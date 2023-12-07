@@ -25,10 +25,14 @@ class Generator(object):
             model_name = 'HuggingFaceH4/zephyr-7b-alpha'
         elif args.model == 'gpt2':
             model_name = 'gpt2'
-        elif args.model == 'Llama-13b-chat':
-            model_name = 'meta-llama/Llama-2-13b-chat-hf'
         elif args.model == 'Llama-13b':
             model_name = 'meta-llama/Llama-2-13b-hf'
+        elif args.model == 'Llama-13b-chat':
+            model_name = 'meta-llama/Llama-2-13b-chat-hf'
+        elif args.model == 'Llama-7b':
+            model_name = 'meta-llama/Llama-2-7b-hf'
+        elif args.model == 'Llama-7b-chat':
+            model_name = 'meta-llama/Llama-2-7b-chat-hf'            
         else:
             raise Exception("Unrecognized model name. Try python generate_text -h")
         self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", load_in_4bit=True)
