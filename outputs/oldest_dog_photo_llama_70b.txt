@@ -1,0 +1,1163 @@
+PROMPT 1: "<s>[INST] What is the oldest photo of a dog? [/INST]"
+
+OUTPUT 1: "[INST] What is the oldest photo of a dog? [/INST]  The oldest known photograph of a dog is a daguerreotype taken in 1843 by French photographer Hippolyte Bayard. The photograph shows a dog named "Miles" sitting on a table, looking directly at the camera. The image is considered to be one of the earliest examples of animal photography and is now held at the Bibliothèque nationale de France.
+
+Miles was a popular dog in Parisian society and was known for his intelligence and loyalty. He was trained by his owner, a French aristocrat named Henri de La Roche, to perform tricks and entertain guests. The photograph of Miles was likely taken to showcase his obedience and training.
+
+The daguerreotype process was a time-consuming and expensive process, so it's not surprising that one of the earliest photographs of a dog was taken of a well-known and beloved pet like Miles. The image is a fascinating glimpse into the history of animal photography and a reminder of the special bond between humans and their furry companions."
+
+
+Token 1: ''
+Top tokens: ['', ' ', '  ', '   ', 'The', '    ', '     ', 'The']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.2188, 18.1562, 11.0703, 10.0234,  9.5703,  8.6797,  8.3203,  7.3516]
+
+Token 2: 'The'
+Top tokens: ['The', 'It', 'I', 'There', 'Some', 'According', 'The', 'D']
+Top probs: [0.9998, 0.0002, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [26.1562, 17.4844, 14.6406, 13.8281, 13.4219, 13.3594, 13.2969, 12.6250]
+
+Token 3: 'oldest'
+Top tokens: ['oldest', 'earliest', 'exact', 'older', 'orig', 'origin', 'age', 'Old']
+Top probs: [0.9999, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.8750, 19.9688, 15.0469, 14.2031, 13.5469, 13.1406, 11.9375, 11.8125]
+
+Token 4: 'known'
+Top tokens: ['known', 'surv', 'known', 'photo', 'photograph', 'know', 'photos', 'recognized']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.4375, 21.6250, 21.3906, 19.8750, 19.2812, 15.3750, 14.7812, 14.4062]
+
+Token 5: 'photograph'
+Top tokens: ['photograph', 'photo', 'surv', 'phot', 'photos', 'Phot', 'portrait', 'фото']
+Top probs: [0.9928, 0.0071, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.4688, 25.5312, 19.4062, 19.1094, 18.4688, 17.2812, 16.3281, 13.9297]
+
+Token 6: 'of'
+Top tokens: ['of', 's', 'of', 'dep', 'featuring', '(', 'that', 'or']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.7812, 17.3594, 14.5078, 14.1484, 13.9375, 13.4453, 11.8359, 11.0547]
+
+Token 7: 'a'
+Top tokens: ['a', 'dog', 'an', 'dogs', 'a', '', 'the', 'A']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [33.5000, 17.2500, 14.5156, 14.0781, 13.3516, 12.7656, 12.2969, 10.7812]
+
+Token 8: 'dog'
+Top tokens: ['dog', 'Dog', 'dog', 'dogs', 'domestic', 'horse', 'human', 'd']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.8750, 21.0312, 20.7656, 19.9688, 15.9297, 13.8281, 12.7500, 11.8281]
+
+Token 9: 'is'
+Top tokens: ['is', 'was', 'dates', ',', 'date', 'dep', 'in', 'that']
+Top probs: [0.8902, 0.0909, 0.0188, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [24.8594, 22.5781, 21.0000, 14.5781, 13.2500, 13.2109, 12.3438, 11.9375]
+
+Token 10: 'a'
+Top tokens: ['a', 'believed', 'thought', 'an', 'generally', 'attributed', 'considered', 'estimated']
+Top probs: [0.9914, 0.0086, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [26.3438, 21.5938, 15.4922, 13.8047, 13.2031, 12.6016, 12.2734, 11.3281]
+
+Token 11: 'dag'
+Top tokens: ['dag', 'portrait', 'dag', 'picture', 'D', 'salt', 'carte', 'photograph']
+Top probs: [0.9996, 0.0003, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [24.5312, 16.3438, 14.8281, 12.6250, 12.5234, 12.2188, 11.5781, 11.2031]
+
+Token 12: 'uer'
+Top tokens: ['uer', 'urre', 'guer', 'uc', 'tere', 'urer', 'omer', 'ure']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.4688, 15.1875, 14.9219, 10.3984, 10.1094,  9.9375,  9.7188,  9.5781]
+
+Token 13: 're'
+Top tokens: ['re', 'ro', 'ré', 'ре', 'roe', 'RE', 'r', 'res']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.1406, 16.9375, 14.7812, 14.2344, 11.6094, 11.5938, 11.1562, 10.6094]
+
+Token 14: 'ot'
+Top tokens: ['ot', 'o', 'type', 'oty', 'ograph', 'OT', 'opt', 'ian']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.9375, 15.6250, 13.7266, 12.7422, 12.4219, 11.7344, 11.2500, 11.1875]
+
+Token 15: 'ype'
+Top tokens: ['ype', 'yp', 'ope', 'YPE', 'py', 'ypes', 'ye', 'pe']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.1875, 16.2656, 15.8125, 14.1875, 13.3594, 12.8359, 12.6406, 12.3906]
+
+Token 16: 'taken'
+Top tokens: ['taken', 'image', '(', 'of', 'portrait', 'from', 'dep', 'titled']
+Top probs: [0.8486, 0.0518, 0.0443, 0.0379, 0.0066, 0.0045, 0.0023, 0.0014]
+Top logits: [20.6875, 17.8906, 17.7344, 17.5781, 15.8359, 15.4453, 14.7891, 14.3047]
+
+Token 17: 'in'
+Top tokens: ['in', 'by', 'around', 'circa', 'of', 'between', 'on', 'som']
+Top probs: [0.9984, 0.0015, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.0469, 21.5625, 18.2031, 13.4453, 13.1406, 12.7500, 11.5703, 11.4297]
+
+Token 18: ''
+Top tokens: ['', 'the', 'France', 'Paris', 'the', 'about', '1', 'Germany']
+Top probs: [0.9977, 0.0023, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.0938, 21.0156, 11.4141, 11.2812, 10.5078,  9.9922,  9.4844,  9.1250]
+
+Token 19: '1'
+Top tokens: ['1', '2', '8', '9', '0', 'dag', '7', '6']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [34.0000, 12.1328, 10.5391, 10.2109, 10.1016,  9.6719,  8.9609,  8.1797]
+
+Token 20: '8'
+Top tokens: ['8', '9', '7', 'eight', '', '6', '5', 'VIII']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.6562, 16.1719, 14.3047, 13.7578, 12.2109, 10.6562, 10.1406,  9.6641]
+
+Token 21: '4'
+Top tokens: ['4', '3', '5', '6', 'dag', 'forty', '₄', 'four']
+Top probs: [0.9997, 0.0002, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.2500, 18.6562, 17.9219, 10.8281, 10.5547, 10.4922,  9.6406,  9.2891]
+
+Token 22: '3'
+Top tokens: ['3', '4', '5', '2', '0', '1', '7', '6']
+Top probs: [0.8690, 0.0370, 0.0364, 0.0337, 0.0169, 0.0059,0.0004, 0.0003]
+Top logits: [26.2656, 23.1094, 23.0938, 23.0156, 22.3281, 21.2812, 18.4688, 18.3750]
+
+Token 23: 'by'
+Top tokens: ['by', ',', '.', 'or', 'of', 'by', 'dep', 'and']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.9688, 18.7188, 17.1250, 16.5156, 15.7578, 14.7188, 14.1641, 12.9297]
+
+Token 24: 'French'
+Top tokens: ['French', 'photograph', 'an', 'the', 'William', 'phot', 'Phot', 'artist']
+Top probs: [0.8254, 0.1286, 0.0253, 0.0106, 0.0066, 0.0005,0.0003, 0.0003]
+Top logits: [18.9844, 17.1250, 15.5000, 14.6250, 14.1562, 11.6484, 11.1875, 11.1250]
+
+Token 25: 'photograph'
+Top tokens: ['photograph', 'invent', 'phot', 'artist', 'Phot', 'dag', 'painter', 'pione']
+Top probs: [0.9993, 0.0003, 0.0002, 0.0002, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [26.4844, 18.2500, 18.0469, 17.7344, 16.0625, 14.9297, 13.6562, 13.3281]
+
+Token 26: 'er'
+Top tokens: ['er', 'ers', 'ist', 'erc', 'ier', 'ER', 'ician', 'ер']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [37.3125, 20.9375, 14.8047, 14.3828, 14.3516, 14.3125, 13.6641, 13.3750]
+
+Token 27: 'Hi'
+Top tokens: ['Hi', 'Jean', 'Henri', 'Joseph', 'Louis', 'Charles', 'Gust', ',']
+Top probs: [0.7675, 0.0803, 0.0243, 0.0200, 0.0167, 0.0104, 0.0077, 0.0073]
+Top logits: [14.4375, 12.1797, 10.9844, 10.7891, 10.6094, 10.1406,  9.8359,  9.7812]
+
+Token 28: 'pp'
+Top tokens: ['pp', 'pp', 'PP', 'ipp', 'ppo', 'é', 'ér', 'ppel']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.1406, 16.5312, 14.7344, 12.6406, 12.6172, 10.6094, 10.5547, 10.4688]
+
+Token 29: 'oly'
+Top tokens: ['oly', 'ol', 'loy', 'olly', 'OL', 'olate', 'aly', 'oy']
+Top probs: [0.9998, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [26.7344, 17.9062, 13.9531, 13.8203, 11.5469, 11.4844, 10.2812,  9.9141]
+
+Token 30: 'te'
+Top tokens: ['te', 'the', 'tes', 'ite', 'se', 'те', 'ta', 'ne']
+Top probs: [0.9999, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.5469, 18.9688, 13.8281, 12.9688, 12.7656, 12.1562, 11.8750, 11.0547]
+
+Token 31: 'Bay'
+Top tokens: ['Bay', 'Victor', 'Fland', 'P', 'dag', 'bay', 'Bat', 'Bapt']
+Top probs: [0.9848, 0.0022, 0.0015, 0.0008, 0.0007, 0.0006,0.0006, 0.0005]
+Top logits: [16.5000, 10.4141, 10.0156,  9.3594,  9.2812,  9.0312,  9.0156,  8.8828]
+
+Token 32: 'ard'
+Top tokens: ['ard', 'art', 'ARD', 'e', 'rd', 'erd', 'ар', 'ar']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [24.6875, 12.2656, 12.0234, 11.9297, 10.7031,  9.7500,  9.7266,  9.6875]
+
+Token 33: '.'
+Top tokens: ['.', ',', 'titled', 'dep', '!', '(', '[', 'entitled']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.3438, 19.0938, 14.0469, 13.8047, 13.4375, 13.1719, 11.7812, 11.4375]
+
+Token 34: 'The'
+Top tokens: ['The', 'It', 'Bay', 'The', 'This', 'However', '', 'Tit']
+Top probs: [0.9993, 0.0007, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.2656, 21.9375, 18.0938, 17.6406, 16.5625, 13.7188, 13.7031, 13.6406]
+
+Token 35: 'photograph'
+Top tokens: ['photograph', 'photo', 'image', 'dag', 'portrait', 'picture', 'dog', 'image']
+Top probs: [0.5240, 0.3080, 0.1675, 0.0002, 0.0002, 0.0000,0.0000, 0.0000]
+Top logits: [26.4844, 25.9531, 25.3438, 18.7188, 18.4688, 16.6250, 16.3750, 15.0156]
+
+Token 36: 'shows'
+Top tokens: ['shows', 'features', 'is', 'dep', ',', 'showing', 'featuring', 'capt']
+Top probs: [0.5197, 0.3628, 0.0961, 0.0132, 0.0080, 0.0000,0.0000, 0.0000]
+Top logits: [23.8906, 23.5312, 22.2031, 20.2188, 19.7188, 13.6797, 13.0312, 12.8594]
+
+Token 37: 'a'
+Top tokens: ['a', 'Bay', 'two', 'an', 'the', 'his', 'three', 'a']
+Top probs: [0.9999, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.6250, 17.3438, 17.0312, 13.7500, 13.4922, 12.5859, 11.4922,  9.7578]
+
+Token 38: 'dog'
+Top tokens: ['dog', 'man', 'portrait', 'hunting', 'Dog', 'pointer', 'black', 'gentleman']
+Top probs: [0.8590, 0.0837, 0.0141, 0.0053, 0.0048, 0.0028, 0.0025, 0.0024]
+Top logits: [16.5000, 14.1719, 12.3906, 11.4141, 11.3203, 10.7656, 10.6641, 10.6250]
+
+Token 39: 'named'
+Top tokens: ['named', 'sitting', 'named', 'standing', 'lying', 'sit', 'identified', 'pos']
+Top probs: [0.9896, 0.0103, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [25.2500, 20.6875, 14.9062, 14.6562, 14.5547, 14.1562, 12.9531, 12.8281]
+
+Token 40: '"'
+Top tokens: ['"', '“', 'M', "'", 'named', 'Sab', 'D', "''"]
+Top probs: [0.9985, 0.0002, 0.0002, 0.0001, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [18.9688, 10.5938, 10.2266,  9.6875,  9.0078,  8.4453,  8.2969,  8.2656]
+
+Token 41: 'M'
+Top tokens: ['M', 'S', 'B', 'Sh', 'F', 'Le', 'T', 'J']
+Top probs: [0.4690, 0.2867, 0.0233, 0.0198, 0.0158, 0.0135, 0.0119, 0.0111]
+Top logits: [14.2656, 13.7734, 11.2656, 11.1016, 10.8750, 10.7188, 10.5938, 10.5234]
+
+Token 42: 'iles'
+Top tokens: ['iles', 'ous', 'ilo', 'onsieur', 'lle', 'ann', 'imi', 'ilon']
+Top probs: [0.1587, 0.1316, 0.0575, 0.0308, 0.0282, 0.0240, 0.0223, 0.0177]
+Top logits: [10.5469, 10.3594,  9.5312,  8.9062,  8.8203,  8.6562,  8.5859,  8.3516]
+
+Token 43: '"'
+Top tokens: ['"', ',"', 'Cover', '”', '",', '")', "'", '"?']
+Top probs: [0.9956, 0.0041, 0.0001, 0.0001, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [20.0938, 14.5938, 10.3906, 10.2109,  9.3281,  8.7891,  8.7109,  8.6562]
+
+Token 44: 'sitting'
+Top tokens: ['sitting', 'and', 'sit', 'belonging', ',', 'standing', 'who', 'pos']
+Top probs: [0.8603, 0.1361, 0.0011, 0.0006, 0.0006, 0.0005,0.0004, 0.0001]
+Top logits: [21.8125, 19.9688, 15.1406, 14.6094, 14.5781, 14.4062, 14.0938, 12.4531]
+
+Token 45: 'on'
+Top tokens: ['on', 'in', 'next', 'ob', 'by', 'u', 'loyal', 'lo']
+Top probs: [0.9999, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [24.8594, 15.0391, 14.6406, 14.2031, 12.9453, 12.1328, 12.0781, 11.7422]
+
+Token 46: 'a'
+Top tokens: ['a', 'the', 'his', 'its', 'top', 'an', 'a', 'floor']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.5469, 17.1562, 16.5312, 15.4688, 14.0391, 12.7500, 10.5547,  8.7344]
+
+Token 47: 'table'
+Top tokens: ['table', 'chair', 'vel', 'throne', 'wooden', 'c', 'rug', 'ben']
+Top probs: [0.9728, 0.0255, 0.0003, 0.0002, 0.0001, 0.0001,0.0001, 0.0001]
+Top logits: [20.6406, 17.0000, 12.6094, 12.2031, 11.6562, 11.5703, 11.5234, 11.4609]
+
+Token 48: ','
+Top tokens: [',', 'in', 'with', '.', 'next', 'and', 'outside', 'near']
+Top probs: [0.9985, 0.0015, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.8125, 21.2812, 15.0547, 14.6719, 13.5234, 11.8906, 11.8125, 11.4219]
+
+Token 49: 'looking'
+Top tokens: ['looking', 'looking', 'we', 'looked', 'gaz', 'Looking', 'facing', 'and']
+Top probs: [0.9983, 0.0008, 0.0003, 0.0002, 0.0001, 0.0001,0.0000, 0.0000]
+Top logits: [23.7969, 16.7031, 15.8281, 15.0703, 14.8828, 14.5781, 13.7500, 13.3906]
+
+Token 50: 'directly'
+Top tokens: ['directly', 'straight', 'up', 'towards', 'direct', 'alert', 'Direct', 'direct']
+Top probs: [0.9999, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [25.8281, 16.4062, 14.8750, 14.6953, 13.4531, 13.3828, 13.0312, 12.9688]
+
+Token 51: 'at'
+Top tokens: ['at', 'into', 'towards', 'at', 'up', 'toward', 'to', 'At']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [34.3125, 24.1250, 16.3750, 15.0000, 13.9531, 13.6406, 12.3047, 11.5938]
+
+Token 52: 'the'
+Top tokens: ['the', 'Bay', 'the', 'camera', 'Camera', 'a', 'The', 'he']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [35.8750, 17.7031, 15.9844, 15.5312, 11.6328, 11.5625, 11.1641, 11.0234]
+
+Token 53: 'camera'
+Top tokens: ['camera', 'Camera', 'camera', 'vie', 'Camera', 'photograph', 'l', 'audience']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.1875, 22.8906, 21.6094, 21.5938, 18.0938, 17.7656, 15.6875, 14.2891]
+
+Token 54: '.'
+Top tokens: ['.', 'with', ',', 'l', 'avec', '!', 'with', 'With']
+Top probs: [0.9954, 0.0046, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.1562, 25.7812, 17.8750, 12.7031, 12.2344, 12.1406, 11.9219, 11.2578]
+
+Token 55: 'The'
+Top tokens: ['The', '\n', 'Bay', 'It', 'Mil', 'The', 'At', 'This']
+Top probs: [0.8541, 0.0989, 0.0270, 0.0172, 0.0027, 0.0000,0.0000, 0.0000]
+Top logits: [23.9688, 21.8125, 20.5156, 20.0625, 18.2031, 13.3672, 13.1719, 13.0156]
+
+Token 56: 'image'
+Top tokens: ['image', 'photograph', 'dag', 'photo', 'picture', 'image', 'dog', 'portrait']
+Top probs: [0.9557, 0.0164, 0.0150, 0.0128, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [26.9375, 22.8750, 22.7812, 22.6250, 16.7188, 15.9609, 15.8906, 15.5000]
+
+Token 57: 'is'
+Top tokens: ['is', 'was', 'has', 'measures', ',', 'is', 'appears', 'belongs']
+Top probs: [0.9903, 0.0097, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.2500, 23.6250, 17.4531, 12.7500, 11.3594, 11.2031, 11.0938, 10.8984]
+
+Token 58: 'considered'
+Top tokens: ['considered', 'believed', 'a', 'notable', 'revers', 'significant', 'titled', 'somewhat']
+Top probs: [0.5265, 0.2161, 0.1644, 0.0172, 0.0129, 0.0096, 0.0072, 0.0066]
+Top logits: [16.2188, 15.3281, 15.0547, 12.7969, 12.5078, 12.2188, 11.9219, 11.8438]
+
+Token 59: 'to'
+Top tokens: ['to', 'a', 'one', 'not', 'an', 'as', 'to', 'the']
+Top probs: [0.9675, 0.0321, 0.0003, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.2500, 24.8438, 20.3125, 17.3281, 14.6875, 12.6953, 12.4297, 12.3125]
+
+Token 60: 'be'
+Top tokens: ['be', 'be', 'have', 'one', 'Be', 'not', 'been', 'being']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [39.0625, 17.8750, 15.6016, 14.5312, 14.1797, 12.7344, 12.6406, 12.1641]
+
+Token 61: 'one'
+Top tokens: ['one', 'the', 'a', 'an', 'one', 'One', 'among', 'One']
+Top probs: [0.9984, 0.0016, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.4062, 23.9531, 19.5000, 15.5312, 15.3281, 14.0781, 12.5469, 11.5938]
+
+Token 62: 'of'
+Top tokens: ['of', 'the', 'of', '', 'year', 'Of', 'o', 'fo']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [37.6875, 17.4688, 15.9297, 11.8125, 11.4844, 11.4062, 11.1016, 11.0703]
+
+Token 63: 'the'
+Top tokens: ['the', 'the', 'Bay', 'earliest', 'The', 'oldest', 'th', 'he']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.3750, 18.0312, 15.2031, 14.8672, 11.8906, 11.8359, 11.7812, 10.9141]
+
+Token 64: 'earliest'
+Top tokens: ['earliest', 'first', 'oldest', 'pione', 'early', 'first', 'very', 'earlier']
+Top probs: [0.9950, 0.0045, 0.0004, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.1250, 26.7344, 24.3438, 18.6719, 18.5938, 18.3438, 15.9141, 13.5391]
+
+Token 65: 'examples'
+Top tokens: ['examples', 'photograph', 'known', 'phot', 'surv', 'photos', 'images', 'animal']
+Top probs: [0.5249, 0.4705, 0.0033, 0.0004, 0.0003, 0.0002,0.0001, 0.0001]
+Top logits: [22.5938, 22.4844, 17.5312, 15.3750, 15.1562, 14.5312, 14.1328, 13.8125]
+
+Token 66: 'of'
+Top tokens: ['of', 'of', 'Of', 'OF', ',', 'phot', '.', '']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [39.1562, 18.4062, 14.3203, 12.3438, 12.0312, 11.5391, 11.5234, 11.3828]
+
+Token 67: 'animal'
+Top tokens: ['animal', 'dog', 'a', 'phot', 'an', 'Animal', 'photograph', 'pet']
+Top probs: [0.8646, 0.0626, 0.0511, 0.0185, 0.0016, 0.0006,0.0003, 0.0002]
+Top logits: [22.0625, 19.4375, 19.2344, 18.2188, 15.7422, 14.8594, 13.9453, 13.7422]
+
+Token 68: 'phot'
+Top tokens: ['phot', 'portrait', 'Phot', 'photograph', 'ph', 'dag', 'port', 'photo']
+Top probs: [0.9997, 0.0003, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.8281, 22.5625, 17.8906, 17.0469, 15.7188, 13.0547, 12.6875, 12.4297]
+
+Token 69: 'ography'
+Top tokens: ['ography', 'graph', 'portrait', 'ographic', 'og', 'ographie', 'oport', 'графи']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [37.1250, 17.8750, 15.5469, 15.4688, 14.7891, 14.7500, 14.5938, 14.5781]
+
+Token 70: 'and'
+Top tokens: ['and', '.', ',', 'and', 'ever', ';', 'in', 'и']
+Top probs: [0.9797, 0.0197, 0.0006, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [33.3125, 29.4062, 25.8750, 16.3750, 14.2031, 12.3828, 12.3281, 12.1250]
+
+Token 71: 'is'
+Top tokens: ['is', 'has', 'provides', 'serves', 'was', 'represents', 'highlight', 'capt']
+Top probs: [0.9998, 0.0002, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [25.2031, 16.6406, 14.3906, 12.9453, 12.6641, 11.4922, 11.1875, 10.9062]
+
+Token 72: 'now'
+Top tokens: ['now', 'held', 'hous', 'a', 'currently', 'widely', 'considered', 'believed']
+Top probs: [0.9771, 0.0107, 0.0060, 0.0026, 0.0013, 0.0007,0.0005, 0.0003]
+Top logits: [22.0156, 17.5000, 16.9219, 16.0781, 15.4219, 14.7422, 14.4922, 14.0156]
+
+Token 73: 'held'
+Top tokens: ['held', 'hous', 'in', 'owned', 'considered', 'stored', 'part', 'kept']
+Top probs: [0.6519, 0.3435, 0.0017, 0.0011, 0.0005, 0.0004,0.0004, 0.0002]
+Top logits: [22.8438, 22.2031, 16.8750, 16.4219, 15.5938, 15.5469, 15.5234, 14.5000]
+
+Token 74: 'at'
+Top tokens: ['at', 'in', 'by', 'as', 'within', 'the', 'on', 'at']
+Top probs: [0.7370, 0.2015, 0.0615, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.8750, 26.5781, 25.3906, 16.1562, 14.0234, 12.7031, 12.2031, 10.6641]
+
+Token 75: 'the'
+Top tokens: ['the', 'the', 'The', 'France', 'Musée', 'th', 'The', 'thee']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.6250, 14.6250, 13.3516, 12.4922,  9.7812,  9.1250,  8.9688,  8.4766]
+
+Token 76: 'Bibliothèque'
+Top tokens: ['Bibliothèque', 'Musée', 'Library', 'National', 'Société', 'Bibli', 'Museum', 'Get']
+Top probs: [0.4685, 0.1670, 0.1644, 0.1087, 0.0490, 0.0140, 0.0081, 0.0036]
+Top logits: [17.2031, 16.1719, 16.1562, 15.7422, 14.9453, 13.6953, 13.1406, 12.3281]
+
+Token 77: 'nationale'
+Top tokens: ['nationale', 'N', 'national', 'National', 'Nacional', 'nacional', 'ationale', 'National']
+Top probs: [0.9909, 0.0076, 0.0008, 0.0004, 0.0001, 0.0000,0.0000, 0.0000]
+Top logits: [22.7656, 17.8906, 15.5938, 14.8594, 13.8438, 12.6172, 12.0703, 12.0547]
+
+Token 78: 'de'
+Top tokens: ['de', 'France', 'Fran', 'du', 'fran', 'française', 'des', 'François']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.7031, 13.8672, 13.0781, 12.7422, 11.8438, 11.6953, 11.3359, 10.9609]
+
+Token 79: 'France'
+Top tokens: ['France', 'France', 'Frankreich', 'Francia', 'França', 'Paris', 'Фран', 'French']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.0625, 19.4688, 17.6875, 16.9062, 16.2969, 15.3750, 14.3750, 13.1328]
+
+Token 80: '.'
+Top tokens: ['.', 'in', ',', '(', "'", 'as', 'in', '!']
+Top probs: [0.9262, 0.0737, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.2656, 26.7344, 19.8750, 17.9219, 14.2812, 13.4844, 12.8594, 12.1641]
+
+Token 81: '\n'
+Top tokens: ['\n', '</s>', 'The', 'It', 'Bay', 'However', 'Unfortunately', 'Prior']
+Top probs: [0.9999, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [26.1875, 15.2656, 15.1406, 15.0938, 14.1641, 14.0547, 13.6562, 13.1250]
+
+Token 82: '\n'
+Top tokens: ['\n', 'It', 'Before', '[', '</s>', 'M', 'Other', 'The']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [25.0156, 11.7891, 11.7344, 10.9531, 10.0391,  9.7734,  9.6484,  9.6016]
+
+Token 83: 'M'
+Top tokens: ['M', 'Here', 'It', 'The', 'H', 'Before', '[', 'B']
+Top probs: [0.8019, 0.0794, 0.0581, 0.0262, 0.0235, 0.0039, 0.0017, 0.0013]
+Top logits: [21.5000, 19.1875, 18.8750, 18.0781, 17.9688, 16.1719, 15.3516, 15.0391]
+
+Token 84: 'iles'
+Top tokens: ['iles', 'illes', 'ile', 'ost', 'ules', 'ade', 'ills', 'uch']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.2812, 15.0938, 11.9297, 11.8984, 11.8594, 11.5938, 11.2969, 11.1562]
+
+Token 85: 'was'
+Top tokens: ['was', ',', 'belonged', 'was', 'était', '(', 'appears', 'is']
+Top probs: [0.9978, 0.0020, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [22.2188, 15.9922, 13.1016, 11.9609, 10.9375, 10.8828, 10.6406, 10.3594]
+
+Token 86: 'a'
+Top tokens: ['a', 'owned', 'reported', 'believed', 'said', 'an', 'the', 'belonged']
+Top probs: [0.9998, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.6562, 18.6875, 17.8281, 15.8906, 13.6250, 13.5547, 13.3438, 13.1250]
+
+Token 87: 'popular'
+Top tokens: ['popular', 'black', 'hunting', 'favorite', 'Fox', 'pointer', 'dog', 'M']
+Top probs: [0.2353, 0.2299, 0.1165, 0.0482, 0.0478, 0.0381, 0.0375, 0.0235]
+Top logits: [12.9062, 12.8828, 12.2031, 11.3203, 11.3125, 11.0859, 11.0703, 10.6016]
+
+Token 88: 'dog'
+Top tokens: ['dog', 'subject', 'circ', 'att', 'hunting', 'dogs', 'dag', 'Dog']
+Top probs: [0.9482, 0.0195, 0.0122, 0.0033, 0.0022, 0.0015, 0.0011, 0.0011]
+Top logits: [17.7656, 13.8828, 13.4141, 12.1016, 11.6875, 11.3125, 11.0312, 11.0078]
+
+Token 89: 'in'
+Top tokens: ['in', 'at', 'of', 'among', 'bre', 'belonging', 'model', 'during']
+Top probs: [0.9964, 0.0028, 0.0002, 0.0002, 0.0001, 0.0000,0.0000, 0.0000]
+Top logits: [23.5000, 17.6406, 15.1406, 15.1016, 14.1797, 13.4688, 12.9609, 12.7891]
+
+Token 90: 'Paris'
+Top tokens: ['Paris', 'France', 'French', '', 'his', 'Bay', 'the', 'mid']
+Top probs: [0.9611, 0.0212, 0.0100, 0.0055, 0.0014, 0.0003,0.0003, 0.0000]
+Top logits: [23.2812, 19.4688, 18.7188, 18.1250, 16.7500, 15.3438, 15.0781, 12.7188]
+
+Token 91: 'ian'
+Top tokens: ['ian', 'at', 'during', 'in', ',', 'and', 'an', 'ien']
+Top probs: [0.8902, 0.1097, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.2344, 26.1406, 19.1875, 17.9375, 16.3438, 15.7969, 14.6719, 14.4609]
+
+Token 92: 'society'
+Top tokens: ['society', 'high', 'Society', 'circ', 'circles', 'dog', 'social', 'phot']
+Top probs: [0.9979, 0.0017, 0.0003, 0.0001, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [26.3281, 19.9375, 18.2500, 16.8594, 15.9609, 15.7578, 14.5469, 13.5703]
+
+Token 93: 'and'
+Top tokens: ['and', 'at', ',', 'circles', '.', 'during', ';', 'circle']
+Top probs: [0.7596, 0.2317, 0.0079, 0.0007, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.0938, 25.9062, 22.5312, 20.1406, 15.8516, 15.1406, 14.4844, 13.2344]
+
+Token 94: 'was'
+Top tokens: ['was', 'belonged', 'had', 'appeared', 'often', 'became', 'lived', 'belongs']
+Top probs: [0.9952, 0.0047, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.0312, 22.6719, 19.0938, 16.1875, 15.1016, 14.3125, 14.2812, 14.1406]
+
+Token 95: 'known'
+Top tokens: ['known', 'owned', 'often', 'reported', 'owned', 'known', 'said', 'believed']
+Top probs: [0.9185, 0.0526, 0.0282, 0.0003, 0.0001, 0.0001,0.0001, 0.0000]
+Top logits: [25.1406, 22.2812, 21.6562, 16.9844, 16.3125, 15.4531, 15.4141, 15.0938]
+
+Token 96: 'for'
+Top tokens: ['for', 'for', 'as', 'to', 'For', 'für', 'by', 'для']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [35.4688, 19.0156, 17.6094, 15.9375, 12.8594, 10.6172, 10.5625, 10.3906]
+
+Token 97: 'his'
+Top tokens: ['his', 'being', 'its', 'accomp', 'his', 'performing', 'appearing', 'его']
+Top probs: [0.9998, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.0938, 20.0938, 18.3750, 18.0625, 17.0625, 16.1406, 14.1094, 12.9609]
+
+Token 98: 'intelligence'
+Top tokens: ['intelligence', 'ability', 'intellig', 'loyal', 'clever', 'appearances', 'talent', 'appearance']
+Top probs: [0.9628, 0.0191, 0.0114, 0.0030, 0.0009, 0.0006,0.0004, 0.0003]
+Top logits: [20.2656, 16.3438, 15.8281, 14.4922, 13.2500, 12.8984, 12.5625, 12.1172]
+
+Token 99: 'and'
+Top tokens: ['and', ',', '.', 'and', '&', 'и', ';', 'tr']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [39.4375, 28.2812, 17.8750, 17.8438, 14.5625, 14.0078, 13.9375, 13.8594]
+
+Token 100: 'loyal'
+Top tokens: ['loyal', 'ob', 'friendly', 'ability', 'gentle', 'trained', 'affection', 'faithful']
+Top probs: [0.9886, 0.0075, 0.0025, 0.0005, 0.0001, 0.0001,0.0001, 0.0001]
+Top logits: [22.5312, 17.6562, 16.5312, 14.9922, 13.3984, 13.3281, 13.2188, 13.0781]
+
+Token 101: 'ty'
+Top tokens: ['ty', 'nature', 'ness', 'ity', 'temper', 'TY', 'behavior', 'companion']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [34.4062, 21.1875, 18.3750, 17.7969, 16.2188, 15.0859, 15.0078, 14.9141]
+
+Token 102: '.'
+Top tokens: ['.', 'to', ',', 'towards', ';', '.', ':', '!']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [37.0625, 27.1250, 18.7031, 14.6562, 14.0781, 13.2656, 12.4297, 11.9609]
+
+Token 103: 'He'
+Top tokens: ['He', 'Bay', 'His', 'The', 'According', 'He', 'At', 'Hi']
+Top probs: [0.9806, 0.0107, 0.0075, 0.0010, 0.0001, 0.0000,0.0000, 0.0000]
+Top logits: [27.3594, 22.8438, 22.4844, 20.5000, 18.0312, 17.1562, 16.1562, 13.7812]
+
+Token 104: 'was'
+Top tokens: ['was', 'belonged', 'belongs', 'belong', 'became', 'belonging', 'had', 'appeared']
+Top probs: [0.7520, 0.2480, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.9219, 26.8125, 17.5938, 16.7500, 15.8516, 15.5859, 14.9844, 14.5781]
+
+Token 105: 'trained'
+Top tokens: ['trained', 'owned', 'the', 'a', 'often', 'reported', 'also', 'owned']
+Top probs: [0.6074, 0.2781, 0.0903, 0.0120, 0.0053, 0.0047,0.0006, 0.0003]
+Top logits: [20.3438, 19.5625, 18.4375, 16.4219, 15.6094, 15.4844, 13.4844, 12.7812]
+
+Token 106: 'by'
+Top tokens: ['by', 'to', 'as', 'By', 'by', 'to', 'for', 'at']
+Top probs: [0.8032, 0.1968, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.0000, 29.5938, 16.2500, 14.4531, 14.2656, 12.2344, 11.9609, 11.3125]
+
+Token 107: 'his'
+Top tokens: ['his', 'the', 'Bay', 'a', 'his', 'French', 'His', 'zijn']
+Top probs: [0.9995, 0.0004, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [23.7969, 15.8984, 13.8828, 13.8047, 11.3125, 11.1406, 10.6094,  9.0469]
+
+Token 108: 'owner'
+Top tokens: ['owner', 'owner', 'Owner', 'handler', 'wner', 'own', 'ow', 'master']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [37.0000, 23.3906, 20.6094, 18.1875, 17.0156, 16.7812, 13.7188, 13.3906]
+
+Token 109: ','
+Top tokens: [',', 'to', '.', 'and', 'Jean', 'Charles', ';', 'August']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.1094, 19.7812, 12.1719, 11.3438, 10.0234, 10.0156,  9.9062,  9.6172]
+
+Token 110: 'a'
+Top tokens: ['a', 'Captain', 'French', 'Charles', 'Professor', 'Monsieur', 'an', 'who']
+Top probs: [0.9998, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [22.0469, 12.1719, 10.8984, 10.8906, 10.7578, 10.4375, 10.3516, 10.2656]
+
+Token 111: 'French'
+Top tokens: ['French', 'man', 'professor', 'doctor', 'dent', 'Monsieur', 'M', 'circ']
+Top probs: [0.7663, 0.1849, 0.0067, 0.0056, 0.0041, 0.0030, 0.0030, 0.0030]
+Top logits: [17.7031, 16.2812, 12.9688, 12.7812, 12.4766, 12.1719, 12.1641, 12.1641]
+
+Token 112: 'arist'
+Top tokens: ['arist', 'no', 'man', 'army', 'actor', 'artist', 'gentleman', 'noble']
+Top probs: [0.8473, 0.0439, 0.0334, 0.0141, 0.0093, 0.0069, 0.0066, 0.0063]
+Top logits: [18.3594, 15.3984, 15.1250, 14.2656, 13.8438, 13.5547, 13.5000, 13.4531]
+
+Token 113: 'ocrat'
+Top tokens: ['ocrat', 'ocr', 'ologist', 'ician', 'roc', 'assador', 'endant', 'ractor']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.2188, 18.9375, 14.7891, 14.0703, 13.2812, 13.1328, 12.9688, 12.7344]
+
+Token 114: 'named'
+Top tokens: ['named', ',', 'named', 'and', 'names', 'name', 'called', 'Named']
+Top probs: [0.9996, 0.0004, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.9688, 24.2031, 20.4531, 17.8281, 17.0312, 16.5625, 14.3828, 13.8750]
+
+Token 115: 'Henri'
+Top tokens: ['Henri', 'Count', 'Henry', 'Charles', 'Louis', 'Hen', 'Madame', 'Alfred']
+Top probs: [0.5012, 0.3161, 0.0520, 0.0205, 0.0178, 0.0094, 0.0072, 0.0069]
+Top logits: [14.7266, 14.2656, 12.4609, 11.5312, 11.3906, 10.7500, 10.4844, 10.4375]
+
+Token 116: 'de'
+Top tokens: ['de', 'd', '-', 'G', 'Villa', 'Ville', 'F', 'Le']
+Top probs: [0.8371, 0.0726, 0.0172, 0.0074, 0.0051, 0.0024, 0.0022, 0.0018]
+Top logits: [13.9766, 11.5312, 10.0938,  9.2500,  8.8828,  8.1406,  8.0469,  7.8281]
+
+Token 117: 'La'
+Top tokens: ['La', 'la', 'France', 'Mont', 'C', 'P', 'V', 'La']
+Top probs: [0.5044, 0.4556, 0.0069, 0.0049, 0.0046, 0.0023, 0.0018, 0.0014]
+Top logits: [15.6250, 15.5234, 11.3359, 10.9922, 10.9297, 10.2188,  9.9766,  9.7656]
+
+Token 118: 'Ro'
+Top tokens: ['Ro', 'V', 'us', 'itt', 'uss', 'Ro', 'iten', 'Hay']
+Top probs: [0.6728, 0.1478, 0.0414, 0.0163, 0.0151, 0.0044, 0.0040, 0.0032]
+Top logits: [13.6719, 12.1562, 10.8828,  9.9531,  9.8750,  8.6406,  8.5391,  8.3125]
+
+Token 119: 'che'
+Top tokens: ['che', 'ch', 'chen', 'que', 'qu', 'chem', 'ché', 'cha']
+Top probs: [0.9991, 0.0004, 0.0003, 0.0001, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [22.8906, 14.9453, 14.7188, 13.3594, 12.8906, 12.6719, 11.8359, 10.4453]
+
+Token 120: ','
+Top tokens: [',', 'f', 'ja', 'font', '-', 'fort', 'ford', 'j']
+Top probs: [0.9413, 0.0491, 0.0025, 0.0018, 0.0018, 0.0016,0.0007, 0.0001]
+Top logits: [18.6250, 15.6719, 12.6797, 12.3750, 12.3516, 12.2188, 11.4062,  9.7266]
+
+Token 121: 'to'
+Top tokens: ['to', 'who', 'and', 'who', '', 'to', 'whom', ',']
+Top probs: [0.9352, 0.0646, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.2812, 25.6094, 19.1875, 14.3125, 13.3438, 12.9844, 12.3828, 11.6875]
+
+Token 122: 'perform'
+Top tokens: ['perform', 'sit', 'performs', 'pose', 'performed', 'perform', 'performing', 'perf']
+Top probs: [0.9925, 0.0073, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [26.9688, 22.0625, 16.8125, 16.5938, 15.9844, 15.7344, 15.1875, 14.6562]
+
+Token 123: 'tr'
+Top tokens: ['tr', 'various', 'a', 'tr', 'tasks', 'Tr', 'numerous', 'trick']
+Top probs: [0.7631, 0.2054, 0.0315, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.8438, 26.5312, 24.6562, 15.3359, 14.6875, 14.0391, 13.6328, 13.3984]
+
+Token 124: 'icks'
+Top tokens: ['icks', 'ics', 'cks', 'ades', 'uck', 'ic', 'ills', 'tr']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.0938, 14.4609, 13.8984, 13.3125, 13.0156, 11.3438, 11.0547, 10.8594]
+
+Token 125: 'and'
+Top tokens: ['and', 'such', ',', 'and', 'like', '.', 'for', 'including']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.6562, 22.8906, 18.0312, 17.1562, 15.1719, 14.7969, 13.8438, 13.5312]
+
+Token 126: 'entertain'
+Top tokens: ['entertain', 'obey', 'tasks', 'ob', 'behave', 'was', 'fetch', 'pose']
+Top probs: [0.7711, 0.1279, 0.0258, 0.0240, 0.0198, 0.0077, 0.0037, 0.0037]
+Top logits: [18.2812, 16.4844, 14.8828, 14.8125, 14.6172, 13.6719, 12.9453, 12.9453]
+
+Token 127: 'guests'
+Top tokens: ['guests', 'visitors', 'crow', 'guest', 'people', 'aud', 'the', 'his']
+Top probs: [0.9817, 0.0183, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.5469, 23.5625, 17.4688, 15.2031, 14.9766, 14.6484, 14.5469, 14.3203]
+
+Token 128: '.'
+Top tokens: ['.', 'at', 'during', 'with', ',', ':', '!', 'at']
+Top probs: [0.9997, 0.0003, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [35.4375, 27.3125, 17.8125, 15.8281, 14.3359, 12.6719, 12.6172, 12.3672]
+
+Token 129: 'The'
+Top tokens: ['The', 'Bay', 'De', '\n', 'La', 'de', 'It', 'When']
+Top probs: [0.4763, 0.3949, 0.0665, 0.0543, 0.0046, 0.0025,0.0006, 0.0001]
+Top logits: [22.7500, 22.5625, 20.7812, 20.5781, 18.1094, 17.5000, 16.0938, 14.0312]
+
+Token 130: 'photograph'
+Top tokens: ['photograph', 'dag', 'photo', 'dog', 'phot', 'dag', 'portrait', 'image']
+Top probs: [0.9495, 0.0495, 0.0009, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.3125, 26.3594, 22.3438, 18.0625, 17.8438, 16.9219, 16.8750, 15.3906]
+
+Token 131: 'of'
+Top tokens: ['of', 'was', 'taken', 'er', 'is', 'was', 'of', 'itself']
+Top probs: [0.9814, 0.0185, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.0625, 25.0938, 16.5781, 14.6875, 14.1953, 13.5625, 12.8984, 11.8672]
+
+Token 132: 'Mil'
+Top tokens: ['Mil', 'miles', 'Mil', 'M', 'him', 'Milan', 'Ми', 'M']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [38.1875, 22.5625, 21.0938, 16.1562, 14.2188, 13.9297, 13.9141, 13.3750]
+
+Token 133: 'es'
+Top tokens: ['es', 'ES', 'és', 'ess', 'ès', 'est', 'ers', 'es']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.9375, 16.7031, 15.9609, 14.9297, 14.7266, 14.6406, 13.9219, 13.8125]
+
+Token 134: 'was'
+Top tokens: ['was', 'is', 'was', 'has', 'taken', 'sitting', 'wasn', 'became']
+Top probs: [0.9998, 0.0002, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.9062, 20.5781, 15.0312, 13.1562, 11.8281, 11.7188, 11.3438, 11.2734]
+
+Token 135: 'likely'
+Top tokens: ['likely', 'taken', 'most', 'probably', 'likely', 'tak', 'one', 'taking']
+Top probs: [0.8633, 0.1366, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.3438, 25.5000, 17.6250, 17.5469, 17.0625, 13.9062, 13.8359, 13.2734]
+
+Token 136: 'taken'
+Top tokens: ['taken', 'taking', 'take', 'commission', 'tak', 'takes', 'took', 'intended']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [33.0625, 17.8281, 17.3438, 17.3281, 17.2812, 16.1250, 15.9141, 15.0312]
+
+Token 137: 'to'
+Top tokens: ['to', 'as', 'for', 'by', 'during', 'at', 'in', 'when']
+Top probs: [0.7120, 0.2877, 0.0001, 0.0001, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.4375, 26.5312, 18.9531, 18.8594, 17.0312, 16.5938, 15.8438, 13.8828]
+
+Token 138: 'show'
+Top tokens: ['show', 'demonstrate', 'comm', 'capture', 'document', 'display', 'show', 'promote']
+Top probs: [0.9969, 0.0020, 0.0006, 0.0003, 0.0001, 0.0000,0.0000, 0.0000]
+Top logits: [26.9688, 20.7812, 19.5938, 18.7812, 17.3281, 16.9062, 16.0000, 15.1953]
+
+Token 139: 'case'
+Top tokens: ['case', 'off', 'off', 'cases', 'case', 'Case', 'CASE', 'Off']
+Top probs: [0.9998, 0.0002, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.5625, 28.1406, 19.4688, 17.0156, 16.8750, 15.5469, 15.4531, 15.3516]
+
+Token 140: 'his'
+Top tokens: ['his', 'the', 'Bay', 'de', 'both', 'him', 'De', 'hi']
+Top probs: [0.8976, 0.1023, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.1406, 28.9688, 21.7969, 19.2031, 17.0938, 15.4844, 15.0156, 14.9062]
+
+Token 141: 'ob'
+Top tokens: ['ob', 'intelligence', 'training', 'ab', 'tal', 'skills', 'talent', 'owner']
+Top probs: [0.9496, 0.0315, 0.0054, 0.0045, 0.0043, 0.0016, 0.0011, 0.0010]
+Top logits: [21.7500, 18.3438, 16.5781, 16.4062, 16.3438, 15.3438, 14.9453, 14.8438]
+
+Token 142: 'ed'
+Top tokens: ['ed', 'edic', 'ED', 'ob', 'edi', 'session', 'id', 'doc']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.3750, 14.7422, 14.3516, 13.9219, 13.8828, 12.7031, 12.3906, 12.2031]
+
+Token 143: 'ience'
+Top tokens: ['ience', 'iance', 'iency', 'ient', 'ien', 'iene', 'ients', 'iencia']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [41.1875, 25.2656, 24.8281, 24.0312, 19.9375, 18.8594, 16.7188, 16.6406]
+
+Token 144: 'and'
+Top tokens: ['and', 'skills', 'training', 'and', ',', '.', 'Sk', 'trained']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.6250, 24.7500, 21.0625, 17.2188, 16.0625, 14.1406, 13.3828, 13.1484]
+
+Token 145: 'training'
+Top tokens: ['training', 'intelligence', 'train', 'trained', 'loyal', 'discipline', 'Training', 'talent']
+Top probs: [0.5555, 0.3068, 0.0950, 0.0285, 0.0061, 0.0022, 0.0012, 0.0007]
+Top logits: [19.7344, 19.1406, 17.9688, 16.7656, 15.2188, 14.2188, 13.6016, 13.0156]
+
+Token 146: '.'
+Top tokens: ['.', 'skills', ',', 'ab', 'capabilities', 'techniques', 'as', 'skill']
+Top probs: [0.4012, 0.3769, 0.2215, 0.0004, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.8125, 27.7500, 27.2188, 20.9688, 15.9375, 15.5000, 15.2422, 13.7266]
+
+Token 147: '\n'
+Top tokens: ['\n', '</s>', '', 'The', 'It', 'Bay', 'D', 'The']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.8281, 17.1875, 15.9688, 14.5703, 13.4609, 12.9766, 11.7500, 11.2812]
+
+Token 148: '\n'
+Top tokens: ['\n', '</s>', '{', '"', '(', '[', '@', 'hui']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [25.7031, 10.4141,  6.9023,  6.6836,  6.5781,  6.1602,  5.9844,  5.6953]
+
+Token 149: 'The'
+Top tokens: ['The', 'It', 'Wh', 'Inter', 'At', 'H', 'Un', 'D']
+Top probs: [0.9500, 0.0363, 0.0093, 0.0032, 0.0004, 0.0002,0.0002, 0.0001]
+Top logits: [24.2344, 20.9688, 19.6094, 18.5312, 16.5000, 15.9531, 15.5391, 15.4609]
+
+Token 150: 'dag'
+Top tokens: ['dag', 'photograph', 'dag', 'image', 'photo', 'Bay', 'portrait', 'discovery']
+Top probs: [0.9890, 0.0108, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.7500, 23.2344, 18.6094, 17.8125, 16.5469, 12.8438, 12.7734, 12.6172]
+
+Token 151: 'uer'
+Top tokens: ['uer', 'guer', 'urre', 'ure', 'rer', 'gu', 'ger', 'uerte']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.9844, 16.7812, 14.0625, 13.4062, 13.1250, 12.9453, 12.1875, 12.0625]
+
+Token 152: 're'
+Top tokens: ['re', 'ro', 'ре', 'ra', 'r', 'RE', 'ere', 'res']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.5000, 14.7500, 13.9219, 13.1250, 13.0078, 11.6719, 11.6094, 11.3359]
+
+Token 153: 'ot'
+Top tokens: ['ot', 'o', 'type', 'ot', 'atype', 'to', 'type', 'ote']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.5938, 15.1328, 14.3828, 12.1328, 11.9297, 11.5469, 11.0234, 10.8984]
+
+Token 154: 'ype'
+Top tokens: ['ype', 'pe', 'ope', 'ipe', 'YPE', 'ape', 'ypes', 'ye']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.1250, 18.1719, 18.0312, 15.5938, 15.5781, 15.0625, 14.9531, 14.7188]
+
+Token 155: 'process'
+Top tokens: ['process', 'of', 'is', 'technique', 'format', 'Process', 'was', 'method']
+Top probs: [0.9999, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.7812, 19.3906, 18.8906, 18.7500, 17.4219, 17.1719, 17.1250, 16.8594]
+
+Token 156: 'was'
+Top tokens: ['was', ',', 'used', 'is', 'involved', 'had', 'became', 'was']
+Top probs: [0.9872, 0.0128, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.3906, 25.0469, 16.7812, 15.8281, 14.5703, 13.6328, 12.6641, 11.8906]
+
+Token 157: 'a'
+Top tokens: ['a', 'invent', 'the', 'still', 'introduced', 'relatively', 'used', 'developed']
+Top probs: [0.8232, 0.1726, 0.0022, 0.0012, 0.0006, 0.0001,0.0000, 0.0000]
+Top logits: [23.6250, 22.0625, 17.7188, 17.0625, 16.3438, 14.1875, 13.8984, 13.6094]
+
+Token 158: 'time'
+Top tokens: ['time', 'pione', 'popular', 'relatively', 'early', 'complex', 'method', 'primitive']
+Top probs: [0.6665, 0.1252, 0.0564, 0.0547, 0.0382, 0.0213, 0.0158, 0.0051]
+Top logits: [19.2500, 17.5781, 16.7812, 16.7500, 16.3906, 15.8047, 15.5078, 14.3750]
+
+Token 159: '-'
+Top tokens: ['-', 'consum', 'cons', 'caps', '-', 'ous', '--', 'consume']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.3438, 16.1094, 15.5000, 12.2969, 10.9766, 10.8906,  9.8125,  9.7656]
+
+Token 160: 'consum'
+Top tokens: ['consum', 'cons', 'cons', 'consume', 'Cons', 'consumer', 'int', 'sens']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.6250, 19.5781, 18.6562, 17.0938, 16.6562, 15.7969, 15.6250, 15.4297]
+
+Token 161: 'ing'
+Top tokens: ['ing', 'ING', 'img', 'uming', 'ption', 'ng', 'bing', 'sing']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.5938, 13.8672, 12.0000, 11.3203, 11.3047, 11.1797, 10.6250, 10.1953]
+
+Token 162: 'and'
+Top tokens: ['and', 'process', 'one', 'method', 'procedure', 'technique', 'affair', 'ende']
+Top probs: [0.9996, 0.0003, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.4531, 22.4844, 18.3750, 18.2031, 17.6406, 15.8828, 13.8828, 13.3281]
+
+Token 163: 'expensive'
+Top tokens: ['expensive', 'complex', 'complicated', 'labor', 'cum', 'difficult', 'techn', 'cost']
+Top probs: [0.7652, 0.1483, 0.0364, 0.0288, 0.0114, 0.0029, 0.0014, 0.0014]
+Top logits: [21.6094, 19.9688, 18.5625, 18.3281, 17.4062, 16.0469, 15.3047, 15.2812]
+
+Token 164: 'process'
+Top tokens: ['process', 'method', 'procedure', 'technique', 'ende', 'phot', 'medium', 'undert']
+Top probs: [0.9122, 0.0621, 0.0080, 0.0079, 0.0075, 0.0011,0.0006, 0.0003]
+Top logits: [24.5000, 21.8125, 19.7656, 19.7500, 19.7031, 17.7500, 17.1250, 16.4531]
+
+Token 165: ','
+Top tokens: [',', 'that', 'in', '.', 'at', 'when', 'and', 'for']
+Top probs: [0.9940, 0.0060, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.6562, 25.5469, 16.5000, 15.6016, 15.1562, 14.3516, 13.5312, 12.6172]
+
+Token 166: 'so'
+Top tokens: ['so', 'which', 'and', 'making', 'requiring', 'so', 'requires', 'involving']
+Top probs: [0.8327, 0.1470, 0.0170, 0.0016, 0.0016, 0.0000,0.0000, 0.0000]
+Top logits: [23.9219, 22.1875, 20.0312, 17.6719, 17.6719, 12.8281, 12.5781, 12.2500]
+
+Token 167: 'it'
+Top tokens: ['it', 'the', 'photograph', 'Bay', 'having', 'It', 'only', 'animal']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.5625, 15.4844, 15.1016, 14.9531, 14.8438, 14.5156, 13.5781, 12.4062]
+
+Token 168: "'"
+Top tokens: ["'", 'was', 'is', 'wasn', 'would', '’', 'may', 'could']
+Top probs: [0.8081, 0.1803, 0.0115, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.6875, 26.1875, 23.4375, 17.8125, 15.2188, 14.3828, 13.8281, 12.3047]
+
+Token 169: 's'
+Top tokens: ['s', 'S', 'm', 're', 't', '0', 'd', 'll']
+Top probs: [0.7300, 0.0020, 0.0019, 0.0016, 0.0015, 0.0014, 0.0008, 0.0007]
+Top logits: [11.2109,  5.3242,  5.2422,  5.0977,  5.0234,  4.9844,  4.3516,  4.3164]
+
+Token 170: 'not'
+Top tokens: ['not', 'remarkable', 'likely', 'unlikely', 'no', 'surprising', 'impress', 'notable']
+Top probs: [0.4893, 0.1977, 0.1276, 0.0786, 0.0462, 0.0205, 0.0117, 0.0070]
+Top logits: [20.0625, 19.1562, 18.7188, 18.2344, 17.7031, 16.8906, 16.3281, 15.8203]
+
+Token 171: 'surprising'
+Top tokens: ['surprising', 'surprise', 'surprised', 'surpr', 'ew', 'unexpected', 'likely', 'sur']
+Top probs: [0.9783, 0.0213, 0.0001, 0.0001, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.2500, 23.4219, 18.3906, 18.2812, 16.8750, 16.8281, 16.5625, 16.3750]
+
+Token 172: 'that'
+Top tokens: ['that', 'to', 'that', 'the', 'That', 'why', 'it', 'this']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [37.3125, 19.7188, 18.8125, 16.2188, 14.9766, 14.4219, 14.2031, 14.0938]
+
+Token 173: 'one'
+Top tokens: ['one', 'the', 'early', 'very', 'Mil', 'few', 'this', 'only']
+Top probs: [0.9280, 0.0484, 0.0175, 0.0016, 0.0013, 0.0010,0.0008, 0.0005]
+Top logits: [23.7969, 20.8438, 19.8281, 17.4062, 17.2188, 16.9531, 16.7188, 16.2812]
+
+Token 174: 'of'
+Top tokens: ['of', '-', 'the', 'of', 'was', 'would', 'from', '']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.6094, 13.2578, 13.0859, 12.1953, 11.8281, 11.6562, 11.2031, 10.5156]
+
+Token 175: 'the'
+Top tokens: ['the', 'the', 'its', 'these', 'earliest', 'only', 'The', '']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [34.0938, 16.6406, 14.4844, 13.8828, 12.8984, 12.3906, 12.3438, 11.5078]
+
+Token 176: 'earliest'
+Top tokens: ['earliest', 'first', 'early', 'oldest', 'earlier', 'first', 'few', 'very']
+Top probs: [0.9788, 0.0210, 0.0002, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.7500, 28.9062, 24.2969, 20.6250, 18.5312, 18.4062, 17.7812, 15.2344]
+
+Token 177: 'photograph'
+Top tokens: ['photograph', 'animal', 'photos', 'dog', 'examples', 'surv', 'uses', 'phot']
+Top probs: [0.7951, 0.1059, 0.0673, 0.0160, 0.0086, 0.0036, 0.0010, 0.0010]
+Top logits: [22.8125, 20.7969, 20.3438, 18.9062, 18.2812, 17.4062, 16.1719, 16.1719]
+
+Token 178: 's'
+Top tokens: ['s', 'ed', 'ers', 'es', 'ies', 'er', 'so', 'ss']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.8750, 18.9688, 18.5938, 15.5625, 15.0156, 13.9375, 13.1719, 13.0312]
+
+Token 179: 'of'
+Top tokens: ['of', 'taken', 'was', 'dep', 'ever', 'to', 'would', 'of']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.4844, 19.9062, 16.1719, 16.0312, 15.5938, 14.2500, 13.5000, 13.3672]
+
+Token 180: 'a'
+Top tokens: ['a', 'an', 'dogs', 'dog', 'animals', 'animal', 'the', 'this']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [35.7500, 25.5469, 20.1562, 18.9375, 17.5312, 15.6875, 14.4922, 13.4531]
+
+Token 181: 'dog'
+Top tokens: ['dog', 'dog', 'Dog', 'dogs', 'pet', 'domestic', 'animal', 'horse']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.1875, 21.0938, 20.6719, 18.9688, 18.3438, 18.0625, 17.0938, 13.6172]
+
+Token 182: 'was'
+Top tokens: ['was', 'would', 'is', 'features', 'belongs', 'belonged', 'was', 'should']
+Top probs: [0.9527, 0.0364, 0.0107, 0.0002, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [25.2031, 21.9375, 20.7188, 16.6406, 13.0078, 12.9219, 12.7812, 12.5938]
+
+Token 183: 'taken'
+Top tokens: ['taken', 'of', 'took', 'taking', 'a', 'take', 'tak', 'captured']
+Top probs: [0.9933, 0.0067, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.1250, 24.1250, 15.8438, 15.7266, 15.4609, 15.3516, 14.8281, 14.6562]
+
+Token 184: 'of'
+Top tokens: ['of', 'using', 'in', 'by', 'with', 'at', 'from', 'for']
+Top probs: [0.9989, 0.0005, 0.0003, 0.0002, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.2188, 20.5938, 20.0625, 19.9219, 17.0938, 16.9844, 15.8906, 14.7734]
+
+Token 185: 'a'
+Top tokens: ['a', 'such', 'Mil', 'this', 'such', 'someone', 'an', 'Mil']
+Top probs: [0.9984, 0.0015, 0.0001, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.3750, 25.8750, 23.3281, 18.7656, 16.5938, 16.2812, 16.2656, 15.7500]
+
+Token 186: 'well'
+Top tokens: ['well', 'bel', 'celebrated', 'dog', 'privile', 'popular', 'celebr', 'wealth']
+Top probs: [0.9821, 0.0149, 0.0008, 0.0007, 0.0005, 0.0004,0.0002, 0.0001]
+Top logits: [24.0312, 19.8438, 16.9062, 16.7188, 16.5312, 16.1094, 15.6641, 14.8125]
+
+Token 187: '-'
+Top tokens: ['-', 'known', '–', '-', '--', 'known', 'pedig', 'bre']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.3125, 13.3750, 13.0156, 12.9219, 12.8594, 12.3125, 11.1953, 10.9844]
+
+Token 188: 'known'
+Top tokens: ['known', 'to', 'he', 'bre', 'tra', 'known', 'be', 'off']
+Top probs: [0.9940, 0.0045, 0.0009, 0.0002, 0.0002, 0.0000,0.0000, 0.0000]
+Top logits: [27.5781, 22.1875, 20.6250, 19.1875, 18.7812, 16.6562, 16.6250, 16.4062]
+
+Token 189: 'and'
+Top tokens: ['and', 'dog', 'animal', ',', 'and', 'celebr', 'pet', 'и']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.8281, 18.5000, 16.3906, 16.1250, 15.8672, 13.4297, 12.4453, 12.3750]
+
+Token 190: 'bel'
+Top tokens: ['bel', 'well', 'celebrated', 'loved', 'adm', 'much', 'well', 'highly']
+Top probs: [0.5734, 0.4261, 0.0001, 0.0001, 0.0001, 0.0001,0.0000, 0.0000]
+Top logits: [25.7344, 25.4375, 17.3125, 17.2656, 17.0625, 16.4062, 16.2812, 15.3594]
+
+Token 191: 'oved'
+Top tokens: ['oved', 'ove', 'ored', 'loved', 'ived', 'iev', 'lo', 'led']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [33.8125, 16.7500, 15.6250, 15.3672, 13.1797, 12.8281, 12.7812, 12.6094]
+
+Token 192: 'pet'
+Top tokens: ['pet', 'dog', 'animal', 'companion', 'pet', 'pup', 'Pet', 'dog']
+Top probs: [0.8587, 0.1276, 0.0137, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.6094, 26.7031, 24.4688, 18.0781, 17.6562, 16.8594, 16.6406, 15.5078]
+
+Token 193: 'like'
+Top tokens: ['like', '.', ',', 'such', 'of', 'like', 'Like', 'belonging']
+Top probs: [0.9999, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.7500, 23.7344, 18.7031, 18.4219, 18.0312, 17.6250, 15.9844, 15.1875]
+
+Token 194: 'Mil'
+Top tokens: ['Mil', 'miles', 'Mil', 'Milan', 'Max', 'M', 'M', 'mil']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.2500, 20.2812, 19.1562, 13.8750, 13.8047, 13.5078, 13.4531, 13.3281]
+
+Token 195: 'es'
+Top tokens: ['es', 'ES', 'és', 'ès', 'est', 'es', 'ес', 'ess']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [37.4375, 17.4375, 16.5625, 15.0156, 14.3750, 14.1406, 13.9688, 13.7656]
+
+Token 196: '.'
+Top tokens: ['.', ',', 'rather', '!', 'who', '.', '.,', ';']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.1875, 22.5625, 14.7266, 13.8516, 13.3750, 13.3281, 13.2578, 13.0000]
+
+Token 197: 'The'
+Top tokens: ['The', '\n', 'It', 'D', 'Today', 'This', '</s>', 'Dog']
+Top probs: [0.9939, 0.0048, 0.0006, 0.0001, 0.0001, 0.0001,0.0001, 0.0001]
+Top logits: [24.4844, 19.1562, 17.0312, 15.3125, 15.2891, 14.8906, 14.6953, 14.6250]
+
+Token 198: 'image'
+Top tokens: ['image', 'photograph', 'photo', 'fact', 'portrait', 'popular', 'Image', 'image']
+Top probs: [0.7452, 0.2535, 0.0011, 0.0001, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [25.4688, 24.3906, 18.9531, 16.5312, 15.6484, 14.4453, 13.7188, 13.6875]
+
+Token 199: 'is'
+Top tokens: ['is', 'has', 'provides', 'remains', 'was', 'itself', 'serves', 'represents']
+Top probs: [0.8126, 0.1842, 0.0019, 0.0010, 0.0001, 0.0000,0.0000, 0.0000]
+Top logits: [23.7812, 22.2969, 17.7188, 17.0625, 14.1250, 14.0469, 13.8047, 13.5938]
+
+Token 200: 'a'
+Top tokens: ['a', 'not', 'now', 'also', 'significant', 'still', 'small', 'an']
+Top probs: [0.9388, 0.0610, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [23.8750, 21.1406, 13.8281, 13.8203, 13.7500, 13.3750, 12.8516, 12.3594]
+
+Token 201: 'fasc'
+Top tokens: ['fasc', 'significant', 'test', 'remarkable', 'char', 'rare', 'unique', 'valuable']
+Top probs: [0.3240, 0.2408, 0.1351, 0.1085, 0.0832, 0.0638, 0.0270, 0.0103]
+Top logits: [19.1562, 18.8594, 18.2812, 18.0625, 17.7969, 17.5312, 16.6719, 15.7031]
+
+Token 202: 'in'
+Top tokens: ['in', 'ating', 'IN', 'ination', 'int', 'ina', 'iting', 'ulating']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [33.6250, 15.3594, 14.0312, 14.0000, 11.5625, 10.9609, 10.6094, 10.5859]
+
+Token 203: 'ating'
+Top tokens: ['ating', 'ated', 'aring', 'ulating', 'cing', 'ifying', 'izing', 'ling']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.8125, 13.6953, 12.1875, 12.1875, 11.7656, 11.3516, 11.2734, 10.8125]
+
+Token 204: 'g'
+Top tokens: ['g', 'piece', 'snapshot', 'look', 'window', 'example', 'historical', 'artifact']
+Top probs: [0.9881, 0.0074, 0.0015, 0.0009, 0.0009, 0.0004,0.0003, 0.0002]
+Top logits: [25.3125, 20.4219, 18.8281, 18.2969, 18.2969, 17.5938, 17.2812, 16.9844]
+
+Token 205: 'limp'
+Top tokens: ['limp', 'lim', 'lipse', 'lip', 'glance', 'look', 'host', 'lymp']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [35.8438, 19.1406, 15.8281, 14.5078, 14.4062, 13.9688, 13.7656, 13.5469]
+
+Token 206: 'se'
+Top tokens: ['se', 'see', 'seg', 'te', 'sein', 'Hi', 'seau', 'SE']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.0625, 11.1406, 10.0781, 10.0625,  9.9844,  9.9766,  9.3359,  9.1094]
+
+Token 207: 'into'
+Top tokens: ['into', 'of', 'into', 'at', 'back', 'In', 'INTO', 'not']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [37.0625, 22.2031, 19.9062, 18.6094, 18.2344, 15.8125, 15.7500, 15.2969]
+
+Token 208: 'the'
+Top tokens: ['the', 'life', '', 'early', 'dog', 'animal', 'can', 'the']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [28.2656, 17.6094, 15.8047, 15.6953, 14.9219, 14.8750, 14.7969, 12.9922]
+
+Token 209: 'history'
+Top tokens: ['history', 'lives', 'early', 'past', 'life', 'relationship', 'earliest', 'world']
+Top probs: [0.5370, 0.3207, 0.0683, 0.0593, 0.0080, 0.0060,0.0003, 0.0003]
+Top logits: [22.9688, 22.4531, 20.9062, 20.7656, 18.7656, 18.4688, 15.5000, 15.4375]
+
+Token 210: 'of'
+Top tokens: ['of', 'of', 'or', 'and', 'both', 'not', '.', 'Of']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.5000, 17.8594, 14.9062, 13.9141, 13.4844, 12.8281, 12.7656, 12.5469]
+
+Token 211: 'animal'
+Top tokens: ['animal', 'phot', 'dog', 'pet', 'both', 'Animal', 'Phot', 'photograph']
+Top probs: [0.5639, 0.4323, 0.0020, 0.0014, 0.0003, 0.0000,0.0000, 0.0000]
+Top logits: [27.6719, 27.4062, 22.0469, 21.6562, 20.2188, 17.4062, 16.8438, 15.9062]
+
+Token 212: 'phot'
+Top tokens: ['phot', 'portrait', 'photograph', 'Phot', 'ph', 'representation', 'and', 'lo']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.4844, 19.2656, 17.4375, 17.0312, 16.9375, 13.7656, 12.5000, 11.8594]
+
+Token 213: 'ography'
+Top tokens: ['ography', 'graph', 'og', 'graph', 'графи', 'ografia', 'agraph', 'ob']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [38.0000, 19.5781, 16.5938, 14.9609, 14.5391, 13.7891, 13.5859, 13.5312]
+
+Token 214: 'and'
+Top tokens: ['and', ',', '.', 'and', 'as', '!', '-', '–']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.8125, 26.8906, 21.5625, 16.6250, 16.2812, 14.7578, 13.2031, 12.6094]
+
+Token 215: 'a'
+Top tokens: ['a', 'shows', 'show', 'the', 'provides', 'gives', 'serves', 'is']
+Top probs: [0.6000, 0.2462, 0.0585, 0.0448, 0.0233, 0.0077, 0.0058, 0.0044]
+Top logits: [20.1875, 19.2969, 17.8594, 17.5938, 16.9375, 15.8281, 15.5547, 15.2734]
+
+Token 216: 'rem'
+Top tokens: ['rem', 'test', 'testim', 'char', 'rare', 'test', 'reflection', 'great']
+Top probs: [0.6370, 0.3629, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [26.5625, 26.0000, 15.7891, 15.6094, 14.9922, 14.8516, 14.4688, 14.2734]
+
+Token 217: 'inder'
+Top tokens: ['inder', 'inds', 'ind', 'inding', 'test', 'emb', 'nant', 'ider']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.5938, 16.4844, 16.0625, 14.0234, 14.0156, 13.5938, 12.5156, 11.9844]
+
+Token 218: 'of'
+Top tokens: ['of', 'that', 'how', 'of', 'to', 'the', 'that', 'about']
+Top probs: [0.9999, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [37.5312, 28.6094, 16.7031, 16.2812, 14.1875, 13.1094, 13.0312, 12.0547]
+
+Token 219: 'the'
+Top tokens: ['the', 'our', 'how', 'humans', 'people', 'the', 'human', 'just']
+Top probs: [0.9867, 0.0077, 0.0057, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.2969, 26.4375, 26.1406, 16.3125, 15.8359, 15.7891, 15.7891, 15.7500]
+
+Token 220: 'special'
+Top tokens: ['special', 'end', 'long', 'deep', 'strong', 'close', 'importance', 'important']
+Top probs: [0.5668, 0.2806, 0.1325, 0.0107, 0.0035, 0.0028, 0.0017, 0.0010]
+Top logits: [23.1250, 22.4219, 21.6719, 19.1562, 18.0312, 17.7969, 17.3125, 16.7812]
+
+Token 221: 'bond'
+Top tokens: ['bond', 'place', 'relationship', 'connection', 'role', 'b', 'Bond', 'places']
+Top probs: [0.9706, 0.0284, 0.0005, 0.0004, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.4688, 26.9375, 22.9375, 22.6875, 18.5156, 18.0781, 18.0000, 17.2656]
+
+Token 222: 'between'
+Top tokens: ['between', 'that', 'humans', 'we', 'people', 'Between', 'between', 'zwischen']
+Top probs: [0.9872, 0.0128, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.5000, 27.1562, 20.4375, 19.2969, 17.6406, 17.2656, 16.8438, 14.6953]
+
+Token 223: 'humans'
+Top tokens: ['humans', 'dogs', 'people', 'animals', 'Hum', 'man', 'horses', 'hum']
+Top probs: [0.9998, 0.0002, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.1250, 27.7812, 22.1094, 20.4531, 18.0938, 15.8516, 15.4531, 14.9922]
+
+Token 224: 'and'
+Top tokens: ['and', 'and', '.', ',', 'an', '&', 'And', 'и']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [39.0312, 18.4219, 16.2500, 16.1406, 14.6250, 13.7656, 13.3906, 13.3438]
+
+Token 225: 'their'
+Top tokens: ['their', 'dogs', 'animals', 'our', 'can', 'Their', 'horses', 'the']
+Top probs: [0.9930, 0.0051, 0.0014, 0.0004, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.2812, 27.0156, 25.7500, 24.4844, 18.4219, 17.3438, 14.8516, 13.4453]
+
+Token 226: 'fur'
+Top tokens: ['fur', 'can', 'bel', 'loyal', 'p', 'four', 'faithful', 'companion']
+Top probs: [0.5706, 0.4110, 0.0103, 0.0045, 0.0022, 0.0006,0.0002, 0.0002]
+Top logits: [25.3438, 25.0156, 21.3281, 20.5000, 19.7969, 18.5312, 17.3750, 17.2500]
+
+Token 227: 'ry'
+Top tokens: ['ry', 'red', 'ried', 'compan', 'rier', 'ri', 'ious', 'ries']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [35.5312, 20.2344, 18.3750, 16.1875, 15.1094, 14.3750, 14.1328, 13.5703]
+
+Token 228: 'compan'
+Top tokens: ['compan', 'friends', 'companion', 'Comp', 'Fri', 'comp', 'fri', 'counter']
+Top probs: [0.7879, 0.2121, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [32.0000, 30.6875, 20.9375, 18.7031, 17.0000, 16.9375, 16.6719, 14.7188]
+
+Token 229: 'ions'
+Top tokens: ['ions', 'isons', 'eros', 'iments', 'itions', 'ints', 'iona', 'IONS']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.3750, 12.2656, 12.2266, 10.8906, 10.7578, 10.7344, 10.3594, 10.2031]
+
+Token 230: '.'
+Top tokens: ['.', 'that', ',', '</s>', 'over', 'throughout', '\n', '."']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [33.0312, 21.2969, 16.2812, 15.6641, 15.5391, 15.4766, 14.3984, 14.3906]
+
+Token 231: '</s>'
+Top tokens: ['</s>', '\n', '', '(', 'Today', ' ', '#', 'Over']
+Top probs: [0.9399, 0.0601, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [29.0000, 26.2500, 16.1094, 11.8750, 11.8281, 11.4609, 10.1250,  9.6719]

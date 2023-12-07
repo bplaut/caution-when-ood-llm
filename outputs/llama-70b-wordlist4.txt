@@ -1,0 +1,71 @@
+PROMPT 1: "<s>[INST] Pick any word from this list: landscape, sweater, baseball, apricot, conference. Then pick any word not in that list. Make your response as short as possible. [/INST]"
+
+OUTPUT 1: "[INST] Pick any word from this list: landscape, sweater, baseball, apricot, conference. Then pick any word not in that list. Make your response as short as possible. [/INST]  Landscape
+
+Not in the list: computer"
+
+
+Token 1: ''
+Top tokens: ['', ' ', 'Sure', '  ', 'sure', '\t', '    ', '   ']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [36.0000, 19.2812, 14.8281, 13.6328, 12.0469, 11.8672, 11.2344, 11.1641]
+
+Token 2: 'Land'
+Top tokens: ['Land', 'Sure', 'Word', 'landscape', 'S', 'Okay', 'A', 'My']
+Top probs: [0.5549, 0.2621, 0.1590, 0.0178, 0.0020, 0.0013,0.0007, 0.0004]
+Top logits: [19.6406, 18.8906, 18.3906, 16.2031, 13.9922, 13.5703, 12.8984, 12.3516]
+
+Token 3: 's'
+Top tokens: ['s', 'cape', 'sc', 'slide', 'line', 'schaft', 'scale', 'scope']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [33.5938, 17.8750, 14.9844, 13.9688, 13.1562, 12.9766, 12.8047, 12.4844]
+
+Token 4: 'cape'
+Top tokens: ['cape', 'ape', 'ca', 'lip', 'phere', 'Cape', 'cre', 'port']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [27.8281, 16.7031, 11.1172, 10.5625, 10.3828,  9.8047,  9.0703,  9.0000]
+
+Token 5: '\n'
+Top tokens: ['\n', ',', '.', 'and', ':', ';', '</s>', '']
+Top probs: [0.8970, 0.0991, 0.0037, 0.0001, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [24.2812, 22.0781, 18.7969, 14.9219, 14.2344, 13.7891, 13.3906, 13.0312]
+
+Token 6: '\n'
+Top tokens: ['\n', 'Not', 'Not', 'O', 'N', 'Non', 'not', 'not']
+Top probs: [0.9273, 0.0693, 0.0019, 0.0002, 0.0002, 0.0001,0.0001, 0.0001]
+Top logits: [19.3281, 16.7344, 13.1406, 10.8047, 10.7031, 10.3750, 10.0469, 10.0156]
+
+Token 7: 'Not'
+Top tokens: ['Not', 'Non', 'S', 'N', 'O', 'Vol', 'K', 'Not']
+Top probs: [0.8424, 0.0539, 0.0226, 0.0159, 0.0124, 0.0055, 0.0050, 0.0044]
+Top logits: [16.8281, 14.0781, 13.2109, 12.8594, 12.6094, 11.8047, 11.7031, 11.5781]
+
+Token 8: 'in'
+Top tokens: ['in', 'ebook', 'on', 'landscape', 'listed', 'from', ':', 're']
+Top probs: [0.9139, 0.0484, 0.0323, 0.0041, 0.0006, 0.0004,0.0003, 0.0000]
+Top logits: [20.5312, 17.5938, 17.1875, 15.1172, 13.1250, 12.7734, 12.4297,  9.5234]
+
+Token 9: 'the'
+Top tokens: ['the', 'list', 'that', 'this', 'List', 'list', 'lists', 'the']
+Top probs: [0.9963, 0.0035, 0.0002, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [31.1094, 25.4688, 22.4844, 15.6250, 15.2266, 14.0859, 13.7812, 13.2734]
+
+Token 10: 'list'
+Top tokens: ['list', 'list', 'List', 'listed', 'lists', 'List', 'lista', 'original']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [39.5938, 22.6094, 22.0625, 19.6094, 19.0625, 18.3438, 17.0781, 15.7656]
+
+Token 11: ':'
+Top tokens: [':', ':', ';', '：', '(', '-', ',', '):']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [35.7500, 18.7344, 14.6562, 13.5312, 12.6562, 12.2109, 11.7344, 11.3125]
+
+Token 12: 'computer'
+Top tokens: ['computer', 'Computer', 'p', 'Per', 'Pom', 'Comput', 'Comput', 'computers']
+Top probs: [0.3695, 0.2330, 0.0632, 0.0477, 0.0338, 0.0333, 0.0227, 0.0121]
+Top logits: [13.9844, 13.5234, 12.2188, 11.9375, 11.5938, 11.5781, 11.1953, 10.5625]
+
+Token 13: '</s>'
+Top tokens: ['</s>', '.', '\n', 'mouse', '"', '', ')', '!']
+Top probs: [1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,0.0000, 0.0000]
+Top logits: [30.4062, 18.6562, 16.7812, 12.6797, 12.4531, 12.0234, 11.2266, 10.8828]
