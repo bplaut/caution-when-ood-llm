@@ -23,6 +23,7 @@ def generate_prompt(instruction):
 """
 
 def grade_answers(question_data, llm_answer):
+    # This grading should probably be improved. It accepted "Toy Story 2" when "Toy Story" was correct
     correct_answer = None
     for answer in question_data['answers']:
         if answer['correct']:
@@ -56,8 +57,8 @@ def run_test(model, trivia_data):
     total_score = 0
     incorrect = []
     unknown = []
-    random.shuffle(trivia_data) # Randomize question order
-    num_questions = 10
+    # random.shuffle(trivia_data) # Randomize question order
+    num_questions = 40
 
     for i, question_data in enumerate(trivia_data):
         question_string = generate_question_string(question_data)
@@ -79,6 +80,7 @@ def run_test(model, trivia_data):
         else:
             total_score += 0
             unknown.append((i+1, question_string, answer_output))
+        print("Current score:", total_score, '\n')
         if i == num_questions:
             break
     return total_score
@@ -88,8 +90,8 @@ def main():
     trivia_data = load_trivia_questions(args['input_filepath'])
     model = generate_text.Generator(args)
     score = run_test(model, trivia_data)
-    print("MODEL:", args['model'], "| SCORE:", score)
-
+    halu_str = '+ halu check' if args['check_for_halu'] else ''
+    print("MODEL:", args['model'], halu_str, "| SCORE:", score)
 
 if __name__ == '__main__':
     main()

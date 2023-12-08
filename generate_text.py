@@ -3,21 +3,8 @@ from transformers import AutoTokenizer
 import argparse
 import torch as t
 
-class HaluDetector(object):
-    def min_max_logit(self, scores, response_idx, normalize=False):
-        # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
-        scores_tensor = t.stack(list(scores), dim=0)
-        if normalize:
-            scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
-        (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
-        (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
-        # Small bug: this should exclude the padding characters at the end
-        return (min_among_max_logits[response_idx], indices[response_idx])
-
 class Generator(object):
-    def __init__(self, args):
-        self.halu_detector = HaluDetector()
-        
+    def __init__(self, args):        
         if args['model'] == 'Mistral-raw':
             model_name = 'mistralai/Mistral-7B-v0.1'
         elif args['model'] == 'Mistral':
@@ -48,6 +35,16 @@ class Generator(object):
         else:
             self.num_responses = self.args['num_responses']
             
+    def min_max_logit(self, scores, response_idx, normalize=True):
+        # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
+        scores_tensor = t.stack(list(scores), dim=0)
+        if normalize:
+            scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
+        (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
+        (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
+        # Small bug to be fixed: this should exclude the padding characters at the end
+        return (min_among_max_logits[response_idx], indices[response_idx])
+            
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
         return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
@@ -61,8 +58,8 @@ class Generator(object):
             token_ids = output.sequences[i][len(model_inputs[prompt_idx]):]
 
             if self.args['num_top_tokens'] > 0:
-                (mm_logit, mm_logit_idx) = self.halu_detector.min_max_logit(output.scores, i)
-                (mm_prob, mm_prob_idx) = self.halu_detector.min_max_logit(output.scores, i, normalize=True)
+                (mm_logit, mm_logit_idx) = self.min_max_logit(output.scores, i, normalize=False)
+                (mm_prob, mm_prob_idx) = self.min_max_logit(output.scores, i, normalize=True)
                 print("Min max prob  =", t_to_str(mm_prob), "| Index =", t_to_str(mm_prob_idx))
                 print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
                 for j in range(len(token_ids)):
@@ -90,9 +87,13 @@ class Generator(object):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
-        output_just_responses = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output. i//num_responses is the prompt index
-        text_outputs = self.tokenizer.batch_decode(output_just_responses, skip_special_tokens=True) 
+        output_just_responses = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output. i//num_responses in the prompt index
+        text_outputs = self.tokenizer.batch_decode(output_just_responses, skip_special_tokens=True)
         self.print_output(output, model_inputs, prompts, text_outputs)
+        for (i, response) in enumerate(text_outputs):
+            (mm_prob, _) = self.min_max_logit(output.scores, i//self.num_responses, normalize=True)
+            if self.args['check_for_halu'] and mm_prob < 0.5:
+                text_outputs[i] = "E. I don't know. (I was going to maybe hallucinate but then I caught myself.)"
         return text_outputs
 
 def parse_args():
@@ -106,6 +107,7 @@ def parse_args():
     parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
     parser.add_argument('-i', '--interactive', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Automatically activates chat mode.', default=False)
     parser.add_argument('-f', '--input_filepath', type=str, default=None, help='The path to the json file containing input data (this is mostly for running experiments/tests)')
+    parser.add_argument('-u', '--check_for_halu', action="store_true", help='Should we add an extra check for hallucations? Eventually there will also be an option for why detection method to use.', default=False)
     return dict(vars(parser.parse_args())) # turn it into a dictionary so we can easily modify it
     
 def t_to_str(T):
@@ -120,7 +122,6 @@ def t_to_str(T):
     
 def main():
     t.set_printoptions(sci_mode=False, precision=3)
-    halu_detector = HaluDetector()
     args = parse_args() 
     generator = Generator(args)
 
