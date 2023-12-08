@@ -27,6 +27,8 @@ class Generator(object):
         
         if args.model == 'Mistral-7b':
             model_name = 'mistralai/Mistral-7B-v0.1'
+        elif args.model == 'Mistral-7b-chat':
+            model_name = 'mistralai/Mistral-7B-Instruct-v0.1'
         elif args.model == 'Zephyr-7b-beta':
             model_name = 'HuggingFaceH4/zephyr-7b-beta'
         elif args.model == 'Zephyr-7b-alpha':
