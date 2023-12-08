@@ -4,11 +4,14 @@ import argparse
 import torch as t
 
 class HaluDetector(object):
-    def min_max_logit(self, scores, response_idx):
-        # scores has shape (response_length, num_responses, vocab_size)
+    def min_max_logit(self, scores, response_idx, normalize=False):
+        # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
         scores_tensor = t.stack(list(scores), dim=0)
+        if normalize:
+            scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
         (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
         (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
+        # Small bug: this should exclude the padding characters at the end
         return (min_among_max_logits[response_idx], indices[response_idx])
 
 class Generator(object):
@@ -59,6 +62,8 @@ class Generator(object):
 
             if self.args['num_top_tokens'] > 0:
                 (mm_logit, mm_logit_idx) = self.halu_detector.min_max_logit(output.scores, i)
+                (mm_prob, mm_prob_idx) = self.halu_detector.min_max_logit(output.scores, i, normalize=True)
+                print("Min max prob =", t_to_str(mm_prob), "| Index =", t_to_str(mm_prob_idx))
                 print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
                 for j in range(len(token_ids)):
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
@@ -66,7 +71,9 @@ class Generator(object):
                     sorted_probs = t.exp(sorted_scores) / t.sum(t.exp(sorted_scores))
                     top_tokens = self.tokenizer.batch_decode(top_token_ids[:self.args['num_top_tokens']])
                     if self.args['num_top_tokens'] == 1:
-                        print(t_to_str(sorted_probs[0]), '|', t_to_str(sorted_scores[0]), '|', repr(top_tokens[0]))
+                        max_token_idx_len = len(str(len(token_ids)))
+                        idx_str = str(j).zfill(max_token_idx_len) # pad with 0s for prettiness
+                        print("Token %s |" % idx_str, t_to_str(sorted_probs[0]), '|', t_to_str(sorted_scores[0]), '|', repr(top_tokens[0]))
                     else:
                         print('\nToken %d:' % j, repr(self.tokenizer.decode(token_ids[j])))
                         print("Top tokens:", top_tokens)
