@@ -12,8 +12,8 @@ class HaluDetector(object):
         return (min_among_max_logits[response_idx], indices[response_idx])
 
 class Generator(object):
-    def __init__(self, args, halu_detector=None):
-        self.halu_detector = halu_detector
+    def __init__(self, args):
+        self.halu_detector = HaluDetector()
         
         if args['model'] == 'Mistral-raw':
             model_name = 'mistralai/Mistral-7B-v0.1'
@@ -49,8 +49,7 @@ class Generator(object):
         chats = [[{"role": "user", "content": p}] for p in prompts]
         return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
 
-    def print_output(self, output, model_inputs, prompts):
-        text_outputs = self.tokenizer.batch_decode(output.sequences, skip_special_tokens=True)
+    def print_output(self, output, model_inputs, prompts, text_outputs):
         print('\n')
         for i in range(len(text_outputs)):
             prompt_idx = i//self.num_responses
@@ -79,13 +78,14 @@ class Generator(object):
                         break
                     
             print('\n')
-        return text_outputs
 
     def generate(self, prompts):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
-        return self.print_output(output, model_inputs, prompts)
+        text_outputs = self.tokenizer.batch_decode([output.sequences[0][len(model_inputs[0]):]], skip_special_tokens=True) # decode just the non-prompt part of the output. Need to fix the 0-indexing later, that only works when there's a single prompt
+#        self.print_output(output, model_inputs, prompts, text_outputs)
+        return text_outputs
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Use an LLM to generate text via HuggingFace.')
@@ -97,7 +97,8 @@ def parse_args():
     parser.add_argument('-s', '--do_sample', action="store_true", help='Should we sample from the probability distribution, or greedily pick the most likely token?', default=False)
     parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
     parser.add_argument('-i', '--interactive', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Automatically activates chat mode.', default=False)
-    return parser.parse_args()
+    parser.add_argument('-f', '--input_filepath', type=str, default=None, help='The path to the json file containing input data (this is mostly for running experiments/tests)')
+    return dict(vars(parser.parse_args())) # turn it into a dictionary so we can easily modify it
     
 def t_to_str(T):
     # Get rid of a bunch of stuff in the tensor format that I don't like
@@ -112,8 +113,8 @@ def t_to_str(T):
 def main():
     t.set_printoptions(sci_mode=False, precision=3)
     halu_detector = HaluDetector()
-    args = dict(vars(parse_args())) # turn it into a dictionary so we can easily modify it
-    generator = Generator(args, halu_detector)
+    args = parse_args() 
+    generator = Generator(args)
 
     if args['prompts'] == None:
         prompts = [input("\nEnter an initial prompt:\n")]
@@ -133,4 +134,5 @@ def main():
             base_text = generator.generate([prompt])[0] # output text becomes the base text for next prompt
             user_prompt = input("User response: ")
         
-main()
+if __name__ == '__main__':
+    main()
