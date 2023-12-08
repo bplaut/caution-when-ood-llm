@@ -14,7 +14,7 @@ def generate_question_string(question_data):
     return f"{question}\n{''.join(choices)}"
 
 def generate_prompt(instruction):
-        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request. Only answer the question. Keep token limit low.
+        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request. Only answer the question. Keep your response as brief as possible; just state the letter corresponding to your answer."
 
 ### Instruction:
 {instruction}
@@ -54,11 +54,11 @@ def grade_answers(question_data, llm_answer):
     return f"{llm_answer} (incorrect {correct_answer['choice']}.)"
 
 def run_test(model, trivia_data):
-    total_score = 0
+    correct = []
     incorrect = []
-    unknown = []
+    abstained = []
     # random.shuffle(trivia_data) # Randomize question order
-    num_questions = 40
+    num_questions = 80
 
     for i, question_data in enumerate(trivia_data):
         question_string = generate_question_string(question_data)
@@ -72,26 +72,28 @@ def run_test(model, trivia_data):
         answer_output = grade_answers(question_data, llm_answer)
         print(f"Answer: {answer_output}\n")
 
-        if "(correct)" in answer_output: # They scored it 2/1/0 but I'm doing 1/0/-1 for now
-            total_score += 1
+        if "(correct)" in answer_output:
+            correct.append((i+1, question_string, answer_output))
         elif "(incorrect" in answer_output:
             incorrect.append((i+1, question_string, answer_output))
-            total_score -= 1
         else:
-            total_score += 0
-            unknown.append((i+1, question_string, answer_output))
-        print("Current score:", total_score, '\n')
-        if i == num_questions:
+            abstained.append((i+1, question_string, answer_output))
+        print("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
+        if i == num_questions - 1:
             break
-    return total_score
+    return (correct, incorrect, abstained)
     
 def main():
     args = generate_text.parse_args()
     trivia_data = load_trivia_questions(args['input_filepath'])
     model = generate_text.Generator(args)
-    score = run_test(model, trivia_data)
+    (correct, incorrect, abstained) = run_test(model, trivia_data)
     halu_str = '+ halu check' if args['check_for_halu'] else ''
-    print("MODEL:", args['model'], halu_str, "| SCORE:", score)
+    print("FINAL: model =", args['model'], halu_str)
+    print("Correct: %d | Wrong: %d | Abstained: %d" % (len(correct), len(incorrect), len(abstained)))
+    print("Score (even grading):", len(correct) - len(incorrect))
+    print("Score (harsher grading):", len(correct) - 2 * len(incorrect))
+    print("Score (very harsh):", len(correct) - 4 * len(incorrect))
 
 if __name__ == '__main__':
     main()

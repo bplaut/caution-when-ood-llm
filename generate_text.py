@@ -92,7 +92,7 @@ class Generator(object):
         self.print_output(output, model_inputs, prompts, text_outputs)
         for (i, response) in enumerate(text_outputs):
             (mm_prob, _) = self.min_max_logit(output.scores, i//self.num_responses, normalize=True)
-            if self.args['check_for_halu'] and mm_prob < 0.5:
+            if self.args['check_for_halu'] and mm_prob < 0.6:
                 text_outputs[i] = "E. I don't know. (I was going to maybe hallucinate but then I caught myself.)"
         return text_outputs
 
