@@ -3,6 +3,7 @@ from transformers import AutoTokenizer
 import argparse
 import torch as t
 
+# Still need to try beam search at some point
 class Generator(object):
     def __init__(self, args):        
         if args['model'] == 'Mistral-raw':
@@ -92,7 +93,7 @@ class Generator(object):
         self.print_output(output, model_inputs, prompts, text_outputs)
         for (i, response) in enumerate(text_outputs):
             (mm_prob, _) = self.min_max_logit(output.scores, i//self.num_responses, normalize=True)
-            if self.args['check_for_halu'] and mm_prob < 0.6:
+            if self.args['check_for_halu'] and mm_prob < self.args['threshold']:
                 text_outputs[i] = "E. I don't know. (I was going to maybe hallucinate but then I caught myself.)"
         return text_outputs
 
@@ -101,13 +102,14 @@ def parse_args():
     parser.add_argument('-m', '--model', type=str, help='Which LLM to use. Check this file for currently supported options and/or add your own.',required=True)
     parser.add_argument('-p', '--prompts', type=str, help='List of prompts, separated by |. For example "Hello my name is Ben|What a time to be alive". If not provided, you will be asked for a prompt by command line.', default=None)
     parser.add_argument('-n', '--max_new_tokens', type=int, help='Number of new tokens to generate on top of the prompt', default=10)
-    parser.add_argument('-t', '--num_top_tokens', type=int, help='For each token, print out the top candidates considered by the model and their probabilities', default=0)
+    parser.add_argument('-k', '--num_top_tokens', type=int, help='For each token, print out the top candidates considered by the model and their probabilities', default=0)
     parser.add_argument('-c', '--chat', action="store_true", help='Whether to treat the prompt as a chat message and generate a chatbot response, vs just normal text auto-complete', default=True)
     parser.add_argument('-s', '--do_sample', action="store_true", help='Should we sample from the probability distribution, or greedily pick the most likely token?', default=False)
     parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
     parser.add_argument('-i', '--interactive', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Automatically activates chat mode.', default=False)
     parser.add_argument('-f', '--input_filepath', type=str, default=None, help='The path to the json file containing input data (this is mostly for running experiments/tests)')
     parser.add_argument('-u', '--check_for_halu', action="store_true", help='Should we add an extra check for hallucations? Eventually there will also be an option for why detection method to use.', default=False)
+    parser.add_argument('-t', '--threshold', type=float, help='When running the hallucination check, what should we compare with? Right now, this is just a comparison with the min max probability.', default=0.5)
     return dict(vars(parser.parse_args())) # turn it into a dictionary so we can easily modify it
     
 def t_to_str(T):

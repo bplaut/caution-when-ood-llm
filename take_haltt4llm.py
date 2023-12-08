@@ -14,7 +14,7 @@ def generate_question_string(question_data):
     return f"{question}\n{''.join(choices)}"
 
 def generate_prompt(instruction):
-        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request. Only answer the question. Keep your response as brief as possible; just state the letter corresponding to your answer."
+        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request. Only answer the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period."
 
 ### Instruction:
 {instruction}
