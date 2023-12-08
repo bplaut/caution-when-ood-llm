@@ -3,8 +3,17 @@ from transformers import AutoTokenizer
 import argparse
 import torch as t
 
+class HaluDetector(object):
+    def min_max_logit(self, scores, response_idx):
+        # scores has shape (response_length, num_responses, vocab_size)
+        scores_tensor = t.stack(list(scores), dim=0)
+        (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
+        (min_among_max_logits, _) = t.min(max_logit_per_token, dim=0)
+        return min_among_max_logits[response_idx]
+
 class Generator(object):
-    def __init__(self):
+    def __init__(self, halu_detector):
+        self.halu_detector = halu_detector
         parser = argparse.ArgumentParser(description='Use an LLM to generate text via HuggingFace.')
         parser.add_argument('-m', '--model', type=str, help='Which LLM to use. Check this file for currently supported options and/or add your own.',required=True)
         parser.add_argument('-p', '--prompts', type=str, help='List of prompts, separated by |. For example "Hello my name is Ben|What a time to be alive". If not provided, you will be asked for a prompt by command line.', default=None)
@@ -15,7 +24,7 @@ class Generator(object):
         parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
         parser.add_argument('-i', '--interactive_mode', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Only relevant in chat mode.', default=False)
         args = parser.parse_args()
-                            
+        
         if args.model == 'Mistral-7b':
             model_name = 'mistralai/Mistral-7B-v0.1'
         elif args.model == 'Zephyr-7b-beta':
@@ -66,6 +75,7 @@ class Generator(object):
             print('OUTPUT %d: "%s"\n' % (i % self.num_responses + 1, text_outputs[i]))
             token_ids = output.sequences[i][len(model_inputs[prompt_idx]):]
 
+            print("Minimum max logit across tokens:", self.halu_detector.min_max_logit(output.scores, i))
             if self.args.num_top_tokens > 0:
                 for j in range(len(token_ids)):
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
@@ -102,7 +112,8 @@ def t_to_str(T):
     
 def main():
     t.set_printoptions(sci_mode=False, precision=3)
-    generator = Generator()
+    halu_detector = HaluDetector()
+    generator = Generator(halu_detector)
     prompts = generator.prepare_for_chat(generator.initial_prompts) if generator.args.chat_mode else generator.initial_prompts
     
     output_text = generator.generate(prompts)
