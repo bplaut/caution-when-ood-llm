@@ -57,9 +57,9 @@ class Generator(object):
             print('OUTPUT %d: "%s"\n' % (i % self.num_responses + 1, text_outputs[i]))
             token_ids = output.sequences[i][len(model_inputs[prompt_idx]):]
 
-            (mm_logit, mm_logit_idx) = self.halu_detector.min_max_logit(output.scores, i)
-            print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
             if self.args['num_top_tokens'] > 0:
+                (mm_logit, mm_logit_idx) = self.halu_detector.min_max_logit(output.scores, i)
+                print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
                 for j in range(len(token_ids)):
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
                     (sorted_scores, top_token_ids) = t.sort(output.scores[j][i], descending=True)
@@ -83,8 +83,9 @@ class Generator(object):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
-        text_outputs = self.tokenizer.batch_decode([output.sequences[0][len(model_inputs[0]):]], skip_special_tokens=True) # decode just the non-prompt part of the output. Need to fix the 0-indexing later, that only works when there's a single prompt
-#        self.print_output(output, model_inputs, prompts, text_outputs)
+        output_just_responses = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output. i//num_responses is the prompt index
+        text_outputs = self.tokenizer.batch_decode(output_just_responses, skip_special_tokens=True) 
+        self.print_output(output, model_inputs, prompts, text_outputs)
         return text_outputs
 
 def parse_args():
