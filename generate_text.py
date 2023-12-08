@@ -25,25 +25,23 @@ class Generator(object):
         parser.add_argument('-i', '--interactive_mode', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Only relevant in chat mode.', default=False)
         args = parser.parse_args()
         
-        if args.model == 'Mistral-7b':
+        if args.model == 'Mistral-raw':
             model_name = 'mistralai/Mistral-7B-v0.1'
-        elif args.model == 'Mistral-7b-chat':
+        elif args.model == 'Mistral':
             model_name = 'mistralai/Mistral-7B-Instruct-v0.1'
-        elif args.model == 'Zephyr-7b-beta':
+        elif args.model == 'Zephyr':
             model_name = 'HuggingFaceH4/zephyr-7b-beta'
-        elif args.model == 'Zephyr-7b-alpha':
-            model_name = 'HuggingFaceH4/zephyr-7b-alpha'
         elif args.model == 'gpt2':
             model_name = 'gpt2'
-        elif args.model == 'Llama-13b':
+        elif args.model == 'Llama-13b-raw':
             model_name = 'meta-llama/Llama-2-13b-hf'
-        elif args.model == 'Llama-13b-chat':
+        elif args.model == 'Llama-13b':
             model_name = 'meta-llama/Llama-2-13b-chat-hf'
-        elif args.model == 'Llama-7b':
+        elif args.model == 'Llama-7b-raw':
             model_name = 'meta-llama/Llama-2-7b-hf'
-        elif args.model == 'Llama-7b-chat':
+        elif args.model == 'Llama-7b':
             model_name = 'meta-llama/Llama-2-7b-chat-hf'
-        elif args.model == 'Llama-70b-chat':
+        elif args.model == 'Llama-70b':
             model_name = 'meta-llama/Llama-2-70b-chat-hf'
         else:
             raise Exception("Unrecognized model name. Try python generate_text -h")
