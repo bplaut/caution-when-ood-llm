@@ -12,7 +12,7 @@ class HaluDetector(object):
         return (min_among_max_logits[response_idx], indices[response_idx])
 
 class Generator(object):
-    def __init__(self, halu_detector, args):
+    def __init__(self, args, halu_detector=None):
         self.halu_detector = halu_detector
         
         if args.model == 'Mistral-raw':
@@ -40,17 +40,10 @@ class Generator(object):
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.args = args
 
-        if self.args.num_responses > 1 and (self.args.interactive_mode or not self.args.do_sample):
+        if self.args.num_responses > 1 and (self.args.interactive or not self.args.do_sample):
             self.num_responses = 1
         else:
             self.num_responses = self.args.num_responses
-
-        prompts = None if args.prompts == None else args.prompts.split('|')
-        if prompts != None:
-            self.initial_prompts = args.prompts.split('|')
-        else:
-            self.initial_prompts = [input("\nEnter an initial prompt:\n")]
-            print('\n')            
             
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
@@ -103,7 +96,7 @@ def parse_args():
     parser.add_argument('-c', '--chat', action="store_true", help='Whether to treat the prompt as a chat message and generate a chatbot response, vs just normal text auto-complete', default=True)
     parser.add_argument('-s', '--do_sample', action="store_true", help='Should we sample from the probability distribution, or greedily pick the most likely token?', default=False)
     parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
-    parser.add_argument('-i', '--interactive', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Only relevant in chat mode.', default=False)
+    parser.add_argument('-i', '--interactive', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Automatically activates chat mode.', default=False)
     return parser.parse_args()
     
 def t_to_str(T):
@@ -120,13 +113,20 @@ def main():
     t.set_printoptions(sci_mode=False, precision=3)
     halu_detector = HaluDetector()
     args = parse_args()
-    generator = Generator(halu_detector, args)
+    generator = Generator(args, halu_detector)
+
+    if args.prompts == None:
+        prompts = [input("\nEnter an initial prompt:\n")]
+        print('\n')
+    else:
+        prompts = args.prompts.split('|')
+    
     if not generator.args.interactive:
-        output_text = generator.generate(generator.initial_prompts)
+        output_text = generator.generate(prompts)
     else:
         base_text = ""
         # All the zero indices are because the functions return lists for batching, which doesn't make sense in interactive mode
-        user_prompt = generator.initial_prompts[0] # Only use first prompt
+        user_prompt = prompts[0] # Only use first prompt
         while True:
             # Careful with typing of lists vs strs here
             prompt = base_text + generator.prepare_for_chat([user_prompt])[0]
