@@ -12,18 +12,8 @@ class HaluDetector(object):
         return (min_among_max_logits[response_idx], indices[response_idx])
 
 class Generator(object):
-    def __init__(self, halu_detector):
+    def __init__(self, halu_detector, args):
         self.halu_detector = halu_detector
-        parser = argparse.ArgumentParser(description='Use an LLM to generate text via HuggingFace.')
-        parser.add_argument('-m', '--model', type=str, help='Which LLM to use. Check this file for currently supported options and/or add your own.',required=True)
-        parser.add_argument('-p', '--prompts', type=str, help='List of prompts, separated by |. For example "Hello my name is Ben|What a time to be alive". If not provided, you will be asked for a prompt by command line.', default=None)
-        parser.add_argument('-n', '--max_new_tokens', type=int, help='Number of new tokens to generate on top of the prompt', default=10)
-        parser.add_argument('-t', '--num_top_tokens', type=int, help='For each token, print out the top candidates considered by the model and their probabilities', default=0)
-        parser.add_argument('-c', '--chat_mode', action="store_true", help='Whether to treat the prompt as a chat message and generate a chatbot response, vs just normal text auto-complete', default=False)
-        parser.add_argument('-s', '--do_sample', action="store_true", help='Should we sample from the probability distribution, or greedily pick the most likely token?', default=False)
-        parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
-        parser.add_argument('-i', '--interactive_mode', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Only relevant in chat mode.', default=False)
-        args = parser.parse_args()
         
         if args.model == 'Mistral-raw':
             model_name = 'mistralai/Mistral-7B-v0.1'
@@ -96,13 +86,26 @@ class Generator(object):
                         break
                     
             print('\n')
-        return text_outputs        
+        return text_outputs
 
-    def generate(self, prompts):        
+    def generate(self, prompts):
+        prompts = self.prepare_for_chat(prompts) if self.args.chat and not self.args.interactive else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
         output = self.model.generate(**model_inputs, max_new_tokens=self.args.max_new_tokens, do_sample=self.args.do_sample, output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
         return self.print_output(output, model_inputs, prompts)
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Use an LLM to generate text via HuggingFace.')
+    parser.add_argument('-m', '--model', type=str, help='Which LLM to use. Check this file for currently supported options and/or add your own.',required=True)
+    parser.add_argument('-p', '--prompts', type=str, help='List of prompts, separated by |. For example "Hello my name is Ben|What a time to be alive". If not provided, you will be asked for a prompt by command line.', default=None)
+    parser.add_argument('-n', '--max_new_tokens', type=int, help='Number of new tokens to generate on top of the prompt', default=10)
+    parser.add_argument('-t', '--num_top_tokens', type=int, help='For each token, print out the top candidates considered by the model and their probabilities', default=0)
+    parser.add_argument('-c', '--chat', action="store_true", help='Whether to treat the prompt as a chat message and generate a chatbot response, vs just normal text auto-complete', default=True)
+    parser.add_argument('-s', '--do_sample', action="store_true", help='Should we sample from the probability distribution, or greedily pick the most likely token?', default=False)
+    parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
+    parser.add_argument('-i', '--interactive', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Only relevant in chat mode.', default=False)
+    return parser.parse_args()
+    
 def t_to_str(T):
     # Get rid of a bunch of stuff in the tensor format that I don't like
     s = str(T).replace(",\n       device='cuda:0')", "")
@@ -116,15 +119,18 @@ def t_to_str(T):
 def main():
     t.set_printoptions(sci_mode=False, precision=3)
     halu_detector = HaluDetector()
-    generator = Generator(halu_detector)
-    prompts = generator.prepare_for_chat(generator.initial_prompts) if generator.args.chat_mode else generator.initial_prompts
-    
-    output_text = generator.generate(prompts)
-    if generator.args.interactive_mode:
+    args = parse_args()
+    generator = Generator(halu_detector, args)
+    if not generator.args.interactive:
+        output_text = generator.generate(generator.initial_prompts)
+    else:
+        base_text = ""
+        # All the zero indices are because the functions return lists for batching, which doesn't make sense in interactive mode
+        user_prompt = generator.initial_prompts[0] # Only use first prompt
         while True:
             # Careful with typing of lists vs strs here
-            user_response = input("User response: ")
-            new_prompt = '\n'.join(output_text + generator.prepare_for_chat([user_response])) 
-            output_text = generator.generate([new_prompt])
+            prompt = base_text + generator.prepare_for_chat([user_prompt])[0]
+            base_text = generator.generate([prompt])[0] # output text becomes the base text for next prompt
+            user_prompt = input("User response: ")
         
 main()
