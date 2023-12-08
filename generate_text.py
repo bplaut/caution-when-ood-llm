@@ -14,7 +14,6 @@ class Generator(object):
         parser.add_argument('-s', '--do_sample', action="store_true", help='Should we sample from the probability distribution, or greedily pick the most likely token?', default=False)
         parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
         parser.add_argument('-i', '--interactive_mode', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Only relevant in chat mode.', default=False)
-        
         args = parser.parse_args()
                             
         if args.model == 'Mistral-7b':
@@ -42,50 +41,56 @@ class Generator(object):
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.args = args
 
+        if self.args.num_responses > 1 and (self.args.interactive_mode or not self.args.do_sample):
+            self.num_responses = 1
+        else:
+            self.num_responses = self.args.num_responses
+
         prompts = None if args.prompts == None else args.prompts.split('|')
         if prompts != None:
             self.initial_prompts = args.prompts.split('|')
         else:
             self.initial_prompts = [input("\nEnter an initial prompt:\n")]
-            print('\n')
+            print('\n')            
             
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
         return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
 
-    def generate(self, prompts):        
-        if self.args.num_responses > 1 and (self.args.interactive_mode or not self.args.do_sample):
-            num_responses = 1
-        else:
-            num_responses = self.args.num_responses
-            
-        model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
-        output = self.model.generate(**model_inputs, max_new_tokens=self.args.max_new_tokens, do_sample=self.args.do_sample, output_scores=True, num_return_sequences=num_responses, return_dict_in_generate=True, renormalize_logits=False)
+    def print_output(self, output, model_inputs, prompts):
         text_outputs = self.tokenizer.batch_decode(output.sequences, skip_special_tokens=True)
-
         print('\n')
         for i in range(len(text_outputs)):
-            prompt_idx = i//num_responses
+            prompt_idx = i//self.num_responses
             print('PROMPT %d: "%s"\n' % (prompt_idx+1, prompts[prompt_idx]))
-            print('OUTPUT %d: "%s"\n' % (i % num_responses + 1, text_outputs[i]))
+            print('OUTPUT %d: "%s"\n' % (i % self.num_responses + 1, text_outputs[i]))
             token_ids = output.sequences[i][len(model_inputs[prompt_idx]):]
 
             if self.args.num_top_tokens > 0:
                 for j in range(len(token_ids)):
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
-                    print('\nToken %d:' % (j+1), repr(self.tokenizer.decode(token_ids[j])))
                     (sorted_scores, top_token_ids) = t.sort(output.scores[j][i], descending=True)
                     sorted_probs = t.exp(sorted_scores) / t.sum(t.exp(sorted_scores))
-                    print("Top tokens:", self.tokenizer.batch_decode(top_token_ids[:self.args.num_top_tokens]))
-                    print("Top probs:", t_to_str(sorted_probs[:self.args.num_top_tokens]))
-                    print("Top logits:", t_to_str(sorted_scores[:self.args.num_top_tokens]))
+                    top_tokens = self.tokenizer.batch_decode(top_token_ids[:self.args.num_top_tokens])
+                    if self.args.num_top_tokens == 1:
+                        print(t_to_str(sorted_probs[0]), '|', t_to_str(sorted_scores[0]), '|', top_tokens[0])
+                    else:
+                        print('\nToken %d:' % (j+1), repr(self.tokenizer.decode(token_ids[j])))
+                        print("Top tokens:", top_tokens)
+                        print("Top probs:", t_to_str(sorted_probs[:self.args.num_top_tokens]))
+                        print("Top logits:", t_to_str(sorted_scores[:self.args.num_top_tokens]))
                     
                     if self.tokenizer.decode(token_ids[j]) == self.tokenizer.pad_token:
                         # If we have prompts/responses of different lengths, some will get padded
                         break
                     
             print('\n')
-        return text_outputs
+        return text_outputs        
+
+    def generate(self, prompts):        
+        model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
+        output = self.model.generate(**model_inputs, max_new_tokens=self.args.max_new_tokens, do_sample=self.args.do_sample, output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
+        return self.print_output(output, model_inputs, prompts)
 
 def t_to_str(T):
     # Get rid of a bunch of stuff in the tensor format that I don't like
@@ -96,7 +101,7 @@ def t_to_str(T):
     return s.replace(", device='cuda:0')", "")
     
 def main():
-    t.set_printoptions(sci_mode=False)
+    t.set_printoptions(sci_mode=False, precision=3)
     generator = Generator()
     prompts = generator.prepare_for_chat(generator.initial_prompts) if generator.args.chat_mode else generator.initial_prompts
     
