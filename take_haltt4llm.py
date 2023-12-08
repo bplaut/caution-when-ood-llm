@@ -52,7 +52,6 @@ def run_test(model, trivia_data):
     incorrect = []
     unknown = []
 
-    count = 0
     for i, question_data in enumerate(trivia_data):
         question_string = generate_question_string(question_data)
         prompt = generate_prompt(question_string)
@@ -72,8 +71,7 @@ def run_test(model, trivia_data):
         else:
             total_score += 1
             unknown.append((i+1, question_string, answer_output))
-        count += 1
-        if count > 20: break
+        if i > 40: break
     return total_score
     
 def main():
