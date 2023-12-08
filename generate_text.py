@@ -75,7 +75,7 @@ class Generator(object):
             print('OUTPUT %d: "%s"\n' % (i % self.num_responses + 1, text_outputs[i]))
             token_ids = output.sequences[i][len(model_inputs[prompt_idx]):]
 
-            print("Minimum max logit across tokens:", self.halu_detector.min_max_logit(output.scores, i))
+            print("Min max logit:", t_to_str(self.halu_detector.min_max_logit(output.scores, i)))
             if self.args.num_top_tokens > 0:
                 for j in range(len(token_ids)):
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
