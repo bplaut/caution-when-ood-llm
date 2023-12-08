@@ -15,23 +15,23 @@ class Generator(object):
     def __init__(self, args, halu_detector=None):
         self.halu_detector = halu_detector
         
-        if args.model == 'Mistral-raw':
+        if args['model'] == 'Mistral-raw':
             model_name = 'mistralai/Mistral-7B-v0.1'
-        elif args.model == 'Mistral':
+        elif args['model'] == 'Mistral':
             model_name = 'mistralai/Mistral-7B-Instruct-v0.1'
-        elif args.model == 'Zephyr':
+        elif args['model'] == 'Zephyr':
             model_name = 'HuggingFaceH4/zephyr-7b-beta'
-        elif args.model == 'gpt2':
+        elif args['model'] == 'gpt2':
             model_name = 'gpt2'
-        elif args.model == 'Llama-13b-raw':
+        elif args['model'] == 'Llama-13b-raw':
             model_name = 'meta-llama/Llama-2-13b-hf'
-        elif args.model == 'Llama-13b':
+        elif args['model'] == 'Llama-13b':
             model_name = 'meta-llama/Llama-2-13b-chat-hf'
-        elif args.model == 'Llama-7b-raw':
+        elif args['model'] == 'Llama-7b-raw':
             model_name = 'meta-llama/Llama-2-7b-hf'
-        elif args.model == 'Llama-7b':
+        elif args['model'] == 'Llama-7b':
             model_name = 'meta-llama/Llama-2-7b-chat-hf'
-        elif args.model == 'Llama-70b':
+        elif args['model'] == 'Llama-70b':
             model_name = 'meta-llama/Llama-2-70b-chat-hf'
         else:
             raise Exception("Unrecognized model name. Try python generate_text -h")
@@ -40,10 +40,10 @@ class Generator(object):
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.args = args
 
-        if self.args.num_responses > 1 and (self.args.interactive or not self.args.do_sample):
+        if self.args['num_responses'] > 1 and (self.args['interactive'] or not self.args['do_sample']):
             self.num_responses = 1
         else:
-            self.num_responses = self.args.num_responses
+            self.num_responses = self.args['num_responses']
             
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
@@ -60,19 +60,19 @@ class Generator(object):
 
             (mm_logit, mm_logit_idx) = self.halu_detector.min_max_logit(output.scores, i)
             print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
-            if self.args.num_top_tokens > 0:
+            if self.args['num_top_tokens'] > 0:
                 for j in range(len(token_ids)):
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
                     (sorted_scores, top_token_ids) = t.sort(output.scores[j][i], descending=True)
                     sorted_probs = t.exp(sorted_scores) / t.sum(t.exp(sorted_scores))
-                    top_tokens = self.tokenizer.batch_decode(top_token_ids[:self.args.num_top_tokens])
-                    if self.args.num_top_tokens == 1:
+                    top_tokens = self.tokenizer.batch_decode(top_token_ids[:self.args['num_top_tokens']])
+                    if self.args['num_top_tokens'] == 1:
                         print(t_to_str(sorted_probs[0]), '|', t_to_str(sorted_scores[0]), '|', repr(top_tokens[0]))
                     else:
                         print('\nToken %d:' % j, repr(self.tokenizer.decode(token_ids[j])))
                         print("Top tokens:", top_tokens)
-                        print("Top probs:", t_to_str(sorted_probs[:self.args.num_top_tokens]))
-                        print("Top logits:", t_to_str(sorted_scores[:self.args.num_top_tokens]))
+                        print("Top probs:", t_to_str(sorted_probs[:self.args['num_top_tokens']]))
+                        print("Top logits:", t_to_str(sorted_scores[:self.args['num_top_tokens']]))
                     
                     if self.tokenizer.decode(token_ids[j]) == self.tokenizer.pad_token:
                         # If we have prompts/responses of different lengths, some will get padded
@@ -82,9 +82,9 @@ class Generator(object):
         return text_outputs
 
     def generate(self, prompts):
-        prompts = self.prepare_for_chat(prompts) if self.args.chat and not self.args.interactive else prompts # interactive mode is handled separately
+        prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
-        output = self.model.generate(**model_inputs, max_new_tokens=self.args.max_new_tokens, do_sample=self.args.do_sample, output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
+        output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
         return self.print_output(output, model_inputs, prompts)
 
 def parse_args():
@@ -112,16 +112,16 @@ def t_to_str(T):
 def main():
     t.set_printoptions(sci_mode=False, precision=3)
     halu_detector = HaluDetector()
-    args = parse_args()
+    args = dict(vars(parse_args())) # turn it into a dictionary so we can easily modify it
     generator = Generator(args, halu_detector)
 
-    if args.prompts == None:
+    if args['prompts'] == None:
         prompts = [input("\nEnter an initial prompt:\n")]
         print('\n')
     else:
-        prompts = args.prompts.split('|')
+        prompts = args['prompts'].split('|')
     
-    if not generator.args.interactive:
+    if not generator.args['interactive']:
         output_text = generator.generate(prompts)
     else:
         base_text = ""
