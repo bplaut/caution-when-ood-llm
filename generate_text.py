@@ -8,8 +8,8 @@ class HaluDetector(object):
         # scores has shape (response_length, num_responses, vocab_size)
         scores_tensor = t.stack(list(scores), dim=0)
         (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
-        (min_among_max_logits, _) = t.min(max_logit_per_token, dim=0)
-        return min_among_max_logits[response_idx]
+        (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
+        return (min_among_max_logits[response_idx], indices[response_idx])
 
 class Generator(object):
     def __init__(self, halu_detector):
@@ -77,7 +77,8 @@ class Generator(object):
             print('OUTPUT %d: "%s"\n' % (i % self.num_responses + 1, text_outputs[i]))
             token_ids = output.sequences[i][len(model_inputs[prompt_idx]):]
 
-            print("Min max logit:", t_to_str(self.halu_detector.min_max_logit(output.scores, i)))
+            (mm_logit, mm_logit_idx) = self.halu_detector.min_max_logit(output.scores, i)
+            print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
             if self.args.num_top_tokens > 0:
                 for j in range(len(token_ids)):
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
@@ -85,9 +86,9 @@ class Generator(object):
                     sorted_probs = t.exp(sorted_scores) / t.sum(t.exp(sorted_scores))
                     top_tokens = self.tokenizer.batch_decode(top_token_ids[:self.args.num_top_tokens])
                     if self.args.num_top_tokens == 1:
-                        print(t_to_str(sorted_probs[0]), '|', t_to_str(sorted_scores[0]), '|', top_tokens[0])
+                        print(t_to_str(sorted_probs[0]), '|', t_to_str(sorted_scores[0]), '|', repr(top_tokens[0]))
                     else:
-                        print('\nToken %d:' % (j+1), repr(self.tokenizer.decode(token_ids[j])))
+                        print('\nToken %d:' % j, repr(self.tokenizer.decode(token_ids[j])))
                         print("Top tokens:", top_tokens)
                         print("Top probs:", t_to_str(sorted_probs[:self.args.num_top_tokens]))
                         print("Top logits:", t_to_str(sorted_scores[:self.args.num_top_tokens]))
@@ -110,7 +111,9 @@ def t_to_str(T):
     s = s.replace("tensor(", "")
     s = s.replace("\n", "")
     s = s.replace("    ", "")
-    return s.replace(", device='cuda:0')", "")
+    s = s.replace(", device='cuda:0')", "")
+    target_len = 5 # e.g. 0.534
+    return s + '0' * (target_len - len(s)) if '.' in s else s # pad with 0s if decimal
     
 def main():
     t.set_printoptions(sci_mode=False, precision=3)
