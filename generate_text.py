@@ -63,7 +63,7 @@ class Generator(object):
             if self.args['num_top_tokens'] > 0:
                 (mm_logit, mm_logit_idx) = self.halu_detector.min_max_logit(output.scores, i)
                 (mm_prob, mm_prob_idx) = self.halu_detector.min_max_logit(output.scores, i, normalize=True)
-                print("Min max prob =", t_to_str(mm_prob), "| Index =", t_to_str(mm_prob_idx))
+                print("Min max prob  =", t_to_str(mm_prob), "| Index =", t_to_str(mm_prob_idx))
                 print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
                 for j in range(len(token_ids)):
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
