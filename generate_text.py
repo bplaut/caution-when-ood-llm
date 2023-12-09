@@ -45,7 +45,26 @@ class Generator(object):
         (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
         (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
         return (min_among_max_logits[response_idx], indices[response_idx])
+
+    def max_logit_at_idx(self, scores, response_idx, first_pad_idx, normalize=True):
+        # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
+        scores_tensor = t.stack(list(scores), dim=0)
+        scores_tensor = scores_tensor[:first_pad_idx,::]
+        if normalize:
+            scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
+        (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
+        return max_logit_per_token[1] # For Llama-70B, token at idx 1 is the multiple choice answer
             
+    def check_for_hallucination(self, scores, text_outputs, first_pad_token_idxs):
+        for (i, response) in enumerate(text_outputs):
+            if self.args['model'] == 'Llama-70b':
+                confidence = self.max_logit_at_idx(scores, i//self.num_responses, first_pad_token_idxs[i], normalize=True)
+            else:
+                (confidence, _) = self.min_max_logit(scores, i//self.num_responses, first_pad_token_idxs[i], normalize=True)
+            print("Confidence level:", t_to_str(confidence))
+            if  confidence < self.args['threshold']:
+                text_outputs[i] = "E. I don't know, my confidence value is too low."
+    
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
         return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
@@ -84,13 +103,11 @@ class Generator(object):
                         print("Top probs:", t_to_str(sorted_probs[:self.args['num_top_tokens']]))
                         print("Top logits:", t_to_str(sorted_scores[:self.args['num_top_tokens']]))
 
-            print('\n')
-
     def first_pad_token_idx(self, token_id_seq):
         pad_token_id = self.tokenizer.convert_tokens_to_ids(self.tokenizer.pad_token)
         # First 0 index is because t.where returns a tuple with one elem per dim. Second is because we want the first index with a pad token
         return t.where(token_id_seq == pad_token_id)[0][0].item()
-            
+                
     def generate(self, prompts):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
@@ -101,11 +118,8 @@ class Generator(object):
         first_pad_token_idxs = [self.first_pad_token_idx(output_just_responses[i//self.num_responses]) for i in range(len(text_outputs))]
         # TODO: Clean up this whole first_pad_token_idx thing
         self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
-
-        for (i, response) in enumerate(text_outputs):
-            (mm_prob, _) = self.min_max_logit(output.scores, i//self.num_responses, first_pad_token_idxs[i], normalize=True)
-            if self.args['check_for_halu'] and mm_prob < self.args['threshold']:
-                text_outputs[i] = "E. I don't know. (I was going to maybe hallucinate but then I caught myself.)"
+        if self.args['check_for_halu']:
+            self.check_for_hallucination(output.scores, text_outputs, first_pad_token_idxs)
         return text_outputs
 
 def parse_args():
