@@ -36,31 +36,22 @@ class Generator(object):
         else:
             self.num_responses = self.args['num_responses']
             
-    def min_max_logit(self, scores, response_idx, first_pad_idx, normalize=True):
+    def min_max_logit(self, scores, response_idx, lo=0, hi=None, normalize=True):
         # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
         scores_tensor = t.stack(list(scores), dim=0)
-        scores_tensor = scores_tensor[:first_pad_idx,::]
+        scores_tensor = scores_tensor[lo:hi,::]
         if normalize:
             scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
         (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
         (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
         return (min_among_max_logits[response_idx], indices[response_idx])
-
-    def max_logit_at_idx(self, scores, response_idx, first_pad_idx, normalize=True):
-        # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
-        scores_tensor = t.stack(list(scores), dim=0)
-        scores_tensor = scores_tensor[:first_pad_idx,::]
-        if normalize:
-            scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
-        (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
-        return max_logit_per_token[1] # For Llama-70B, token at idx 1 is the multiple choice answer
             
-    def check_for_hallucination(self, scores, text_outputs, first_pad_token_idxs):
+    def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs):
+        # Currently, we look for the first logit corresponding to the actual letter answer. The commented-out version is looking for the min max logit overall (excluding pad tokens)
         for (i, response) in enumerate(text_outputs):
-            if self.args['model'] == 'Llama-70b':
-                confidence = self.max_logit_at_idx(scores, i//self.num_responses, first_pad_token_idxs[i], normalize=True)
-            else:
-                (confidence, _) = self.min_max_logit(scores, i//self.num_responses, first_pad_token_idxs[i], normalize=True)
+            token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], ['▁A', '▁B', '▁C', '▁D', '▁E', 'A', 'B', 'C', 'D', 'E'])
+            (confidence, _) = self.min_max_logit(scores, i//self.num_responses, lo=token_idx, hi=token_idx+1, normalize=True)
+            #     (confidence, _) = self.min_max_logit(output.scores, i//self.num_responses, lo=0, hi=first_pad_token_idxs[i], normalize=True)
             print("Confidence level:", t_to_str(confidence))
             if  confidence < self.args['threshold']:
                 text_outputs[i] = "E. I don't know, my confidence value is too low."
@@ -78,8 +69,8 @@ class Generator(object):
             token_ids = output.sequences[i][len(model_inputs[prompt_idx]):]
 
             if self.args['num_top_tokens'] > 0:
-                (mm_logit, mm_logit_idx) = self.min_max_logit(output.scores, i, first_pad_token_idxs[i], normalize=False)
-                (mm_prob, mm_prob_idx) = self.min_max_logit(output.scores, i, first_pad_token_idxs[i], normalize=True)
+                (mm_logit, mm_logit_idx) = self.min_max_logit(output.scores, i, lo=0, hi=first_pad_token_idxs[i], normalize=False)
+                (mm_prob, mm_prob_idx) = self.min_max_logit(output.scores, i, lo=0, hi=first_pad_token_idxs[i], normalize=True)
                 print("Min max prob  =", t_to_str(mm_prob), "| Index =", t_to_str(mm_prob_idx))
                 print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
                 for j in range(len(token_ids)):
@@ -104,11 +95,13 @@ class Generator(object):
                         print("Top logits:", t_to_str(sorted_scores[:self.args['num_top_tokens']]))
             print('\n')
 
-    def first_pad_token_idx(self, token_id_seq):
-        pad_token_id = self.tokenizer.convert_tokens_to_ids(self.tokenizer.pad_token)
-        # First 0 index is because t.where returns a tuple with one elem per dim. Second is because we want the first index with a pad token
-        return t.where(token_id_seq == pad_token_id)[0][0].item()
-                
+    def first_token_instance(self, token_id_seq, target_tokens):
+        target_token_ids = self.tokenizer.convert_tokens_to_ids(target_tokens)
+        # The first 0 index is because t.where returns a tuple with one elem per dim
+        where_each_token = [t.where(token_id_seq == token)[0] for token in target_token_ids]
+        # Second 0 index is because we want the first index containing a target (if there are any)
+        return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
+
     def generate(self, prompts):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
@@ -116,11 +109,11 @@ class Generator(object):
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
         output_just_responses = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output. i//num_responses in the prompt index
         text_outputs = self.tokenizer.batch_decode(output_just_responses, skip_special_tokens=True)
-        first_pad_token_idxs = [self.first_pad_token_idx(output_just_responses[i//self.num_responses]) for i in range(len(text_outputs))]
+        first_pad_token_idxs = [self.first_token_instance(output_just_responses[i//self.num_responses], [self.tokenizer.pad_token]) for i in range(len(text_outputs))]
         # TODO: Clean up this whole first_pad_token_idx thing
         self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
         if self.args['check_for_halu']:
-            self.check_for_hallucination(output.scores, text_outputs, first_pad_token_idxs)
+            self.check_for_hallucination(output.scores, output_just_responses, text_outputs, first_pad_token_idxs)
         return text_outputs
 
 def parse_args():
