@@ -1,0 +1,5 @@
+model = Llama-70b_halu_check_0.95
+Correct: 284 | Wrong: 81 | Abstained: 235
+Score (even grading): 203
+Score (harsher grading): 122
+Score (very harsh): -40
