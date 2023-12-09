@@ -36,21 +36,21 @@ class Generator(object):
         else:
             self.num_responses = self.args['num_responses']
             
-    def min_max_logit(self, scores, response_idx, normalize=True):
+    def min_max_logit(self, scores, response_idx, first_pad_idx, normalize=True):
         # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
         scores_tensor = t.stack(list(scores), dim=0)
+        scores_tensor = scores_tensor[:first_pad_idx,::]
         if normalize:
             scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
         (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
         (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
-        # Small bug to be fixed: this should exclude the padding characters at the end
         return (min_among_max_logits[response_idx], indices[response_idx])
             
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
         return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
 
-    def print_output(self, output, model_inputs, prompts, text_outputs):
+    def print_output(self, output, model_inputs, prompts, text_outputs, first_pad_token_idxs):
         print('\n')
         for i in range(len(text_outputs)):
             prompt_idx = i//self.num_responses
@@ -59,12 +59,14 @@ class Generator(object):
             token_ids = output.sequences[i][len(model_inputs[prompt_idx]):]
 
             if self.args['num_top_tokens'] > 0:
-                (mm_logit, mm_logit_idx) = self.min_max_logit(output.scores, i, normalize=False)
-                (mm_prob, mm_prob_idx) = self.min_max_logit(output.scores, i, normalize=True)
+                (mm_logit, mm_logit_idx) = self.min_max_logit(output.scores, i, first_pad_token_idxs[i], normalize=False)
+                (mm_prob, mm_prob_idx) = self.min_max_logit(output.scores, i, first_pad_token_idxs[i], normalize=True)
                 print("Min max prob  =", t_to_str(mm_prob), "| Index =", t_to_str(mm_prob_idx))
                 print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
                 for j in range(len(token_ids)):
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
+                    # scores has shape (response_length, num_responses, vocab_size)
+ 
                     (sorted_scores, top_token_ids) = t.sort(output.scores[j][i], descending=True)
                     sorted_probs = t.exp(sorted_scores) / t.sum(t.exp(sorted_scores))
                     top_tokens = self.tokenizer.batch_decode(top_token_ids[:self.args['num_top_tokens']])
@@ -77,22 +79,31 @@ class Generator(object):
                         print("Top tokens:", top_tokens)
                         print("Top probs:", t_to_str(sorted_probs[:self.args['num_top_tokens']]))
                         print("Top logits:", t_to_str(sorted_scores[:self.args['num_top_tokens']]))
-                    
+
                     if self.tokenizer.decode(token_ids[j]) == self.tokenizer.pad_token:
                         # If we have prompts/responses of different lengths, some will get padded
-                        break
-                    
+                        break             
             print('\n')
 
+    def first_pad_token_idx(self, token_id_seq):
+        pad_token_id = self.tokenizer.convert_tokens_to_ids(self.tokenizer.pad_token)
+        # First 0 index is because t.where returns a tuple with one elem per dim. Second is because we want the first index with a pad token
+        return t.where(token_id_seq == pad_token_id)[0][0].item()
+            
     def generate(self, prompts):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
+
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
         output_just_responses = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output. i//num_responses in the prompt index
         text_outputs = self.tokenizer.batch_decode(output_just_responses, skip_special_tokens=True)
-        self.print_output(output, model_inputs, prompts, text_outputs)
+        first_pad_token_idxs = [self.first_pad_token_idx(output_just_responses[i//self.num_responses]) for i in range(len(text_outputs))]
+        print(first_pad_token_idxs)
+        # TODO: Clean up this whole first_pad_token_idx thing
+        self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
+
         for (i, response) in enumerate(text_outputs):
-            (mm_prob, _) = self.min_max_logit(output.scores, i//self.num_responses, normalize=True)
+            (mm_prob, _) = self.min_max_logit(output.scores, i//self.num_responses, first_pad_token_idxs[i], normalize=True)
             if self.args['check_for_halu'] and mm_prob < self.args['threshold']:
                 text_outputs[i] = "E. I don't know. (I was going to maybe hallucinate but then I caught myself.)"
         return text_outputs
