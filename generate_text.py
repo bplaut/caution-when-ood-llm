@@ -102,6 +102,7 @@ class Generator(object):
                         print("Top tokens:", top_tokens)
                         print("Top probs:", t_to_str(sorted_probs[:self.args['num_top_tokens']]))
                         print("Top logits:", t_to_str(sorted_scores[:self.args['num_top_tokens']]))
+            print('\n')
 
     def first_pad_token_idx(self, token_id_seq):
         pad_token_id = self.tokenizer.convert_tokens_to_ids(self.tokenizer.pad_token)
