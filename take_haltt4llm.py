@@ -58,7 +58,7 @@ def run_test(model, trivia_data):
     incorrect = []
     abstained = []
     # random.shuffle(trivia_data) # Randomize question order
-    num_questions = 80
+    num_questions = 100
 
     for i, question_data in enumerate(trivia_data):
         question_string = generate_question_string(question_data)

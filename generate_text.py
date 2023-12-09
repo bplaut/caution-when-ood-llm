@@ -98,7 +98,6 @@ class Generator(object):
         output_just_responses = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output. i//num_responses in the prompt index
         text_outputs = self.tokenizer.batch_decode(output_just_responses, skip_special_tokens=True)
         first_pad_token_idxs = [self.first_pad_token_idx(output_just_responses[i//self.num_responses]) for i in range(len(text_outputs))]
-        print(first_pad_token_idxs)
         # TODO: Clean up this whole first_pad_token_idx thing
         self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
 
