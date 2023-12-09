@@ -83,11 +83,11 @@ def run_test(model, trivia_data, num_questions):
     
 def main():
     args = generate_text.parse_args()
-    num_questions = 100
+    num_questions = 200
     trivia_data = load_trivia_questions(args['input_filepath'])
     model = generate_text.Generator(args)
     (correct, incorrect, abstained) = run_test(model, trivia_data, num_questions)
-    halu_str = '_and_halu_check' if args['check_for_halu'] else ''
+    halu_str = '_halu_check_' + str(args['threshold']) if args['check_for_halu'] else ''
     output_filename = "results/%s%s-%d_questions.txt" % (args['model'], halu_str, num_questions)
     with open(output_filename, 'w') as f:
         f.write("model = " + args['model'] + halu_str + '\n')
