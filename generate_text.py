@@ -64,6 +64,10 @@ class Generator(object):
                 print("Min max prob  =", t_to_str(mm_prob), "| Index =", t_to_str(mm_prob_idx))
                 print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
                 for j in range(len(token_ids)):
+                    if self.tokenizer.decode(token_ids[j]) == self.tokenizer.pad_token:
+                        # If we have prompts/responses of different lengths, some will get padded
+                        break             
+
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
                     # scores has shape (response_length, num_responses, vocab_size)
  
@@ -80,9 +84,6 @@ class Generator(object):
                         print("Top probs:", t_to_str(sorted_probs[:self.args['num_top_tokens']]))
                         print("Top logits:", t_to_str(sorted_scores[:self.args['num_top_tokens']]))
 
-                    if self.tokenizer.decode(token_ids[j]) == self.tokenizer.pad_token:
-                        # If we have prompts/responses of different lengths, some will get padded
-                        break             
             print('\n')
 
     def first_pad_token_idx(self, token_id_seq):

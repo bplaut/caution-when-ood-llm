@@ -53,12 +53,10 @@ def grade_answers(question_data, llm_answer):
 
     return f"{llm_answer} (incorrect {correct_answer['choice']}.)"
 
-def run_test(model, trivia_data):
+def run_test(model, trivia_data, num_questions):
     correct = []
     incorrect = []
     abstained = []
-    # random.shuffle(trivia_data) # Randomize question order
-    num_questions = 100
 
     for i, question_data in enumerate(trivia_data):
         question_string = generate_question_string(question_data)
@@ -85,15 +83,18 @@ def run_test(model, trivia_data):
     
 def main():
     args = generate_text.parse_args()
+    num_questions = 80
     trivia_data = load_trivia_questions(args['input_filepath'])
     model = generate_text.Generator(args)
-    (correct, incorrect, abstained) = run_test(model, trivia_data)
-    halu_str = '+ halu check' if args['check_for_halu'] else ''
-    print("FINAL: model =", args['model'], halu_str)
-    print("Correct: %d | Wrong: %d | Abstained: %d" % (len(correct), len(incorrect), len(abstained)))
-    print("Score (even grading):", len(correct) - len(incorrect))
-    print("Score (harsher grading):", len(correct) - 2 * len(incorrect))
-    print("Score (very harsh):", len(correct) - 4 * len(incorrect))
+    (correct, incorrect, abstained) = run_test(model, trivia_data, num_questions)
+    halu_str = 'and_halu_check' if args['check_for_halu'] else ''
+    output_filename = "/results/%s%s-%d_questions" % (args['model'], halu_str, num_questions)
+    with open(output_filename, 'w') as f:
+        f.write("model = " + args['model'] + halu_str + '\n')
+        f.write("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
+        f.write("Score (even grading): %d\n" % (len(correct) - len(incorrect)))
+        f.write("Score (harsher grading): %d\n" % (len(correct) - 2 * len(incorrect)))
+        f.write("Score (very harsh): %d" % (len(correct) - 4 * len(incorrect)))
 
 if __name__ == '__main__':
     main()
