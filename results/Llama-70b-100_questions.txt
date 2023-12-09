@@ -1,0 +1,5 @@
+model = Llama-70b
+Correct: 70 | Wrong: 30 | Abstained: 0
+Score (even grading): 40
+Score (harsher grading): 10
+Score (very harsh): -50
