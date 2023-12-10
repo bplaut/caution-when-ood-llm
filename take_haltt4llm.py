@@ -22,7 +22,7 @@ def generate_prompt(instruction):
 ### Response:\n
 """
 
-def grade_answers(question_data, llm_response):
+def grade_answers(question_data, llm_output):
     # This grading should probably be improved. It accepted "Toy Story 2" when "Toy Story" was correct
     correct_answer = None
     for answer in question_data['answers']:
@@ -35,11 +35,11 @@ def grade_answers(question_data, llm_response):
 
     # Find first instance of A. or B. or C. or D. or E., if any
     targets = ['A.', 'B.', 'C.', 'D.', 'E.']
-    target_idxs = [llm_response.find(t) for t in targets if llm_response.find(t) != -1]
+    target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
     if len(target_idxs) > 0:
-        llm_answer = llm_response[ min(target_idxs)]
+        llm_answer = llm_output[ min(target_idxs)]
         if llm_answer == 'E':
-            return f"{llm_response} (uncertain)"
+            return f"{llm_answer} (uncertain)"
         elif llm_answer == f"{correct_answer['choice']}":
             return f"{llm_answer}. (correct)"
         else:
@@ -61,10 +61,10 @@ def run_test(model, trivia_data, start_q, end_q):
             formatted_prompt = model.prepare_for_chat([prompt])[0]
 
             print(f"Question {i+1}: {question_string}")
-            llm_response = model.generate([prompt])[0]
-            print(f"LLM response: {llm_response}")
-            answer_output = grade_answers(question_data, llm_response)
-            print(f"Answer: {answer_output}\n")
+            llm_output = model.generate([prompt])[0]
+            print(f"LLM output: {llm_output}")
+            answer_output = grade_answers(question_data, llm_output)
+            print(f"LLM answer: {answer_output}\n")
 
             if "(correct)" in answer_output:
                 correct.append((i+1, question_string, answer_output))
