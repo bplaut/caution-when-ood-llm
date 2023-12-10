@@ -37,8 +37,13 @@ class Generator(object):
             scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
         (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
         # TODO: Sometimes this throws an error when the tensor is empty I think?
-        (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
-        return (min_among_max_logits[response_idx], indices[response_idx])
+        try:
+            (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
+            return (min_among_max_logits[response_idx], indices[response_idx])
+        except:
+            print("Encountered an error while computing min max logit")
+            print("Max logit per token:", max_logit_per_token)
+            return 0
             
     def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs):
         # Currently, we look for the first logit corresponding to the actual letter answer. The commented-out version is looking for the min max logit overall (excluding pad tokens)
