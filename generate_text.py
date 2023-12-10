@@ -32,7 +32,9 @@ class Generator(object):
     def min_max_logit(self, scores, response_idx, lo=0, hi=None, normalize=True):
         # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
         scores_tensor = t.stack(list(scores), dim=0)
-        scores_tensor = scores_tensor[lo:hi,::]
+        scores_tensor = scores_tensor[lo:hi,::] 
+        if len(scores_tensor) == 0: # For example, when we call this fn with lo=first_token_idx(x), lo=len(scores) if we don't find token x
+            return (0, None) # zero confidence level
         if normalize:
             scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
         (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
@@ -44,7 +46,7 @@ class Generator(object):
             print("Encountered an error while computing min max logit")
             print("Max logit per token:", max_logit_per_token)
             print("lo, hi =", lo, hi)
-            return 0
+            return (0, None)
             
     def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs):
         # Currently, we look for the first logit corresponding to the actual letter answer. The commented-out version is looking for the min max logit overall (excluding pad tokens)

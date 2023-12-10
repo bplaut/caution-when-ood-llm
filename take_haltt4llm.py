@@ -34,6 +34,7 @@ def grade_answers(question_data, llm_output):
         return "No correct answer found"
 
     # Find first instance of A. or B. or C. or D. or E., if any
+    # Maybe add support for (A), (B), etc. The prompt specifically asks for a period, though
     targets = ['A.', 'B.', 'C.', 'D.', 'E.']
     target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
     if len(target_idxs) > 0:
