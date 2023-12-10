@@ -1,5 +1,0 @@
-model = Llama-7b_halu_check_0.75
-Correct: 35 | Wrong: 24 | Abstained: 41
-Score (even grading): 11
-Score (harsher grading): -13
-Score (very harsh): -61

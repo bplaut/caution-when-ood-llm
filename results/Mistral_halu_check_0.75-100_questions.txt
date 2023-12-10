@@ -1,5 +1,0 @@
-model = Mistral_halu_check_0.75
-Correct: 42 | Wrong: 11 | Abstained: 47
-Score (even grading): 31
-Score (harsher grading): 20
-Score (very harsh): -2
