@@ -37,13 +37,13 @@ def grade_answers(question_data, llm_response):
     targets = ['A.', 'B.', 'C.', 'D.', 'E.']
     target_idxs = [llm_response.find(t) for t in targets if llm_response.find(t) != -1]
     if len(target_idxs) > 0:
-        answer_idx = min(target_idxs)
-        if llm_response[answer_idx] == 'E':
+        llm_answer = llm_response[ min(target_idxs)]
+        if llm_answer == 'E':
             return f"{llm_response} (uncertain)"
-        elif llm_response[answer_idx] == f"{correct_answer['choice']}":
+        elif llm_answer == f"{correct_answer['choice']}":
             return f"{correct_answer['choice']}. {correct_answer['text']} (correct)"
         else:
-            return f"{llm_response} (incorrect {correct_answer['choice']}.)"
+            return f"{llm_answer}. (incorrect {correct_answer['choice']}.)"
     else:
         print("Could not find an answer in the LLM response.")
         return f"{llm_response} (incorrect {correct_answer['choice']}.)"
