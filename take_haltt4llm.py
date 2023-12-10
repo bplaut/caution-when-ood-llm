@@ -22,7 +22,7 @@ def generate_prompt(instruction):
 ### Response:\n
 """
 
-def grade_answers(question_data, llm_answer):
+def grade_answers(question_data, llm_response):
     # This grading should probably be improved. It accepted "Toy Story 2" when "Toy Story" was correct
     correct_answer = None
     for answer in question_data['answers']:
@@ -33,25 +33,20 @@ def grade_answers(question_data, llm_answer):
     if correct_answer is None:
         return "No correct answer found"
 
-    normalized_llm_answer = llm_answer.lower().strip()
-    normalized_correct_answer = correct_answer['text'].lower().strip()
-
-    # lower case of the full text answer is in the llm's answer
-    if normalized_correct_answer in normalized_llm_answer:
-        return f"{correct_answer['choice']}. {correct_answer['text']} (correct)"
-
-    # Upper case " A." or  " B." or " C." or " D." or " E." for instance
-    if f" {correct_answer['choice']}." in llm_answer:
+    # Find first instance of A. or B. or C. or D. or E., if any
+    targets = ['A.', 'B.', 'C.', 'D.', 'E.']
+    target_idxs = [llm_response.find(t) for t in targets if llm_response.find(t) != -1]
+    if len(target_idxs) > 0:
+        answer_idx = min(target_idxs)
+        if llm_response[answer_idx] == 'E':
+            return f"{llm_response} (uncertain)"
+        elif llm_response[answer_idx] == f"{correct_answer['choice']}":
             return f"{correct_answer['choice']}. {correct_answer['text']} (correct)"
-
-    # Upper case " (A)" or  " (B)" or " (C)" or " (D)" or " (E)" for instance
-    if f"({correct_answer['choice']})" in llm_answer:
-            return f"{correct_answer['choice']}. {correct_answer['text']} (correct)"
-
-    if "i don't know" in normalized_llm_answer or normalized_llm_answer == "d" or normalized_llm_answer == "d.":
-        return f"{llm_answer} (uncertain)"
-
-    return f"{llm_answer} (incorrect {correct_answer['choice']}.)"
+        else:
+            return f"{llm_response} (incorrect {correct_answer['choice']}.)"
+    else:
+        print("Could not find an answer in the LLM response.")
+        return f"{llm_response} (incorrect {correct_answer['choice']}.)"
 
 def run_test(model, trivia_data, start_q, end_q):
     correct = []
@@ -66,9 +61,9 @@ def run_test(model, trivia_data, start_q, end_q):
             formatted_prompt = model.prepare_for_chat([prompt])[0]
 
             print(f"Question {i+1}: {question_string}")
-            llm_answer = model.generate([prompt])[0]
-            print(f"LLM answer: {llm_answer}")
-            answer_output = grade_answers(question_data, llm_answer)
+            llm_response = model.generate([prompt])[0]
+            print(f"LLM response: {llm_response}")
+            answer_output = grade_answers(question_data, llm_response)
             print(f"Answer: {answer_output}\n")
 
             if "(correct)" in answer_output:
@@ -85,10 +80,10 @@ def main():
     (start_q, end_q) = (0, 1600)
     trivia_data = load_trivia_questions(args['input_filepath'])
     model = generate_text.Generator(args)
-    (correct, incorrect, abstained) = run_test(model, trivia_data, num_questions)
+    (correct, incorrect, abstained) = run_test(model, trivia_data, start_q, end_q)
     halu_str = '_halu_check_' + str(args['threshold']) if args['check_for_halu'] else ''
     input_str = args['input_filepath'].split("/")[-1].split("_questions")[0]
-    output_filename = "results/%s%s-%s-%d.txt" % (args['model'], halu_str, input_str, num_questions)
+    output_filename = "results/%s%s-%s-q%dto%d.txt" % (args['model'], halu_str, input_str, start_q, end_q)
     with open(output_filename, 'w') as f:
         f.write("model = " + args['model'] + halu_str + '\n')
         f.write("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
