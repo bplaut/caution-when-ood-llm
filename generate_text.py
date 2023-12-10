@@ -43,6 +43,7 @@ class Generator(object):
         if normalize:
             scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
         (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
+        # TODO: Sometimes this throws an error when the tensor is empty I think?
         (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
         return (min_among_max_logits[response_idx], indices[response_idx])
             

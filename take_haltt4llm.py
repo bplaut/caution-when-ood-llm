@@ -41,12 +41,12 @@ def grade_answers(question_data, llm_response):
         if llm_answer == 'E':
             return f"{llm_response} (uncertain)"
         elif llm_answer == f"{correct_answer['choice']}":
-            return f"{correct_answer['choice']}. {correct_answer['text']} (correct)"
+            return f"{llm_answer}. (correct)"
         else:
             return f"{llm_answer}. (incorrect {correct_answer['choice']}.)"
     else:
         print("Could not find an answer in the LLM response.")
-        return f"{llm_response} (incorrect {correct_answer['choice']}.)"
+        return f"{llm_answer}. (incorrect {correct_answer['choice']}.)"
 
 def run_test(model, trivia_data, start_q, end_q):
     correct = []
