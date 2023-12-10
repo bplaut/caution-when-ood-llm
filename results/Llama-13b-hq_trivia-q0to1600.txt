@@ -1,0 +1,5 @@
+model = Llama-13b
+Correct: 775 | Wrong: 634 | Abstained: 0
+Score (even grading): 141
+Score (harsher grading): -493
+Score (very harsh): -1761
