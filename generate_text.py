@@ -43,6 +43,7 @@ class Generator(object):
         except:
             print("Encountered an error while computing min max logit")
             print("Max logit per token:", max_logit_per_token)
+            print("lo, hi =", lo, hi)
             return 0
             
     def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs):
