@@ -45,8 +45,7 @@ def grade_answers(question_data, llm_output):
         else:
             return f"{llm_answer}. (incorrect {correct_answer['choice']}.)"
     else:
-        print("Could not find an answer in the LLM response.")
-        return f"{llm_answer}. (incorrect {correct_answer['choice']}.)"
+        return f"Could not parse answer. (incorrect {correct_answer['choice']}.)"
 
 def run_test(model, trivia_data, start_q, end_q):
     correct = []

@@ -5,27 +5,20 @@ import torch as t
 
 # Still need to try beam search at some point
 class Generator(object):
-    def __init__(self, args):        
-        if args['model'] == 'Mistral-raw':
-            model_name = 'mistralai/Mistral-7B-v0.1'
-        elif args['model'] == 'Mistral':
-            model_name = 'mistralai/Mistral-7B-Instruct-v0.1'
-        elif args['model'] == 'Zephyr':
-            model_name = 'HuggingFaceH4/zephyr-7b-beta'
-        elif args['model'] == 'gpt2':
-            model_name = 'gpt2'
-        elif args['model'] == 'Llama-13b-raw':
-            model_name = 'meta-llama/Llama-2-13b-hf'
-        elif args['model'] == 'Llama-13b':
-            model_name = 'meta-llama/Llama-2-13b-chat-hf'
-        elif args['model'] == 'Llama-7b-raw':
-            model_name = 'meta-llama/Llama-2-7b-hf'
-        elif args['model'] == 'Llama-7b':
-            model_name = 'meta-llama/Llama-2-7b-chat-hf'
-        elif args['model'] == 'Llama-70b':
-            model_name = 'meta-llama/Llama-2-70b-chat-hf'
-        else:
+    def __init__(self, args):
+        model_name_map = {'Mistral-raw':'mistralai/Mistral-7B-v0.1',
+                          'Mistral':'mistralai/Mistral-7B-Instruct-v0.1',
+                          'Zephyr':'HuggingFaceH4/zephyr-7b-beta',
+                          'gpt2':'gpt2',
+                          'Llama-13b-raw':'meta-llama/Llama-2-13b-hf',
+                          'Llama-13b':'meta-llama/Llama-2-13b-chat-hf',
+                          'Llama-7b-raw':'meta-llama/Llama-2-7b-hf',
+                          'Llama-7b':'meta-llama/Llama-2-7b-chat-hf',
+                          'Llama-70b':'meta-llama/Llama-2-70b-chat-hf'}
+        if args['model'] not in model_name_map:
             raise Exception("Unrecognized model name. Try python generate_text -h")
+        else:
+            model_name = model_name_map[args['model']]
         self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", load_in_4bit=True)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side="left")
         self.tokenizer.pad_token = self.tokenizer.eos_token
@@ -55,7 +48,7 @@ class Generator(object):
             #     (confidence, _) = self.min_max_logit(output.scores, i//self.num_responses, lo=0, hi=first_pad_token_idxs[i], normalize=True)
             print("Confidence level:", t_to_str(confidence))
             if  confidence < self.args['threshold']:
-                text_outputs[i] = "E. I don't know, my confidence value is too low."
+                text_outputs[i] = "E. I don't know, my confidence level is too low."
     
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
