@@ -53,42 +53,42 @@ def grade_answers(question_data, llm_answer):
 
     return f"{llm_answer} (incorrect {correct_answer['choice']}.)"
 
-def run_test(model, trivia_data, num_questions):
+def run_test(model, trivia_data, start_q, end_q):
     correct = []
     incorrect = []
     abstained = []
 
     for i, question_data in enumerate(trivia_data):
-        question_string = generate_question_string(question_data)
-        prompt = generate_prompt(question_string)
-        # The brackets and 0 indices are because the inputs/outputs in Generator are lists, for batching. For example, if you set num_responses > 1. For Q&A testing, we only take the first response.
-        formatted_prompt = model.prepare_for_chat([prompt])[0]
+        if start_q <= i < end_q:
+            question_string = generate_question_string(question_data)
+            prompt = generate_prompt(question_string)
+            # The brackets and 0 indices are because the inputs/outputs in Generator are lists, for batching. For example, if you set num_responses > 1. For Q&A testing, we only take the first response.
+            formatted_prompt = model.prepare_for_chat([prompt])[0]
 
-        print(f"Question {i+1}: {question_string}")
-        llm_answer = model.generate([prompt])[0]
-        print(f"LLM answer: {llm_answer}")
-        answer_output = grade_answers(question_data, llm_answer)
-        print(f"Answer: {answer_output}\n")
+            print(f"Question {i+1}: {question_string}")
+            llm_answer = model.generate([prompt])[0]
+            print(f"LLM answer: {llm_answer}")
+            answer_output = grade_answers(question_data, llm_answer)
+            print(f"Answer: {answer_output}\n")
 
-        if "(correct)" in answer_output:
-            correct.append((i+1, question_string, answer_output))
-        elif "(incorrect" in answer_output:
-            incorrect.append((i+1, question_string, answer_output))
-        else:
-            abstained.append((i+1, question_string, answer_output))
-        print("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
-        if i == num_questions - 1:
-            break
+            if "(correct)" in answer_output:
+                correct.append((i+1, question_string, answer_output))
+            elif "(incorrect" in answer_output:
+                incorrect.append((i+1, question_string, answer_output))
+            else:
+                abstained.append((i+1, question_string, answer_output))
+            print("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
     return (correct, incorrect, abstained)
     
 def main():
     args = generate_text.parse_args()
-    num_questions = 200
+    (start_q, end_q) = (0, 1600)
     trivia_data = load_trivia_questions(args['input_filepath'])
     model = generate_text.Generator(args)
     (correct, incorrect, abstained) = run_test(model, trivia_data, num_questions)
     halu_str = '_halu_check_' + str(args['threshold']) if args['check_for_halu'] else ''
-    output_filename = "results/%s%s-%d_questions.txt" % (args['model'], halu_str, num_questions)
+    input_str = args['input_filepath'].split("/")[-1].split("_questions")[0]
+    output_filename = "results/%s%s-%s-%d.txt" % (args['model'], halu_str, input_str, num_questions)
     with open(output_filename, 'w') as f:
         f.write("model = " + args['model'] + halu_str + '\n')
         f.write("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
