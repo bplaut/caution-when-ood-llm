@@ -10,9 +10,8 @@ def load_trivia_questions(file_path):
 
 def generate_question_string(question_data):
     question = question_data['question']
-    # Remove the "none of the above answer, and relabel E to be D
-    choices = [f"    {answer['choice']}. {answer['text']}\n" if answer != question_data['answers'][-1] else f"    {answer['choice']}. {answer['text']}" for answer in question_data['answers'] if answer['choice'] != 'D']
-    return f"{question}\n{''.join(choices)}".replace("E. I don't know", "D. I don't know")
+    choices = [f"    {answer['choice']}. {answer['text']}\n" if answer != question_data['answers'][-1] else f"    {answer['choice']}. {answer['text']}" for answer in question_data['answers']]
+    return f"{question}\n{''.join(choices)}"
 
 def generate_prompt(instruction):
         return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request. Only answer the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period."
@@ -34,13 +33,13 @@ def grade_answers(question_data, llm_output):
     if correct_answer is None:
         return "No correct answer found"
 
-    # Find first instance of A. or B. or C. or D., if any
+    # Find first instance of A. or B. or C. or D. or E., if any
     # Maybe add support for (A), (B), etc. The prompt specifically asks for a period, though
-    targets = ['A.', 'B.', 'C.', 'D.']
+    targets = ['A.', 'B.', 'C.', 'D.', 'E.']
     target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
     if len(target_idxs) > 0:
         llm_answer = llm_output[ min(target_idxs)]
-        if llm_answer == 'D':
+        if llm_answer == 'E':
             return f"{llm_answer} (uncertain)"
         elif llm_answer == f"{correct_answer['choice']}":
             return f"{llm_answer}. (correct)"

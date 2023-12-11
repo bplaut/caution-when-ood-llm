@@ -49,14 +49,14 @@ class Generator(object):
             return (0, None)
             
     def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs):
-        # Currently, we look for the first logit corresponding to the actual letter answer. The commented-out version is looking for the min max logit overall (excluding pad tokens)
+        # Currently, we look for the first logit corresponding to the actual letter answer. The commented-out version is looking for the min max logit overall (excluding pad tokens). Maybe we should be looking for A./B. etc instead of just the capital letter
         for (i, response) in enumerate(text_outputs):
-            token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], ['▁A', '▁B', '▁C', '▁D', '▁E', 'A', 'B', 'C', 'D', 'E'])
+            token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], ['▁A', '▁B', '▁C', '▁D', 'A', 'B', 'C', 'D'])
             (confidence, _) = self.min_max_logit(scores, i//self.num_responses, lo=token_idx, hi=token_idx+1, normalize=True)
             #     (confidence, _) = self.min_max_logit(output.scores, i//self.num_responses, lo=0, hi=first_pad_token_idxs[i], normalize=True)
             print("Confidence level:", t_to_str(confidence))
             if  confidence < self.args['threshold']:
-                text_outputs[i] = "E. I don't know, my confidence level is too low."
+                text_outputs[i] = "D. I don't know, my confidence level is too low."
     
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
