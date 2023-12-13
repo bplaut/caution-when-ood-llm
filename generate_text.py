@@ -14,7 +14,10 @@ class Generator(object):
                           'Llama-13b':'meta-llama/Llama-2-13b-chat-hf',
                           'Llama-7b-raw':'meta-llama/Llama-2-7b-hf',
                           'Llama-7b':'meta-llama/Llama-2-7b-chat-hf',
-                          'Llama-70b':'meta-llama/Llama-2-70b-chat-hf'}
+                          'Llama-70b':'meta-llama/Llama-2-70b-chat-hf',
+                          'MPT-30b': 'mosaicml/mpt-30b-instruct',
+                          'Vicuna-33b': 'lmsys/vicuna-33b-v1.3'
+        }
         if args['model'] not in model_name_map:
             raise Exception("Unrecognized model name. Try python generate_text -h")
         else:
