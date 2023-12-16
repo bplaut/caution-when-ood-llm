@@ -7,7 +7,8 @@ import torch as t
 class Generator(object):
     def __init__(self, args):
         model_name_map = {'Mistral-raw':'mistralai/Mistral-7B-v0.1',
-                          'Mistral':'mistralai/Mistral-7B-Instruct-v0.1',
+                          'Mistral':'mistralai/Mistral-7B-Instruct-v0.2',
+                          'Mixtral':'mistralai/Mixtral-8x7B-Instruct-v0.1',
                           'Zephyr':'HuggingFaceH4/zephyr-7b-beta',
                           'gpt2':'gpt2',
                           'Llama-13b-raw':'meta-llama/Llama-2-13b-hf',
@@ -19,7 +20,7 @@ class Generator(object):
                           'Vicuna-33b': 'lmsys/vicuna-33b-v1.3'
         }
         if args['model'] not in model_name_map:
-            raise Exception("Unrecognized model name. Try python generate_text -h")
+            raise Exception("Unrecognized model name. Check model_name_map")
         else:
             model_name = model_name_map[args['model']]
         self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", load_in_4bit=True)

@@ -78,7 +78,7 @@ def run_test(model, trivia_data, start_q, end_q):
     
 def main():
     args = generate_text.parse_args()
-    (start_q, end_q) = (0, 1600)
+    (start_q, end_q) = (0, 1500)
     trivia_data = load_trivia_questions(args['input_filepath'])
     model = generate_text.Generator(args)
     (correct, incorrect, abstained) = run_test(model, trivia_data, start_q, end_q)
