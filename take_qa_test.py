@@ -10,12 +10,13 @@ class Test(object):
         self.model = generate_text.Generator(args)
 
         dataset_name = args['dataset'].lower()
-        dataset_name_map = {'hellaswag':'Rowan/hellaswag',
-                            'ai2_arc':'ai2_arc',
-                            }
+        dataset_args = {'hellaswag':('Rowan/hellaswag'),
+                        'arc-easy':('ai2_arc', 'ARC-Easy'),
+                        'arc-challenge':('ai2_arc', 'ARC-Challenge'),
+        }
         # Different datasets have different keys for the questions and answers
         self.get_q = lambda x: (x['ctx'] if dataset_name == 'hellaswag' else
-                                x['choices']['text'] if dataset_name == 'ai2_arc' else
+                                x['question'] if dataset_name == 'ai2_arc' else
                                 None)
         self.get_a = lambda x: (string.ascii_uppercase[int(x['label'])] if dataset_name == 'hellaswag' else
                                 x['answerKey'] if dataset_name == 'ai2_arc' else
@@ -24,10 +25,10 @@ class Test(object):
                                       x['choices']['text'] if dataset_name == 'ai2_arc' else
                                       None)
 
-        if dataset_name not in dataset_name_map:
+        if dataset_name not in dataset_args:
             raise Exception("Unsupported dataset name")
         self.args = args
-        self.questions = load_dataset(dataset_name_map[dataset_name], split='train')
+        self.questions = load_dataset(*dataset_args[dataset_name], split='train')
 
     def write_output(self, correct, incorrect, abstained):
         halu_str = '_halu_thresh_' + str(self.args['threshold']) if self.args['check_for_halu'] else ''
@@ -75,6 +76,7 @@ class Test(object):
         abstained = []
         for (i, question_data) in enumerate(self.questions):
             if self.start_q <= i < self.end_q:
+                print('question data:', question_data)
                 choices = self.get_choices(question_data)
                 question = self.get_q(question_data)
                 correct_answer = self.get_a(question_data)
