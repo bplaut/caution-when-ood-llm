@@ -41,11 +41,11 @@ class Test(object):
     def make_prompt(self, question_string):
             return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation."
 
-    ### Question:
-    {question_string}
+### Question:
+{question_string}
 
-    ### Response:\n
-    """
+### Response:\n
+"""
 
     def grade_answers(self, choices, correct_answer_idx, llm_output):
         # Find first instance of A./B./C. etc, if any
