@@ -10,7 +10,7 @@ class Test(object):
         self.model = generate_text.Generator(args)
 
         dataset_name = args['dataset'].lower()
-        dataset_args = {'hellaswag':('Rowan/hellaswag'),
+        dataset_args = {'hellaswag':('Rowan/hellaswag',),
                         'arc-easy':('ai2_arc', 'ARC-Easy'),
                         'arc-challenge':('ai2_arc', 'ARC-Challenge'),
         }
@@ -33,8 +33,9 @@ class Test(object):
     def write_output(self, correct, incorrect, abstained):
         halu_str = '_halu_thresh_' + str(self.args['threshold']) if self.args['check_for_halu'] else ''
         dataset_str = self.args['dataset'].split("/")[-1]
-        output_filename = "results/%s%s-%s-q%dto%d.txt" % (self.args['model'], halu_str, dataset_str, start_q, end_q)
-        with open(output_filename, 'w') as f:
+        output_filepath = "results/%s%s-%s-q%dto%d.txt" % (self.args['model'], halu_str, dataset_str, self.start_q, self.end_q)
+        print('\nWriting results to', output_filepath)
+        with open(output_filepath, 'w') as f:
             f.write("model = " + self.args['model'] + halu_str + '\n')
             f.write("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
             f.write("Score (even): %d\n" % (len(correct) - len(incorrect)))
