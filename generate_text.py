@@ -52,7 +52,7 @@ class Generator(object):
             print("lo, hi =", lo, hi)
             return (0, None)
             
-    def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs):
+    def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs, letter_for_uncertain):
         # Currently, we look for the first logit corresponding to the actual letter answer. The commented-out version is looking for the min max logit overall (excluding pad tokens). Maybe we should be looking for A./B. etc instead of just the capital letter
         for (i, response) in enumerate(text_outputs):
             token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], ['▁A', '▁B', '▁C', '▁D', 'A', 'B', 'C', 'D'])
@@ -60,7 +60,7 @@ class Generator(object):
             #     (confidence, _) = self.min_max_logit(output.scores, i//self.num_responses, lo=0, hi=first_pad_token_idxs[i], normalize=True)
             print("Confidence level:", t_to_str(confidence))
             if  confidence < self.args['threshold']:
-                text_outputs[i] = "D. I don't know, my confidence level is too low."
+                text_outputs[i] = letter_for_uncertain + ". I don't know, my confidence level is too low."
     
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
@@ -108,7 +108,7 @@ class Generator(object):
         # Second 0 index is because we want the first index containing a target (if there are any)
         return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
 
-    def generate(self, prompts):
+    def generate(self, prompts, letter_for_uncertain=None):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
 
@@ -119,7 +119,7 @@ class Generator(object):
         # TODO: Clean up this whole first_pad_token_idx thing
         self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
         if self.args['check_for_halu']:
-            self.check_for_hallucination(output.scores, output_just_responses, text_outputs, first_pad_token_idxs)
+            self.check_for_hallucination(output.scores, output_just_responses, text_outputs, first_pad_token_idxs, letter_for_uncertain)
         return text_outputs
 
 def parse_args():
