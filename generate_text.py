@@ -55,14 +55,12 @@ class Generator(object):
 
     # This function should probably go in the take_qa_test.py
     def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs, letter_for_uncertain):
-        # Currently, we look for the first logit corresponding to the actual letter answer. The commented-out version is looking for the min max logit overall (excluding pad tokens). Maybe we should be looking for A./B. etc instead of just the capital letter
+        # Currently, we look for the first logit corresponding to the actual letter answer. Also some models this weird underscore character, so that's why I'm including it. Also maybe we should be looking for A./B. etc instead of just the capital letter
         for (i, response) in enumerate(text_outputs):
             uncertain_idx = string.ascii_uppercase.find(letter_for_uncertain)
             target_tokens = [c for c in string.ascii_uppercase][:uncertain_idx] + ['▁' + c for c in string.ascii_uppercase][:uncertain_idx]
             token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], target_tokens)
-            print(target_tokens, token_idx)
             (confidence, _) = self.min_max_logit(scores, i//self.num_responses, lo=token_idx, hi=token_idx+1, normalize=True)
-            #     (confidence, _) = self.min_max_logit(output.scores, i//self.num_responses, lo=0, hi=first_pad_token_idxs[i], normalize=True)
             print("Confidence level:", t_to_str(confidence))
             if  confidence < self.args['threshold']:
                 text_outputs[i] = letter_for_uncertain + ". I don't know, my confidence level is too low."
