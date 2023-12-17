@@ -1,5 +1,0 @@
-model = Llama-7b
-Correct: 647 | Wrong: 762 | Abstained: 0
-Score (even grading): -115
-Score (harsher grading): -877
-Score (very harsh): -2401

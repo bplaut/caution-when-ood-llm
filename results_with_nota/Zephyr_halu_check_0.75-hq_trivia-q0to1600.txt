@@ -1,5 +1,0 @@
-model = Zephyr_halu_check_0.75
-Correct: 702 | Wrong: 310 | Abstained: 397
-Score (even grading): 392
-Score (harsher grading): 82
-Score (very harsh): -538

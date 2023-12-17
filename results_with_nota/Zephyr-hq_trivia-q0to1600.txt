@@ -1,5 +1,0 @@
-model = Zephyr
-Correct: 812 | Wrong: 558 | Abstained: 39
-Score (even grading): 254
-Score (harsher grading): -304
-Score (very harsh): -1420
