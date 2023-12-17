@@ -6,20 +6,26 @@ import string
 
 class Test(object):
     def __init__(self, args):
-        (self.start_q, self.end_q) = (0, 500)
+        (self.start_q, self.end_q) = (0, 1000)
         self.model = generate_text.Generator(args)
 
         dataset_name = args['dataset'].lower()
-        dataset_name_map = {'hellaswag':'Rowan/hellaswag'}
+        dataset_name_map = {'hellaswag':'Rowan/hellaswag',
+                            'ai2_arc':'ai2_arc',
+                            }
         # Different datasets have different keys for the questions and answers
-        q_field_name_map = {'hellaswag':'ctx'}
-        a_field_name_map = {'hellaswag':'label'}
-        choices_field_name_map = {'hellaswag':'endings'}
+        self.get_q = lambda x: (x['ctx'] if dataset_name == 'hellaswag' else
+                                x['choices']['text'] if dataset_name == 'ai2_arc' else
+                                None)
+        self.get_a = lambda x: (string.ascii_uppercase[int(x['label'])] if dataset_name == 'hellaswag' else
+                                x['answerKey'] if dataset_name == 'ai2_arc' else
+                                None)
+        self.get_choices = lambda x: (x['endings'] if dataset_name == 'hellaswag' else
+                                      x['choices']['text'] if dataset_name == 'ai2_arc' else
+                                      None)
+
         if dataset_name not in dataset_name_map:
             raise Exception("Unsupported dataset name")
-        self.q_field_name = q_field_name_map[dataset_name]
-        self.a_field_name = a_field_name_map[dataset_name]
-        self.choices_field_name = choices_field_name_map[dataset_name]
         self.args = args
         self.questions = load_dataset(dataset_name_map[dataset_name], split='train')
 
@@ -47,13 +53,12 @@ class Test(object):
 ### Response:\n
 """
 
-    def grade_answers(self, choices, correct_answer_idx, llm_output):
+    def grade_answers(self, choices, correct_answer, llm_output):
         # Find first instance of A./B./C. etc, if any
         targets = [c + '.' for c in string.ascii_uppercase][:len(choices) + 1] # +1 corresponds to the "I don't know" answer we added
         target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
         if len(target_idxs) > 0:
             llm_answer = llm_output[min(target_idxs)]
-            correct_answer = string.ascii_uppercase[correct_answer_idx]
             uncertain_answer = string.ascii_uppercase[len(choices)]
             if llm_answer == uncertain_answer:
                 return f"{llm_answer} (uncertain)"
@@ -70,9 +75,9 @@ class Test(object):
         abstained = []
         for (i, question_data) in enumerate(self.questions):
             if self.start_q <= i < self.end_q:
-                choices = question_data[self.choices_field_name]
-                question = question_data[self.q_field_name]
-                correct_answer_idx = int(question_data[self.a_field_name])
+                choices = self.get_choices(question_data)
+                question = self.get_q(question_data)
+                correct_answer = self.get_a(question_data)
                 question_string = self.make_question_string(choices, question)
                 prompt = self.make_prompt(question_string)
                 # The brackets and 0 indices are because the inputs/outputs in Generator are lists, for batching. For example, if you set num_responses > 1. For Q&A testing, we only take the first response.
@@ -82,7 +87,7 @@ class Test(object):
                 letter_for_uncertain = string.ascii_uppercase[len(choices)]
                 llm_output = self.model.generate([prompt], letter_for_uncertain)[0]
                 print(f"LLM output: {llm_output}")
-                answer_output = self.grade_answers(choices, correct_answer_idx, llm_output)
+                answer_output = self.grade_answers(choices, correct_answer, llm_output)
                 print(f"LLM answer: {answer_output}\n")
 
                 if "(correct)" in answer_output:
