@@ -11,19 +11,26 @@ class Test(object):
 
         dset_name = args['dataset'].lower()
         dset_args = {'hellaswag':('Rowan/hellaswag',),
-                        'arc-easy':('ai2_arc', 'ARC-Easy'),
-                        'arc-challenge':('ai2_arc', 'ARC-Challenge'),
+                     'arc-easy':('ai2_arc', 'ARC-Easy'),
+                     'arc-challenge':('ai2_arc', 'ARC-Challenge'),
+                     'winogrande':('winogrande', 'winogrande_s'),
         }
         # Different datasets have different keys for the questions and answers
-        self.get_q = lambda x: (x['ctx'] if dset_name == 'hellaswag' else
-                                x['question'] if dset_name in ['arc-easy', 'arc-challenge'] else
-                                None)
-        self.get_a = lambda x: (ascii_uppercase[int(x['label'])] if dset_name=='hellaswag' else
-                                x['answerKey'] if dset_name in ['arc-easy', 'arc-challenge'] else
-                                None)
-        self.get_choices = lambda x: (x['endings'] if dset_name == 'hellaswag' else
-                                      x['choices']['text'] if dset_name in ['arc-easy', 'arc-challenge'] else
-                                      None)
+        self.get_q = (lambda x:
+                      x['ctx'] if dset_name == 'hellaswag' else
+                      x['question'] if dset_name in ['arc-easy', 'arc-challenge'] else
+                      x['sentence'] if dset_name == 'winogrande' else
+                      None)
+        self.get_a = (lambda x:
+                      ascii_uppercase[int(x['label'])] if dset_name=='hellaswag' else
+                      x['answerKey'] if dset_name in ['arc-easy', 'arc-challenge'] else
+                      ascii_uppercase[int(x['answer'])-1] if dset_name=='winogrande' else
+                      None)
+        self.get_choices = (lambda x:
+                            x['endings'] if dset_name == 'hellaswag' else
+                            x['choices']['text'] if dset_name in ['arc-easy', 'arc-challenge'] else
+                            [x['option1'], x['option2']] if dset_name=='winogrande' else
+                            None)
 
         if dset_name not in dset_args:
             raise Exception("Unsupported dataset name")

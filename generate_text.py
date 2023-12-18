@@ -55,7 +55,6 @@ class Generator(object):
 
     # This function should probably go in the take_qa_test.py
     def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs, letters_for_uncertain):
-        print('hi')
         # Currently, we look for the first logit corresponding to the actual letter answer. Also some models this weird underscore character, so that's why I'm including it. Also maybe we should be looking for A./B. etc instead of just the capital letter
         for (i, response) in enumerate(text_outputs):
             uncertain_idx = string.ascii_uppercase.find(letters_for_uncertain[i])
@@ -143,7 +142,7 @@ def parse_args():
     parser.add_argument('-u', '--check_for_halu', action="store_true", help='Should we add an extra check for hallucations? Eventually there will also be an option for why detection method to use.', default=False)
     parser.add_argument('-t', '--threshold', type=float, help='When running the hallucination check, what should we compare with? Right now, this is just a comparison with the min max probability.', default=0.5)
     parser.add_argument('-q', '--question_range', type=str, help='When running a Q&A test, what range of questions should we test? Format is "-q startq-endq", 0 indexed. For example, "-q 0-100".', default=None)
-    parser.add_argument('-b', '--batch_size', type=int, help='Maximum number of prompts to batch together. Only used for experiments', default=200)
+    parser.add_argument('-b', '--batch_size', type=int, help='Maximum number of prompts to batch together. Only used for experiments', default=1)
     return dict(vars(parser.parse_args())) # turn it into a dictionary so we can easily modify it
     
 def t_to_str(T):
