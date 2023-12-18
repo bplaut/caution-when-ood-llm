@@ -37,9 +37,9 @@ class Test(object):
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
             f.write("model = " + self.args['model'] + halu_str + '\n')
-            f.write("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
-            f.write("Score (even): %d\n" % (len(correct) - len(incorrect)))
-            f.write("Score (harsher): %d\n" % (len(correct) - 2 * len(incorrect)))
+            f.write("Correct: %d | Wrong: %d | Abstained: %d\n" % (correct, incorrect, abstained))
+            f.write("Score (even): %d\n" % (correct - incorrect))
+            f.write("Score (harsher): %d\n" % (correct - 2 * incorrect))
 
     def make_question_string(self, choices, question):
         assert(len(choices) <= 25) # we only have 26 capital letters and need 1 for uncertain
@@ -72,30 +72,30 @@ Response:\n
         else:
             return (f"Could not parse answer. (incorrect {correct_answer}.)", 1)
 
-    def run_test(self):
-        correct = []
-        incorrect = []
-        abstained = []
+    def run_test(self, start_q, end_q):
+        correct = 0
+        incorrect = 0
+        abstained = 0
 
         # First assemble all of the prompts
-        num_prompts = self.end_q - self.start_q
+        num_prompts = end_q - start_q
         prompts = [None] * (num_prompts)
         choices = [None] * (num_prompts)
         question_strings = [None] * (num_prompts)
         correct_answers = [None] * (num_prompts)
         letters_for_uncertain = [None] * (num_prompts)
-        for i in range(self.start_q, self.end_q):
+        for i in range(start_q, end_q):
             question_data = self.questions[i]
             choices_for_q = self.get_choices(question_data)
             question = self.get_q(question_data)
             correct_answer = self.get_a(question_data)
             question_string = self.make_question_string(choices_for_q, question)
             prompt = self.make_prompt(question_string)
-            prompts[i - self.start_q] = prompt
-            choices[i - self.start_q] = choices_for_q
-            question_strings[i - self.start_q] = question_string
-            correct_answers[i - self.start_q] = correct_answer
-            letters_for_uncertain[i - self.start_q] = ascii_uppercase[len(choices_for_q)]
+            prompts[i - start_q] = prompt
+            choices[i - start_q] = choices_for_q
+            question_strings[i - start_q] = question_string
+            correct_answers[i - start_q] = correct_answer
+            letters_for_uncertain[i - start_q] = ascii_uppercase[len(choices_for_q)]
 
         # Batch inference
         llm_outputs = self.model.generate(prompts, letters_for_uncertain)
@@ -108,19 +108,26 @@ Response:\n
             print(f"LLM answer: {answer_output}\n")
 
             if grade == 1:
-                correct.append(i)
+                correct += 1
             elif grade == -1:
-                incorrect.append(i)
+                incorrect += 1
             else:
-                abstained.append(i)
-            print("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
+                abstained += 1
+            print("Correct: %d\nWrong: %d\nAbstained: %d" % (correct, incorrect, abstained))
         return (correct, incorrect, abstained)
 
 def main():
     args = generate_text.parse_args()
     test = Test(args)
-    (correct, incorrect, abstained) = test.run_test()
-    test.write_output(correct, incorrect, abstained)
+    (all_correct, all_incorrect, all_abstained) = (0,0,0)
+    for start_q in range(test.start_q, test.end_q, args['batch_size']):
+        end_q = min(start_q + args['batch_size'], test.end_q)
+        print("start, end:", start_q, end_q)
+        (correct, incorrect, abstained) = test.run_test(start_q, end_q)
+        all_correct += correct
+        all_incorrect += incorrect
+        all_abstained += abstained
+    test.write_output(all_correct, all_incorrect, all_abstained)
 
 if __name__ == '__main__':
     main()

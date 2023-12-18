@@ -142,7 +142,8 @@ def parse_args():
     parser.add_argument('-d', '--dataset', type=str, default=None, help='The name of the Hugging Face dataset (needed for experiments and such)')
     parser.add_argument('-u', '--check_for_halu', action="store_true", help='Should we add an extra check for hallucations? Eventually there will also be an option for why detection method to use.', default=False)
     parser.add_argument('-t', '--threshold', type=float, help='When running the hallucination check, what should we compare with? Right now, this is just a comparison with the min max probability.', default=0.5)
-    parser.add_argument('-q', '--question_range', type=str, help='When running a Q&A test, what range of questions should we test? Format is "-q startq-endq", 0 indexed. For example, "-q 0-100".')
+    parser.add_argument('-q', '--question_range', type=str, help='When running a Q&A test, what range of questions should we test? Format is "-q startq-endq", 0 indexed. For example, "-q 0-100".', default=None)
+    parser.add_argument('-b', '--batch_size', type=int, help='Maximum number of prompts to batch together', default=200)
     return dict(vars(parser.parse_args())) # turn it into a dictionary so we can easily modify it
     
 def t_to_str(T):
