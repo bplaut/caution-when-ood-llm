@@ -54,16 +54,17 @@ class Generator(object):
             return (0, None)
 
     # This function should probably go in the take_qa_test.py
-    def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs, letter_for_uncertain):
+    def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs, letters_for_uncertain):
+        print('hi')
         # Currently, we look for the first logit corresponding to the actual letter answer. Also some models this weird underscore character, so that's why I'm including it. Also maybe we should be looking for A./B. etc instead of just the capital letter
         for (i, response) in enumerate(text_outputs):
-            uncertain_idx = string.ascii_uppercase.find(letter_for_uncertain)
+            uncertain_idx = string.ascii_uppercase.find(letters_for_uncertain[i])
             target_tokens = [c for c in string.ascii_uppercase][:uncertain_idx] + ['▁' + c for c in string.ascii_uppercase][:uncertain_idx]
             token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], target_tokens)
             (confidence, _) = self.min_max_logit(scores, i//self.num_responses, lo=token_idx, hi=token_idx+1, normalize=True)
-            print("Confidence level:", t_to_str(confidence))
+            print("Confidence level for prompt %d:" % (i+1), t_to_str(confidence), '\n')
             if  confidence < self.args['threshold']:
-                text_outputs[i] = letter_for_uncertain + ". I don't know, my confidence level is too low."
+                text_outputs[i] = letters_for_uncertain[i] + ". I don't know, my confidence level is too low."
     
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
@@ -111,7 +112,7 @@ class Generator(object):
         # Second 0 index is because we want the first index containing a target (if there are any)
         return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
 
-    def generate(self, prompts, letter_for_uncertain=None):
+    def generate(self, prompts, letters_for_uncertain=None):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
 
@@ -122,7 +123,10 @@ class Generator(object):
         # TODO: Clean up this whole first_pad_token_idx thing
         self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
         if self.args['check_for_halu']:
-            self.check_for_hallucination(output.scores, output_just_responses, text_outputs, first_pad_token_idxs, letter_for_uncertain)
+            if letters_for_uncertain is not None:
+                self.check_for_hallucination(output.scores, output_just_responses, text_outputs, first_pad_token_idxs, letters_for_uncertain)
+            else:
+                print("No letter provided to indicate an uncertain response, skipping hallucination check.")
         return text_outputs
 
 def parse_args():
@@ -138,6 +142,7 @@ def parse_args():
     parser.add_argument('-d', '--dataset', type=str, default=None, help='The name of the Hugging Face dataset (needed for experiments and such)')
     parser.add_argument('-u', '--check_for_halu', action="store_true", help='Should we add an extra check for hallucations? Eventually there will also be an option for why detection method to use.', default=False)
     parser.add_argument('-t', '--threshold', type=float, help='When running the hallucination check, what should we compare with? Right now, this is just a comparison with the min max probability.', default=0.5)
+    parser.add_argument('-q', '--question_range', type=str, help='When running a Q&A test, what range of questions should we test? Format is "-q startq-endq", 0 indexed. For example, "-q 0-100".')
     return dict(vars(parser.parse_args())) # turn it into a dictionary so we can easily modify it
     
 def t_to_str(T):

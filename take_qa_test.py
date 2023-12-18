@@ -5,7 +5,8 @@ import random
 from string import ascii_uppercase
 class Test(object):
     def __init__(self, args):
-        (self.start_q, self.end_q) = (0, 500)
+        bounds = args['question_range'].split('-')
+        (self.start_q, self.end_q) = (int(bounds[0]), int(bounds[1]))
         self.model = generate_text.Generator(args)
 
         dset_name = args['dataset'].lower()
@@ -49,7 +50,7 @@ class Test(object):
             return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
 
 Question:
-            
+
 {question_string}
 
 Response:\n
@@ -63,44 +64,56 @@ Response:\n
             llm_answer = llm_output[min(target_idxs)]
             uncertain_answer = ascii_uppercase[len(choices)]
             if llm_answer == uncertain_answer:
-                return f"{llm_answer} (uncertain)"
+                return (f"{llm_answer} (uncertain)", 0)
             elif llm_answer == correct_answer:
-                return f"{llm_answer}. (correct)"
+                return (f"{llm_answer}. (correct)", 1)
             else:
-                return f"{llm_answer}. (incorrect {correct_answer}.)"
+                return (f"{llm_answer}. (incorrect {correct_answer}.)", -1)
         else:
-            return f"Could not parse answer. (incorrect {correct_answer}.)"
+            return (f"Could not parse answer. (incorrect {correct_answer}.)", 1)
 
     def run_test(self):
         correct = []
         incorrect = []
         abstained = []
 
-        prompts = []
-        for (i, question_data) in enumerate(self.questions):
-            if self.start_q <= i < self.end_q:
-                choices = self.get_choices(question_data)
-                question = self.get_q(question_data)
-                correct_answer = self.get_a(question_data)
-                question_string = self.make_question_string(choices, question)
-                prompt = self.make_prompt(question_string)
-                # The brackets and 0 indices are because the inputs/outputs in Generator are lists, for batching. For example, if you set num_responses > 1. For Q&A testing, we only take the first response.
-                formatted_prompt = self.model.prepare_for_chat([prompt])[0]
+        # First assemble all of the prompts
+        num_prompts = self.end_q - self.start_q
+        prompts = [None] * (num_prompts)
+        choices = [None] * (num_prompts)
+        question_strings = [None] * (num_prompts)
+        correct_answers = [None] * (num_prompts)
+        letters_for_uncertain = [None] * (num_prompts)
+        for i in range(self.start_q, self.end_q):
+            question_data = self.questions[i]
+            choices_for_q = self.get_choices(question_data)
+            question = self.get_q(question_data)
+            correct_answer = self.get_a(question_data)
+            question_string = self.make_question_string(choices_for_q, question)
+            prompt = self.make_prompt(question_string)
+            prompts[i - self.start_q] = prompt
+            choices[i - self.start_q] = choices_for_q
+            question_strings[i - self.start_q] = question_string
+            correct_answers[i - self.start_q] = correct_answer
+            letters_for_uncertain[i - self.start_q] = ascii_uppercase[len(choices_for_q)]
 
-                print(f"Question {i+1}: {question_string}")
-                letter_for_uncertain = ascii_uppercase[len(choices)]
-                llm_output = self.model.generate([prompt], letter_for_uncertain)[0]
-                print(f"LLM output: {llm_output}")
-                answer_output = self.grade_answers(choices, correct_answer, llm_output)
-                print(f"LLM answer: {answer_output}\n")
+        # Batch inference
+        llm_outputs = self.model.generate(prompts, letters_for_uncertain)
 
-                if "(correct)" in answer_output:
-                    correct.append((i+1, question_string, answer_output))
-                elif "(incorrect" in answer_output:
-                    incorrect.append((i+1, question_string, answer_output))
-                else:
-                    abstained.append((i+1, question_string, answer_output))
-                print("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
+        # Grade outputs
+        for (i, llm_output) in enumerate(llm_outputs):
+            print(f"Question {i+1}: {question_strings[i]}")
+            print(f"LLM output: {llm_output}")
+            (answer_output, grade) = self.grade_answers(choices[i], correct_answers[i], llm_output)
+            print(f"LLM answer: {answer_output}\n")
+
+            if grade == 1:
+                correct.append(i)
+            elif grade == -1:
+                incorrect.append(i)
+            else:
+                abstained.append(i)
+            print("Correct: %d | Wrong: %d | Abstained: %d\n" % (len(correct), len(incorrect), len(abstained)))
         return (correct, incorrect, abstained)
 
 def main():
