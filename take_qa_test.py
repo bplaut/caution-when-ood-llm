@@ -46,9 +46,10 @@ class Test(object):
         return question + '\n' + '\n'.join(choices_with_uncertain)
 
     def make_prompt(self, question_string):
-            return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation."
+            return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
 
 Question:
+            
 {question_string}
 
 Response:\n
