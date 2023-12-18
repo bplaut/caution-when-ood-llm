@@ -1,4 +1,0 @@
-model = Llama-70b_halu_thresh_0.95
-Correct: 143 | Wrong: 71 | Abstained: 286
-Score (even): 72
-Score (harsher): 1

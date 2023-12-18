@@ -113,7 +113,7 @@ Response:\n
                 incorrect += 1
             else:
                 abstained += 1
-                print(f"Correct: {correct} | Wrong: {incorrect} | Abstained: {abstained}\n"
+                print(f"Correct: {correct} | Wrong: {incorrect} | Abstained: {abstained}\n")
         return (correct, incorrect, abstained)
 
 def main():
@@ -127,7 +127,7 @@ def main():
         all_correct += correct
         all_incorrect += incorrect
         all_abstained += abstained
-        print(f"\nTOTAL SO FAR: Correct: {all_correct} | Wrong: {all_incorrect} | Abstained: {all_abstained}\n"
+        print(f"\nTOTAL SO FAR: Correct: {all_correct} | Wrong: {all_incorrect} | Abstained: {all_abstained}\n")
     test.write_output(all_correct, all_incorrect, all_abstained)
 
 if __name__ == '__main__':

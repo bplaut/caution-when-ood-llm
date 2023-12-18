@@ -1,5 +1,0 @@
-model = Llama-70b
-Correct: 329 | Wrong: 141 | Abstained: 30
-Score (even grading): 188
-Score (harsher grading): 47
-Score (very harsh): -235
