@@ -13,7 +13,7 @@ class Test(object):
         dset_args = {'hellaswag':('Rowan/hellaswag',),
                      'arc-easy':('ai2_arc', 'ARC-Easy'),
                      'arc-challenge':('ai2_arc', 'ARC-Challenge'),
-                     'winogrande':('winogrande', 'winogrande_s'),
+                     'winogrande':('winogrande', 'winogrande_l'),
         }
         # Different datasets have different keys for the questions and answers
         self.get_q = (lambda x:
@@ -85,6 +85,7 @@ Response:\n
         abstained = 0
 
         # First assemble all of the prompts
+        end_q = min(end_q, len(self.questions))
         num_prompts = end_q - start_q
         prompts = [None] * (num_prompts)
         choices = [None] * (num_prompts)
