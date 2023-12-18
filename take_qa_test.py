@@ -16,13 +16,13 @@ class Test(object):
         }
         # Different datasets have different keys for the questions and answers
         self.get_q = lambda x: (x['ctx'] if dset_name == 'hellaswag' else
-                                x['question'] if dset_name == 'ai2_arc' else
+                                x['question'] if dset_name in ['arc-easy', 'arc-challenge'] else
                                 None)
         self.get_a = lambda x: (ascii_uppercase[int(x['label'])] if dset_name=='hellaswag' else
-                                x['answerKey'] if dset_name == 'ai2_arc' else
+                                x['answerKey'] if dset_name in ['arc-easy', 'arc-challenge'] else
                                 None)
         self.get_choices = lambda x: (x['endings'] if dset_name == 'hellaswag' else
-                                      x['choices']['text'] if dset_name == 'ai2_arc' else
+                                      x['choices']['text'] if dset_name in ['arc-easy', 'arc-challenge'] else
                                       None)
 
         if dset_name not in dset_args:
@@ -122,12 +122,12 @@ def main():
     (all_correct, all_incorrect, all_abstained) = (0,0,0)
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
         end_q = min(start_q + args['batch_size'], test.end_q)
-        print(f"\nSTARTING NEW BATCH: start q = {start_q}, end q = {end_q}\n")
+        print(f"\nSTARTING NEW BATCH: questions {start_q} to {end_q}\n")
         (correct, incorrect, abstained) = test.run_test(start_q, end_q)
         all_correct += correct
         all_incorrect += incorrect
         all_abstained += abstained
-        print(f"\nTOTAL SO FAR: Correct: {all_correct} | Wrong: {all_incorrect} | Abstained: {all_abstained}\n")
+        print(f"\nTOTAL SO FAR: Correct: {all_correct} | Wrong: {all_incorrect} | Abstained: {all_abstained}")
     test.write_output(all_correct, all_incorrect, all_abstained)
 
 if __name__ == '__main__':

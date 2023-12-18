@@ -62,7 +62,7 @@ class Generator(object):
             target_tokens = [c for c in string.ascii_uppercase][:uncertain_idx] + ['▁' + c for c in string.ascii_uppercase][:uncertain_idx]
             token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], target_tokens)
             (confidence, _) = self.min_max_logit(scores, i//self.num_responses, lo=token_idx, hi=token_idx+1, normalize=True)
-            print("Confidence level for prompt %d:" % (i+1), t_to_str(confidence), '\n')
+            print("Confidence level for prompt %d:" % (i+1), t_to_str(confidence))
             if  confidence < self.args['threshold']:
                 text_outputs[i] = letters_for_uncertain[i] + ". I don't know, my confidence level is too low."
     
