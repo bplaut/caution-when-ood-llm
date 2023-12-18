@@ -1,0 +1,4 @@
+model = Zephyr_halu_thresh_0.99
+Correct: 332 | Wrong: 63 | Abstained: 605
+Score (even): 269
+Score (harsher): 206

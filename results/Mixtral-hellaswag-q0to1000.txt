@@ -1,0 +1,4 @@
+model = Mixtral
+Correct: 559 | Wrong: 342 | Abstained: 99
+Score (even): 217
+Score (harsher): -125
