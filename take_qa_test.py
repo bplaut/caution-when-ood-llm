@@ -113,7 +113,7 @@ Response:\n
                 incorrect += 1
             else:
                 abstained += 1
-            print("Correct: %d\nWrong: %d\nAbstained: %d" % (correct, incorrect, abstained))
+                print(f"Correct: {correct} | Wrong: {incorrect} | Abstained: {abstained}\n"
         return (correct, incorrect, abstained)
 
 def main():
@@ -122,11 +122,12 @@ def main():
     (all_correct, all_incorrect, all_abstained) = (0,0,0)
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
         end_q = min(start_q + args['batch_size'], test.end_q)
-        print("start, end:", start_q, end_q)
+        print(f"\nSTARTING NEW BATCH: start q = {start_q}, end q = {end_q}\n")
         (correct, incorrect, abstained) = test.run_test(start_q, end_q)
         all_correct += correct
         all_incorrect += incorrect
         all_abstained += abstained
+        print(f"\nTOTAL SO FAR: Correct: {all_correct} | Wrong: {all_incorrect} | Abstained: {all_abstained}\n"
     test.write_output(all_correct, all_incorrect, all_abstained)
 
 if __name__ == '__main__':
