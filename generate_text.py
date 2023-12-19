@@ -146,11 +146,11 @@ def parse_args():
     
 def t_to_str(T):
     # Get rid of a bunch of stuff in the tensor format that I don't like
-    s = str(T).replace(",\n       device='cuda:0')", "")
+    i = s.find('device')
+    s = s[:i]
     s = s.replace("tensor(", "")
     s = s.replace("\n", "")
     s = s.replace("    ", "")
-    s = s.replace(", device='cuda:0')", "")
     target_len = 5 # e.g. 0.5348
     return s + '0' * (target_len - len(s)) if '.' in s else s # pad with 0s if decimal
     
