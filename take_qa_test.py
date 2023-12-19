@@ -76,7 +76,7 @@ Response:\n
             if len(result) > 0:
                 found_answers = [(i,start) for (i,t,start) in result if llm_output[start:start+len(t)] == t]
                 (choice_idx, _) = min(found_answers, key=lambda x:x[1]) # Choice index for the found answer with the earliest starting index in the llm output
-                print("No A./B./C./etc, but did find the text of an answer without the letter")
+                print("Grading note: could not find A./B./C./etc, but did find the text of an answer without the letter")
                 return ascii_uppercase[choice_idx]
             return "Could not parse answer"
 
