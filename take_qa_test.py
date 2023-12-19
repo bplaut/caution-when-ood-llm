@@ -43,10 +43,7 @@ class Test(object):
         output_filepath = "results/%s%s-%s-q%dto%d.txt" % (self.args['model'], halu_str, dataset_str, self.start_q, self.end_q)
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
-            f.write("model = " + self.args['model'] + halu_str + '\n')
-            f.write("Correct: %d | Wrong: %d | Abstained: %d\n" % (correct, incorrect, abstained))
-            f.write("Score (even): %d\n" % (correct - incorrect))
-            f.write("Score (harsher): %d\n" % (correct - 2 * incorrect))
+            f.write("Correct: %d\nWrong: %d\nAbstained: %d\n" % (correct, incorrect, abstained))
 
     def make_question_string(self, choices, question):
         assert(len(choices) <= 25) # we only have 26 capital letters and need 1 for uncertain
@@ -55,7 +52,7 @@ class Test(object):
 
     def make_prompt(self, question_string, choices):
         choices_str = 'A.' + ''.join([f" or {ascii_uppercase[i+1]}." for i in range(len(choices))])
-        return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible: no explanation is needed, simply say {choices_str}
+        return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible and do not provide an explanation: simply reply {choices_str}
 
 Question:
 
