@@ -44,7 +44,7 @@ do
             batch_size=$(get_batch_size "$model")
 
             # Running the command with the arguments
-            echo "Running take_qa_test.py with arguments: --model=$model --threshold=$threshold --dataset=$dataset --question_range=$question_range --batch_size=$batch_size"
+            echo "\nRunning take_qa_test.py with arguments: --model=$model --threshold=$threshold --dataset=$dataset --question_range=$question_range --batch_size=$batch_size"
             python take_qa_test.py --model="$model" --threshold="$threshold" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size"
         done
     done
