@@ -1,0 +1,4 @@
+model = Llama-70b
+Correct: 765 | Wrong: 230 | Abstained: 5
+Score (even): 535
+Score (harsher): 305
