@@ -38,9 +38,9 @@ class Test(object):
         self.questions = load_dataset(*dset_args[dset_name], split='train')
 
     def write_output(self, correct, incorrect, abstained):
-        thresh_str = '_thresh-' + str(self.args['threshold'])
+        thresh_str = 'thresh-' + str(self.args['threshold'])
         dataset_str = self.args['dataset'].split("/")[-1]
-        output_filepath = "results/%s%s-%s-q%dto%d.txt" % (self.args['model'], thresh_str, dataset_str, self.start_q, self.end_q)
+        output_filepath = "results/%s_%s_%s-q%dto%d.txt" % (dataset_str, self.args['model'], thresh_str, self.start_q, self.end_q)
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
             f.write("Correct: %d | Wrong: %d | Abstained: %d" % (correct, incorrect, abstained))
