@@ -76,13 +76,9 @@ Response:\n
             if len(result) > 0:
                 found_answers = [(i,start) for (i,t,start) in result if llm_output[start:start+len(t)] == t]
                 (choice_idx, _) = min(found_answers, key=lambda x:x[1]) # Choice index for the found answer with the earliest starting index in the llm output
+                print("No A./B./C./etc, but did find the text of an answer without the letter")
                 return ascii_uppercase[choice_idx]
             return "Could not parse answer"
-
-    def determine_llm_answer_strict(self, choices, llm_output):
-        targets = [c + '.' for c in ascii_uppercase][:len(choices) + 1] 
-        target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
-        return llm_output[min(target_idxs)] if len(target_idxs) > 0 else "Could not parse answer"
 
     def grade_answer(self, choices, correct_answer, llm_output):
         uncertain_answer = ascii_uppercase[len(choices)]
