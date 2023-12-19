@@ -38,12 +38,12 @@ class Test(object):
         self.questions = load_dataset(*dset_args[dset_name], split='train')
 
     def write_output(self, correct, incorrect, abstained):
-        halu_str = '_halu_thresh_' + str(self.args['threshold']) if self.args['check_for_halu'] else ''
+        thresh_str = '_thresh=' + str(self.args['threshold'])
         dataset_str = self.args['dataset'].split("/")[-1]
-        output_filepath = "results/%s%s-%s-q%dto%d.txt" % (self.args['model'], halu_str, dataset_str, self.start_q, self.end_q)
+        output_filepath = "results/%s%s-%s-q%dto%d.txt" % (self.args['model'], thresh_str, dataset_str, self.start_q, self.end_q)
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
-            f.write("Correct: %d\nWrong: %d\nAbstained: %d\n" % (correct, incorrect, abstained))
+            f.write("Correct: %d | Wrong: %d | Abstained: %d" % (correct, incorrect, abstained))
 
     def make_question_string(self, choices, question):
         assert(len(choices) <= 25) # we only have 26 capital letters and need 1 for uncertain
