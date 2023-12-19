@@ -146,8 +146,8 @@ def parse_args():
     
 def t_to_str(T):
     # Get rid of a bunch of stuff in the tensor format that I don't like
-    i = s.find('device')
-    s = s[:i]
+    s = str(T)
+    s = s[:s.rfind(',')] # remove everything after the last comma
     s = s.replace("tensor(", "")
     s = s.replace("\n", "")
     s = s.replace("    ", "")
