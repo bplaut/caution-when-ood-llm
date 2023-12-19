@@ -1,0 +1,4 @@
+model = Mistral
+Correct: 604 | Wrong: 326 | Abstained: 70
+Score (even): 278
+Score (harsher): -48
