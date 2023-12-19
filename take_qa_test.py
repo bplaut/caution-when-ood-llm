@@ -77,7 +77,7 @@ Response:\n
             else:
                 return (f"{llm_answer}. (incorrect {correct_answer}.)", -1)
         else:
-            return (f"Could not parse answer. (incorrect {correct_answer}.)", 1)
+            return (f"Could not parse answer. (incorrect {correct_answer}.)", -1)
 
     def run_test(self, start_q, end_q):
         correct = 0
@@ -121,7 +121,7 @@ Response:\n
                 incorrect += 1
             else:
                 abstained += 1
-                print(f"Correct: {correct} | Wrong: {incorrect} | Abstained: {abstained}\n")
+            print(f"Correct: {correct} | Wrong: {incorrect} | Abstained: {abstained}\n")
         return (correct, incorrect, abstained)
 
 def main():

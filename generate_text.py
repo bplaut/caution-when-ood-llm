@@ -62,7 +62,7 @@ class Generator(object):
             token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], target_tokens)
             (confidence, _) = self.min_max_logit(scores, i//self.num_responses, lo=token_idx, hi=token_idx+1, normalize=True)
             if  confidence < self.args['threshold']:
-                text_outputs[i] = letters_for_uncertain[i] + f". I don't know. My confidence level is {round(confidence, 4)}, which is too low."
+                text_outputs[i] = letters_for_uncertain[i] + f". I don't know. My confidence level is {t_to_str(confidence)}, which is too low."
     
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
@@ -151,7 +151,7 @@ def t_to_str(T):
     s = s.replace("\n", "")
     s = s.replace("    ", "")
     s = s.replace(", device='cuda:0')", "")
-    target_len = 5 # e.g. 0.534
+    target_len = 5 # e.g. 0.5348
     return s + '0' * (target_len - len(s)) if '.' in s else s # pad with 0s if decimal
     
 def main():
