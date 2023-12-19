@@ -53,8 +53,9 @@ class Test(object):
         choices_with_uncertain = [ascii_uppercase[i] + '. ' + choice for (i, choice) in enumerate(choices)] + [ascii_uppercase[len(choices)] + ". I don't know"]
         return question + '\n' + '\n'.join(choices_with_uncertain)
 
-    def make_prompt(self, question_string):
-            return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
+    def make_prompt(self, question_string, choices):
+        choices_str = 'A.' + ''.join([f" or {ascii_uppercase[i+1]}." for i in range(len(choices))])
+        return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible: no explanation is needed, simply say {choices_str}
 
 Question:
 
@@ -69,7 +70,7 @@ Response:\n
         target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
         if len(target_idxs) > 0:
             return llm_output[min(target_idxs)]
-        else: # Maybe it put the text of the answer without the letter
+        else: # If the model includes the text of the answer without the letter, we'll allow it
             targets = choices + ["I don't know"]
             result = [(i,t,llm_output.find(t)) for (i,t) in enumerate(targets) if llm_output.find(t) != -1]
             if len(result) > 0:
@@ -77,7 +78,12 @@ Response:\n
                 (choice_idx, _) = min(found_answers, key=lambda x:x[1]) # Choice index for the found answer with the earliest starting index in the llm output
                 return ascii_uppercase[choice_idx]
             return "Could not parse answer"
-                    
+
+    def determine_llm_answer_strict(self, choices, llm_output):
+        targets = [c + '.' for c in ascii_uppercase][:len(choices) + 1] 
+        target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
+        return llm_output[min(target_idxs)] if len(target_idxs) > 0 else "Could not parse answer"
+
     def grade_answer(self, choices, correct_answer, llm_output):
         uncertain_answer = ascii_uppercase[len(choices)]
         llm_answer = self.determine_llm_answer(choices, llm_output)
@@ -87,22 +93,6 @@ Response:\n
             return (f"{llm_answer}. (correct)", 1)
         else:
             return (f"{llm_answer}. (incorrect {correct_answer}.)", -1)
-
-    def grade_answer_stricter(self, choices, correct_answer, llm_output):
-        # This version requires A./B./C./etc to be in the answer
-        targets = [c + '.' for c in ascii_uppercase][:len(choices) + 1]
-        target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
-        if len(target_idxs) > 0:
-            llm_answer = llm_output[min(target_idxs)]
-            uncertain_answer = ascii_uppercase[len(choices)]
-            if llm_answer == uncertain_answer:
-                return (f"{llm_answer} (uncertain)", 0)
-            elif llm_answer == correct_answer:
-                return (f"{llm_answer}. (correct)", 1)
-            else:
-                return (f"{llm_answer}. (incorrect {correct_answer}.)", -1)
-        else:
-            return (f"Could not parse answer. (incorrect {correct_answer}.)", -1)
 
     def run_test(self, start_q, end_q):
         correct = 0
@@ -123,7 +113,7 @@ Response:\n
             question = self.get_q(question_data)
             correct_answer = self.get_a(question_data)
             question_string = self.make_question_string(choices_for_q, question)
-            prompt = self.make_prompt(question_string)
+            prompt = self.make_prompt(question_string, choices_for_q)
             prompts[i - start_q] = prompt
             choices[i - start_q] = choices_for_q
             question_strings[i - start_q] = question_string
