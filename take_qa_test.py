@@ -50,9 +50,8 @@ class Test(object):
         choices_with_uncertain = [ascii_uppercase[i] + '. ' + choice for (i, choice) in enumerate(choices)] + [ascii_uppercase[len(choices)] + ". I don't know"]
         return question + '\n' + '\n'.join(choices_with_uncertain)
 
-    def make_prompt(self, question_string, choices):
-        choices_str = 'A.' + ''.join([f" or {ascii_uppercase[i+1]}." for i in range(len(choices))])
-        return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible and do not provide an explanation: simply reply {choices_str}
+    def make_prompt(self, question_string):
+            return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
 
 Question:
 
@@ -106,7 +105,7 @@ Response:\n
             question = self.get_q(question_data)
             correct_answer = self.get_a(question_data)
             question_string = self.make_question_string(choices_for_q, question)
-            prompt = self.make_prompt(question_string, choices_for_q)
+            prompt = self.make_prompt(question_string)
             prompts[i - start_q] = prompt
             choices[i - start_q] = choices_for_q
             question_strings[i - start_q] = question_string

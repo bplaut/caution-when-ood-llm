@@ -63,6 +63,8 @@ class Generator(object):
             (confidence, _) = self.min_max_logit(scores, i//self.num_responses, lo=token_idx, hi=token_idx+1, normalize=True)
             if  confidence < self.args['threshold']:
                 text_outputs[i] = letters_for_uncertain[i] + f". I don't know. My confidence level is {t_to_str(confidence)}, which is too low."
+            else:
+                text_outputs[i] += f"\nConfidence level: {t_to_str(confidence)}"
     
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
@@ -120,11 +122,10 @@ class Generator(object):
         first_pad_token_idxs = [self.first_token_instance(output_just_responses[i//self.num_responses], [self.tokenizer.pad_token]) for i in range(len(text_outputs))]
         # TODO: Clean up this whole first_pad_token_idx thing
         self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
-        if self.args['check_for_halu']:
-            if letters_for_uncertain is not None:
-                self.check_for_hallucination(output.scores, output_just_responses, text_outputs, first_pad_token_idxs, letters_for_uncertain)
-            else:
-                print("No letter provided to indicate an uncertain response, skipping hallucination check.")
+        if letters_for_uncertain is not None:
+            self.check_for_hallucination(output.scores, output_just_responses, text_outputs, first_pad_token_idxs, letters_for_uncertain)
+        else:
+            print("No letter provided to indicate an uncertain response, skipping hallucination check.")
         return text_outputs
 
 def parse_args():
