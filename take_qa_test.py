@@ -37,13 +37,13 @@ class Test(object):
         self.args = args
         self.questions = load_dataset(*dset_args[dset_name], split='train')
 
-    def write_output(self, correct, incorrect, abstained):
-        thresh_str = 'thresh-' + str(self.args['threshold'])
+    def write_output(self, correct, wrong, abstained, t):
+        thresh_str = 'thresh-' + str(t)
         dataset_str = self.args['dataset'].split("/")[-1]
         output_filepath = "results/%s_%s_%s-q%dto%d.txt" % (dataset_str, self.args['model'], thresh_str, self.start_q, self.end_q)
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
-            f.write("Correct: %d | Wrong: %d | Abstained: %d" % (correct, incorrect, abstained))
+            f.write("Correct: %d | Wrong: %d | Abstained: %d" % (correct, wrong, abstained))
 
     def make_question_string(self, choices, question):
         assert(len(choices) <= 25) # we only have 26 capital letters and need 1 for uncertain
@@ -98,7 +98,6 @@ Response:\n
         choices = [None] * (num_prompts)
         question_strings = [None] * (num_prompts)
         correct_answers = [None] * (num_prompts)
-        letters_for_uncertain = [None] * (num_prompts)
         for i in range(start_q, end_q):
             question_data = self.questions[i]
             choices_for_q = self.get_choices(question_data)
@@ -110,40 +109,43 @@ Response:\n
             choices[i - start_q] = choices_for_q
             question_strings[i - start_q] = question_string
             correct_answers[i - start_q] = correct_answer
-            letters_for_uncertain[i - start_q] = ascii_uppercase[len(choices_for_q)]
-
+        num_choices = len(choices[0])
+            
         # Batch inference
-        llm_outputs = self.model.generate(prompts, letters_for_uncertain)
+        (llm_outputs, confidence_levels) = self.model.generate(prompts, num_choices) 
 
         # Grade outputs
+        grades = [None] * len(llm_outputs)
         for (i, llm_output) in enumerate(llm_outputs):
-            print(f"Question {i+1}: {question_strings[i]}")
+            print(f"Question {i+1+start_q}: {question_strings[i]}")
             print(f"LLM output: {llm_output}")
             (answer_output, grade) = self.grade_answer(choices[i], correct_answers[i], llm_output)
             print(f"LLM answer: {answer_output}\n")
+            print(f"Confidence level: {generate_text.t_to_str(confidence_levels[i])}\n")
+            grades[i] = grade
+        return (grades, confidence_levels)
 
-            if grade == 1:
-                correct += 1
-            elif grade == -1:
-                incorrect += 1
-            else:
-                abstained += 1
-            print(f"Correct: {correct} | Wrong: {incorrect} | Abstained: {abstained}\n")
-        return (correct, incorrect, abstained)
-
+    def apply_confidence_thresh(self, grades, confidences, t):
+        correct = sum([1 for (c,g) in zip(confidences,grades) if g == 1 and c >= t])
+        wrong = sum([1 for (c,g) in zip(confidences,grades) if g == -1 and c >= t])
+        abstained = sum([1 for (c,g) in zip(confidences,grades) if g == 0 or c < t])
+        return (correct, wrong, abstained)
+    
 def main():
     args = generate_text.parse_args()
     test = Test(args)
-    (all_correct, all_incorrect, all_abstained) = (0,0,0)
+    all_grades = []
+    all_confidence_levels = []
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
         end_q = min(start_q + args['batch_size'], test.end_q)
-        print(f"\nSTARTING NEW BATCH: questions {start_q} to {end_q}\n")
-        (correct, incorrect, abstained) = test.run_test(start_q, end_q)
-        all_correct += correct
-        all_incorrect += incorrect
-        all_abstained += abstained
-        print(f"\nTOTAL SO FAR: Correct: {all_correct} | Wrong: {all_incorrect} | Abstained: {all_abstained}")
-    test.write_output(all_correct, all_incorrect, all_abstained)
+        if args['batch_size'] > 1:
+            print(f"\nSTARTING NEW BATCH: questions {start_q} to {end_q}\n")
+        (grades, confidence_levels) = test.run_test(start_q, end_q)
+        all_grades += grades
+        all_confidence_levels += confidence_levels
+    # FIX THIS. This is just hacky for now, totally ignoring the command line threshold
+    for t in [0, 0.75, 0.85, 0.95, 0.99]:
+        test.write_output(*test.apply_confidence_thresh(all_grades, all_confidence_levels, t), t)
 
 if __name__ == '__main__':
     main()

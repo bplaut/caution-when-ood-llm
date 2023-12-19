@@ -54,17 +54,15 @@ class Generator(object):
             return (0, None)
 
     # This function should probably go in the take_qa_test.py
-    def check_for_hallucination(self, scores, output_just_responses, text_outputs, first_pad_token_idxs, letters_for_uncertain):
+    def compute_confidence_levels(self, scores, output_just_responses, text_outputs, first_pad_token_idxs, num_choices):
         # Currently, we look for the first logit corresponding to the actual letter answer. Also some models this weird underscore character, so that's why I'm including it. Also maybe we should be looking for A./B. etc instead of just the capital letter
+        confidence_levels = [None] * len(text_outputs)
         for (i, response) in enumerate(text_outputs):
-            uncertain_idx = string.ascii_uppercase.find(letters_for_uncertain[i])
-            target_tokens = [c for c in string.ascii_uppercase][:uncertain_idx] + ['▁' + c for c in string.ascii_uppercase][:uncertain_idx]
+            target_tokens = [c for c in string.ascii_uppercase][:num_choices] + ['▁' + c for c in string.ascii_uppercase][:num_choices]
             token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], target_tokens)
             (confidence, _) = self.min_max_logit(scores, i//self.num_responses, lo=token_idx, hi=token_idx+1, normalize=True)
-            if  confidence < self.args['threshold']:
-                text_outputs[i] = letters_for_uncertain[i] + f". I don't know. My confidence level is {t_to_str(confidence)}, which is too low."
-            else:
-                text_outputs[i] += f"\nConfidence level: {t_to_str(confidence)}"
+            confidence_levels[i] = confidence
+        return confidence_levels
     
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
@@ -112,7 +110,7 @@ class Generator(object):
         # Second 0 index is because we want the first index containing a target (if there are any)
         return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
 
-    def generate(self, prompts, letters_for_uncertain=None):
+    def generate(self, prompts, num_choices=0):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
 
@@ -122,11 +120,9 @@ class Generator(object):
         first_pad_token_idxs = [self.first_token_instance(output_just_responses[i//self.num_responses], [self.tokenizer.pad_token]) for i in range(len(text_outputs))]
         # TODO: Clean up this whole first_pad_token_idx thing
         self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
-        if letters_for_uncertain is not None:
-            self.check_for_hallucination(output.scores, output_just_responses, text_outputs, first_pad_token_idxs, letters_for_uncertain)
-        else:
-            print("No letter provided to indicate an uncertain response, skipping hallucination check.")
-        return text_outputs
+        
+        confidence_levels = self.compute_confidence_levels(output.scores, output_just_responses, text_outputs, first_pad_token_idxs, num_choices)
+        return (text_outputs, confidence_levels)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Use an LLM to generate text via HuggingFace.')
