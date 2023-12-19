@@ -63,9 +63,34 @@ Question:
 Response:\n
 """
 
-    def grade_answers(self, choices, correct_answer, llm_output):
+    def determine_llm_answer(self, choices, llm_output):
         # Find first instance of A./B./C. etc, if any
         targets = [c + '.' for c in ascii_uppercase][:len(choices) + 1] # +1 corresponds to the "I don't know" answer we added
+        target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
+        if len(target_idxs) > 0:
+            return llm_output[min(target_idxs)]
+        else: # Maybe it put the text of the answer without the letter
+            targets = choices + ["I don't know"]
+            result = [(i,t,llm_output.find(t)) for (i,t) in enumerate(targets) if llm_output.find(t) != -1]
+            if len(result) > 0:
+                found_answers = [(i,start) for (i,t,start) in result if llm_output[start:start+len(t)] == t]
+                (choice_idx, _) = min(found_answers, key=lambda x:x[1]) # Choice index for the found answer with the earliest starting index in the llm output
+                return ascii_uppercase[choice_idx]
+            return "Could not parse answer"
+                    
+    def grade_answer(self, choices, correct_answer, llm_output):
+        uncertain_answer = ascii_uppercase[len(choices)]
+        llm_answer = self.determine_llm_answer(choices, llm_output)
+        if llm_answer == uncertain_answer:
+            return (f"{llm_answer} (uncertain)", 0)
+        elif llm_answer == correct_answer:
+            return (f"{llm_answer}. (correct)", 1)
+        else:
+            return (f"{llm_answer}. (incorrect {correct_answer}.)", -1)
+
+    def grade_answer_stricter(self, choices, correct_answer, llm_output):
+        # This version requires A./B./C./etc to be in the answer
+        targets = [c + '.' for c in ascii_uppercase][:len(choices) + 1]
         target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
         if len(target_idxs) > 0:
             llm_answer = llm_output[min(target_idxs)]
@@ -112,7 +137,7 @@ Response:\n
         for (i, llm_output) in enumerate(llm_outputs):
             print(f"Question {i+1}: {question_strings[i]}")
             print(f"LLM output: {llm_output}")
-            (answer_output, grade) = self.grade_answers(choices[i], correct_answers[i], llm_output)
+            (answer_output, grade) = self.grade_answer(choices[i], correct_answers[i], llm_output)
             print(f"LLM answer: {answer_output}\n")
 
             if grade == 1:
