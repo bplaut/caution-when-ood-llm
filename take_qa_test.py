@@ -66,7 +66,7 @@ class Test(object):
         output_filepath = "results/%s_%s_%s-q%dto%d.txt" % (dataset_str, self.args['model'], thresh_str, self.start_q, self.end_q)
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
-            f.write("Correct: %d | Wrong: %d | Abstained: %d" % (correct, wrong, abstained))
+            f.write("Correct: %d\nWrong: %d\nAbstained: %d" % (correct, wrong, abstained))
 
     def make_question_string(self, choices, question):
         assert(len(choices) <= 25) # we only have 26 capital letters and need 1 for uncertain
