@@ -30,10 +30,10 @@ class Test(object):
                       x['sentence'] if dset_name == 'winogrande' else
                       None)
         self.get_a = (lambda x:
-                      ascii_uppercase[int(x['label'])] if dset_name=='hellaswag' else
-                      x['answerKey'] if dset_name in ['arc-easy', 'arc-challenge'] else
-                      ascii_uppercase[int(x['answer'])-1] if dset_name=='winogrande' else
-                      ascii_uppercase[int(x['answer'])] if dset_name == 'mmlu' else
+                      self.make_letter(x['label']) if dset_name == 'hellaswag' else
+                      self.make_letter(x['answerKey']) if dset_name in ['arc-easy', 'arc-challenge'] else
+                      self.make_letter(x['answer'],1) if dset_name=='winogrande' else
+                      self.make_letter(x['answer']) if dset_name == 'mmlu' else
                       None)
         self.get_choices = (lambda x:
                             x['endings'] if dset_name == 'hellaswag' else
@@ -46,6 +46,16 @@ class Test(object):
             raise Exception("Unsupported dataset name")
         self.args = args
         self.questions = load_dataset(*dset_args[dset_name], split=dset_split[dset_name])
+        self.end_q = min(self.end_q, len(self.questions))
+        
+    def make_letter(self, answer, offset=0):
+        if answer in ascii_uppercase:
+            return answer
+        elif answer in [str(n) for n in range(10)]:
+            return ascii_uppercase[int(answer) - offset]
+        else:
+            raise Exception(f"Unknown answer format: {answer}")
+
 
     def write_output(self, correct, wrong, abstained, t):
         thresh_str = 'thresh-' + str(t)
@@ -97,10 +107,9 @@ Response:\n
             return (f"{llm_answer}. (incorrect {correct_answer}.)", -1)
 
     def run_test(self, start_q, end_q):
+        assert(start_q < end_q)
         # First assemble all of the prompts
-        if start_q >= end_q:
-            print("returning early")
-            return ([], [])
+        print("Forming prompts...\n")
         num_prompts = end_q - start_q
         prompts = [None] * (num_prompts)
         choices = [None] * (num_prompts)
@@ -111,25 +120,20 @@ Response:\n
             choices_for_q = self.get_choices(question_data)
             question = self.get_q(question_data)
             correct_answer = self.get_a(question_data)
-            if correct_answer in ['0','1','2','3','4','5','6','7']:
-                print("hmm, q = ", i, correct_answer)
-                correct_answer = ascii_uppercase[int(correct_answer)-1]
             question_string = self.make_question_string(choices_for_q, question)
             prompt = self.make_prompt(question_string)
             prompts[i - start_q] = prompt
             choices[i - start_q] = choices_for_q
             question_strings[i - start_q] = question_string
             correct_answers[i - start_q] = correct_answer
-        try:
-            num_choices = len(choices[0])
-        except:
-            print("Failed, setting num choices = 0, choices =", choices)
-            num_choices = 0
-            
+        num_choices = len(choices[0]) # Assume all have same number of choices
+
         # Batch inference
+        print("Running inference...\n")
         (llm_outputs, confidence_levels) = self.model.generate(prompts, num_choices) 
 
         # Grade outputs
+        print("Grading answers...\n")
         grades = [None] * len(llm_outputs)
         for (i, llm_output) in enumerate(llm_outputs):
             print(f"Question {i+1+start_q}: {question_strings[i]}")
@@ -153,7 +157,7 @@ def main():
     all_grades = []
     all_confidence_levels = []
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
-        end_q = min(start_q + args['batch_size'], test.end_q, len(test.questions))
+        end_q = min(start_q + args['batch_size'], test.end_q)
         if args['batch_size'] > 1:
             print(f"\nSTARTING NEW BATCH: questions {start_q} to {end_q}\n")
         (grades, confidence_levels) = test.run_test(start_q, end_q)
