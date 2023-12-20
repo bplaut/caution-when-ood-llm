@@ -81,19 +81,24 @@ Response:\n
 """
 
     def determine_llm_answer(self, choices, llm_output):
-        # Find first instance of A./B./C. etc, if any
-        targets = [c + '.' for c in ascii_uppercase][:len(choices) + 1] # +1 corresponds to the "I don't know" answer we added
-        target_idxs = [llm_output.find(t) for t in targets if llm_output.find(t) != -1]
-        if len(target_idxs) > 0:
-            return llm_output[min(target_idxs)]
-        else: # If the model includes the text of the answer without the letter, we'll allow it
-            targets = choices + ["I don't know"]
-            result = [(i,t,llm_output.find(t)) for (i,t) in enumerate(targets) if llm_output.find(t) != -1]
-            if len(result) > 0:
-                found_answers = [(i,start) for (i,t,start) in result if llm_output[start:start+len(t)] == t]
-                (choice_idx, _) = min(found_answers, key=lambda x:x[1]) # Choice index for the found answer with the earliest starting index in the llm output
-                print("Grading note: could not find A./B./C./etc, but did find the text of an answer without the letter")
-                return ascii_uppercase[choice_idx]
+        # Look for A./B./C. etc. If fail, look for the text of an answer. If fail, look for A/B/C etc
+        targets_v1 = [c + '.' for c in ascii_uppercase][:len(choices) + 1] # +1 corresponds to the "I don't know" answer we added
+        v1_idxs = [llm_output.find(t) for t in targets_v1 if llm_output.find(t) != -1]
+        targets_v2 = choices + ["I don't know"]
+        v2_result = [(i,t,llm_output.find(t)) for (i,t) in enumerate(targets_v2) if llm_output.find(t) != -1]
+        targets_v3 = [c for c in ascii_uppercase][:len(choices) + 1]
+        v3_idxs = [llm_output.find(t) for t in targets_v3 if llm_output.find(t) != -1]
+        if len(v1_idxs) > 0: # found A./B./C. etc
+            return llm_output[min(v1_idxs)]
+        elif len(v2_result) > 0:
+            found = [(i,start) for (i,t,start) in v2_result if llm_output[start:start+len(t)] == t]
+            (choice_idx, _) = min(found, key=lambda x:x[1])
+            print("Grading: could not find A./B./C./etc, but did find the text of an answer")
+            return ascii_uppercase[choice_idx]
+        elif len(v3_idxs) > 0:
+            print("Grading: could not find A./B./C./etc or the text of an answer, but did find A/B/C etc")
+            return llm_output[min(v3_idxs)]
+        else:
             return "Could not parse answer"
 
     def grade_answer(self, choices, correct_answer, llm_output):
