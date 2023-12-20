@@ -49,6 +49,7 @@ class Test(object):
         self.end_q = min(self.end_q, len(self.questions))
         
     def make_letter(self, answer, offset=0):
+        answer = str(answer)
         if answer in ascii_uppercase:
             return answer
         elif answer in [str(n) for n in range(10)]:
