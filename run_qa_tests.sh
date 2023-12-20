@@ -25,7 +25,7 @@ get_batch_size() {
             batch_size=80
             ;;
         "Mistral"|"Zephyr")
-            batch_size=200
+            batch_size=180
             ;;
         *)
             batch_size=100 # Default value

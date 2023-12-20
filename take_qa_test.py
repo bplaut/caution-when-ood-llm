@@ -57,7 +57,6 @@ class Test(object):
         else:
             raise Exception(f"Unknown answer format: {answer}")
 
-
     def write_output(self, correct, wrong, abstained, t):
         thresh_str = 'thresh-' + str(t)
         dataset_str = self.args['dataset'].split("/")[-1]
