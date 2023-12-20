@@ -45,7 +45,7 @@ do
 
         # Running the command with the arguments
         echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size"
-        python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100
+        python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 &> logs/"$model"_"$dataset"_"$question_range"_log.txt
     done
 done
 
