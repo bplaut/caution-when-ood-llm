@@ -12,25 +12,22 @@ IFS=',' read -r -a model_options <<< "$1"
 IFS=',' read -r -a dataset_options <<< "$2"
 question_range="$3"
 
-# Function to determine batch_size based on model name
+
+# Function to determine batch_size based on model and dataset names
 get_batch_size() {
     local model_name="$1"
+    local dataset_name="$2"
     local batch_size
 
-    case "$model_name" in
-        "Llama-70b")
-            batch_size=20
-            ;;
-        "Llama-7b")
-            batch_size=80
-            ;;
-        "Mistral"|"Zephyr")
-            batch_size=100
-            ;;
-        *)
-            batch_size=100 # Default value
-            ;;
-    esac
+    if [ "$model_name" = "Llama-70b" ]; then
+        batch_size=20
+    elif [ "$dataset_name" = "mmlu" ]; then
+        batch_size=100
+    elif [ "$model_name" = "Mistral" ] || [ "$model_name" = "Zephyr" ]; then
+        batch_size=200
+    else
+        batch_size=100 # Default value
+    fi
 
     echo "$batch_size"
 }

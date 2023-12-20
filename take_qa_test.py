@@ -15,18 +15,20 @@ class Test(object):
                      'arc-challenge':('ai2_arc', 'ARC-Challenge'),
                      'winogrande':('winogrande', 'winogrande_l'),
                      'mmlu':('cais/mmlu', 'all'),
+                     'truthful-qa':('truthful_qa','multiple_choice'),
                      }
         dset_split = {'hellaswag':'train',
                       'arc-easy':'train',
                       'arc-challenge':'train',
                       'winogrande':'train',
                       'mmlu':'test',
+                      'truthful-qa':'validation'
                       }
                       
         # Different datasets have different keys for the questions and answers
         self.get_q = (lambda x:
                       x['ctx'] if dset_name == 'hellaswag' else
-                      x['question'] if dset_name in ['arc-easy', 'arc-challenge', 'mmlu'] else
+                      x['question'] if dset_name in ['arc-easy','arc-challenge','mmlu','truthful-qa'] else
                       x['sentence'] if dset_name == 'winogrande' else
                       None)
         self.get_a = (lambda x:
@@ -34,16 +36,17 @@ class Test(object):
                       self.make_letter(x['answerKey']) if dset_name in ['arc-easy', 'arc-challenge'] else
                       self.make_letter(x['answer'],1) if dset_name=='winogrande' else
                       self.make_letter(x['answer']) if dset_name == 'mmlu' else
+                      self.make_letter(x['mc1_targets']['labels'].index(1)) if dset_name == 'truthful-qa' else
                       None)
         self.get_choices = (lambda x:
                             x['endings'] if dset_name == 'hellaswag' else
                             x['choices']['text'] if dset_name in ['arc-easy', 'arc-challenge'] else
                             [x['option1'], x['option2']] if dset_name=='winogrande' else
                             x['choices'] if dset_name == 'mmlu' else
+                            x['mc1_targets']['choices'] if dset_name == 'truthful-qa' else
                             None)
-
         if dset_name not in dset_args:
-            raise Exception("Unsupported dataset name")
+            raise Exception(f"Unsupported dataset name: {dset_name}")
         self.args = args
         self.questions = load_dataset(*dset_args[dset_name], split=dset_split[dset_name])
         self.end_q = min(self.end_q, len(self.questions))
@@ -131,11 +134,10 @@ Response:\n
             choices[i - start_q] = choices_for_q
             question_strings[i - start_q] = question_string
             correct_answers[i - start_q] = correct_answer
-        num_choices = len(choices[0]) # Assume all have same number of choices
 
         # Batch inference
         print("Running inference...\n")
-        (llm_outputs, confidence_levels) = self.model.generate(prompts, num_choices) 
+        (llm_outputs, confidence_levels) = self.model.generate(prompts, choices) 
 
         # Grade outputs
         print("Grading answers...\n")
