@@ -23,6 +23,9 @@ get_batch_size() {
         "Llama-70b")
             batch_size=20
             ;;
+        "Llama-7b")
+            batch_size=70
+            ;;
         "Mistral"|"Zephyr")
             batch_size=200
             ;;
@@ -44,8 +47,8 @@ for model in "${model_options[@]}"
 do
     for dataset in "${dataset_options[@]}"
     do
-        # Determine batch_size based on the model
-        batch_size=$(get_batch_size "$model")
+        # Determine batch_size based on the model and dataset
+        batch_size=$(get_batch_size "$model" "$dataset")
 
         # Running the command with the arguments
         echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size"
