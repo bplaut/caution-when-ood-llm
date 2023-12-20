@@ -14,28 +14,38 @@ class Test(object):
                      'arc-easy':('ai2_arc', 'ARC-Easy'),
                      'arc-challenge':('ai2_arc', 'ARC-Challenge'),
                      'winogrande':('winogrande', 'winogrande_l'),
-        }
+                     'mmlu':('cais/mmlu', 'all'),
+                     }
+        dset_split = {'hellaswag':'train',
+                      'arc-easy':'train',
+                      'arc-challenge':'train',
+                      'winogrande':'train',
+                      'mmlu':'test',
+                      }
+                      
         # Different datasets have different keys for the questions and answers
         self.get_q = (lambda x:
                       x['ctx'] if dset_name == 'hellaswag' else
-                      x['question'] if dset_name in ['arc-easy', 'arc-challenge'] else
+                      x['question'] if dset_name in ['arc-easy', 'arc-challenge', 'mmlu'] else
                       x['sentence'] if dset_name == 'winogrande' else
                       None)
         self.get_a = (lambda x:
                       ascii_uppercase[int(x['label'])] if dset_name=='hellaswag' else
                       x['answerKey'] if dset_name in ['arc-easy', 'arc-challenge'] else
                       ascii_uppercase[int(x['answer'])-1] if dset_name=='winogrande' else
+                      ascii_uppercase[int(x['answer'])] if dset_name == 'mmlu' else
                       None)
         self.get_choices = (lambda x:
                             x['endings'] if dset_name == 'hellaswag' else
                             x['choices']['text'] if dset_name in ['arc-easy', 'arc-challenge'] else
                             [x['option1'], x['option2']] if dset_name=='winogrande' else
+                            x['choices'] if dset_name == 'mmlu' else
                             None)
 
         if dset_name not in dset_args:
             raise Exception("Unsupported dataset name")
         self.args = args
-        self.questions = load_dataset(*dset_args[dset_name], split='train')
+        self.questions = load_dataset(*dset_args[dset_name], split=dset_split[dset_name])
 
     def write_output(self, correct, wrong, abstained, t):
         thresh_str = 'thresh-' + str(t)
@@ -121,7 +131,8 @@ Response:\n
             print(f"LLM output: {llm_output}")
             (answer_output, grade) = self.grade_answer(choices[i], correct_answers[i], llm_output)
             print(f"LLM answer: {answer_output}\n")
-            print(f"Confidence level: {generate_text.t_to_str(confidence_levels[i])}\n")
+            confidence_str = generate_text.t_to_str(confidence_levels[i])
+            print(f"Confidence level: {confidence_str}\n")
             grades[i] = grade
         return (grades, confidence_levels)
 
