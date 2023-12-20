@@ -97,12 +97,10 @@ Response:\n
             return (f"{llm_answer}. (incorrect {correct_answer}.)", -1)
 
     def run_test(self, start_q, end_q):
-        correct = 0
-        incorrect = 0
-        abstained = 0
-
         # First assemble all of the prompts
-        end_q = min(end_q, len(self.questions))
+        if start_q >= end_q:
+            print("returning early")
+            return ([], [])
         num_prompts = end_q - start_q
         prompts = [None] * (num_prompts)
         choices = [None] * (num_prompts)
@@ -113,13 +111,20 @@ Response:\n
             choices_for_q = self.get_choices(question_data)
             question = self.get_q(question_data)
             correct_answer = self.get_a(question_data)
+            if correct_answer in ['0','1','2','3','4','5','6','7']:
+                print("hmm, q = ", i, correct_answer)
+                correct_answer = ascii_uppercase[int(correct_answer)-1]
             question_string = self.make_question_string(choices_for_q, question)
             prompt = self.make_prompt(question_string)
             prompts[i - start_q] = prompt
             choices[i - start_q] = choices_for_q
             question_strings[i - start_q] = question_string
             correct_answers[i - start_q] = correct_answer
-        num_choices = len(choices[0])
+        try:
+            num_choices = len(choices[0])
+        except:
+            print("Failed, setting num choices = 0, choices =", choices)
+            num_choices = 0
             
         # Batch inference
         (llm_outputs, confidence_levels) = self.model.generate(prompts, num_choices) 
@@ -148,7 +153,7 @@ def main():
     all_grades = []
     all_confidence_levels = []
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
-        end_q = min(start_q + args['batch_size'], test.end_q)
+        end_q = min(start_q + args['batch_size'], test.end_q, len(test.questions))
         if args['batch_size'] > 1:
             print(f"\nSTARTING NEW BATCH: questions {start_q} to {end_q}\n")
         (grades, confidence_levels) = test.run_test(start_q, end_q)
