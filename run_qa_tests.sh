@@ -19,14 +19,21 @@ get_batch_size() {
     local dataset_name="$2"
     local batch_size
 
-    if [ "$model_name" = "Llama-70b" ]; then
-        batch_size=20
-    elif [ "$dataset_name" = "mmlu" ]; then
-        batch_size=100
-    elif [ "$model_name" = "Mistral" ] || [ "$model_name" = "Zephyr" ]; then
-        batch_size=200
-    else
-        batch_size=100 # Default value
+    case "$model_name" in
+        "Llama-70b")
+            batch_size=20
+            ;;
+        "Mistral"|"Zephyr")
+            batch_size=200
+            ;;
+        *)
+            batch_size=100 # Default value
+            ;;
+    esac
+
+    # Halve the batch size if dataset is mmlu
+    if [ "$dataset_name" = "mmlu" ]; then
+        batch_size=$((batch_size / 2))
     fi
 
     echo "$batch_size"
