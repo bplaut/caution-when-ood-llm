@@ -21,6 +21,9 @@ get_batch_size() {
         "Llama-70b")
             batch_size=20
             ;;
+        "Llama-7b")
+            batch_size=80
+            ;;
         "Mistral"|"Zephyr")
             batch_size=200
             ;;
