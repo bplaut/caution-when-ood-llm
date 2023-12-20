@@ -34,7 +34,7 @@ get_batch_size() {
             ;;
     esac
 
-    # Halve the batch size if dataset is mmlu
+    # For some reason, mmlu crashes with larger batch sizes sometimes
     if [ "$dataset_name" = "mmlu" ]; then
         batch_size=$((batch_size / 2))
     fi
@@ -49,10 +49,11 @@ do
     do
         # Determine batch_size based on the model and dataset
         batch_size=$(get_batch_size "$model" "$dataset")
+	log_file="logs/${model}_${dataset}_${question_range}_log.txt"
 
         # Running the command with the arguments
         echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size"
-        python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 &> logs/"$model"_"$dataset"_"$question_range"_log.txt
+        python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 &> "$log_file"
     done
 done
 
