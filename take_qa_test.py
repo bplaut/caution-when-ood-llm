@@ -17,12 +17,12 @@ class Test(object):
                      'mmlu':('cais/mmlu', 'all'),
                      'truthful-qa':('truthful_qa','multiple_choice'),
                      }
-        dset_split = {'hellaswag':'train',
-                      'arc-easy':'train',
-                      'arc-challenge':'train',
-                      'winogrande':'train',
+        dset_split = {'hellaswag':'train', # test split doesn't have labels
+                      'arc-easy':'test',
+                      'arc-challenge':'test',
+                      'winogrande':'train', # test split doesn't have labels
                       'mmlu':'test',
-                      'truthful-qa':'validation'
+                      'truthful-qa':'validation' # only split for truthful-qa
                       }
                       
         # Different datasets have different keys for the questions and answers
