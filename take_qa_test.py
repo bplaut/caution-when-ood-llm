@@ -1,8 +1,10 @@
 import generate_text
 import json
+import os
 from datasets import load_dataset
 import random
 from string import ascii_uppercase
+
 class Test(object):
     def __init__(self, args):
         bounds = args['question_range'].split('-')
@@ -52,6 +54,7 @@ class Test(object):
         self.end_q = min(self.end_q, len(self.questions))
         
     def make_letter(self, answer, offset=0):
+        # Puts "answer" in the form of a letter if it isn't already
         answer = str(answer)
         if answer in ascii_uppercase:
             return answer
@@ -60,13 +63,17 @@ class Test(object):
         else:
             raise Exception(f"Unknown answer format: {answer}")
 
-    def write_output(self, correct, wrong, abstained, t):
-        thresh_str = 'thresh-' + str(t)
+    def write_output(self, grades, confidence_levels):
         dataset_str = self.args['dataset'].split("/")[-1]
-        output_filepath = "results/%s_%s_%s-q%dto%d.txt" % (dataset_str, self.args['model'], thresh_str, self.start_q, self.end_q)
+        p = "results/grades_per_question"
+        os.makedirs(p, exist_ok=True)
+        output_filepath = f"{p}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}.txt"
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
-            f.write("Correct: %d\nWrong: %d\nAbstained: %d" % (correct, wrong, abstained))
+            f.write("grade confidence_level\n")
+            for (g,c) in zip(grades, confidence_levels):
+                g_str = "Correct" if g == 1 else "Abstained" if g == 0 else "Wrong"
+                f.write(f"{g_str} {c}\n")
 
     def make_question_string(self, choices, question):
         assert(len(choices) <= 25) # we only have 26 capital letters and need 1 for uncertain
@@ -152,12 +159,6 @@ Response:\n
             grades[i] = grade
         return (grades, confidence_levels)
 
-    def apply_confidence_thresh(self, grades, confidences, t):
-        correct = sum([1 for (c,g) in zip(confidences,grades) if g == 1 and c >= t])
-        wrong = sum([1 for (c,g) in zip(confidences,grades) if g == -1 and c >= t])
-        abstained = sum([1 for (c,g) in zip(confidences,grades) if g == 0 or c < t])
-        return (correct, wrong, abstained)
-    
 def main():
     args = generate_text.parse_args()
     test = Test(args)
@@ -170,9 +171,7 @@ def main():
         (grades, confidence_levels) = test.run_test(start_q, end_q)
         all_grades += grades
         all_confidence_levels += confidence_levels
-    # FIX THIS. This is just hacky for now, totally ignoring the command line threshold
-    for t in [0, 0.75, 0.85, 0.95, 0.99]:
-        test.write_output(*test.apply_confidence_thresh(all_grades, all_confidence_levels, t), t)
+    test.write_output(all_grades, confidence_levels)
 
 if __name__ == '__main__':
     main()
