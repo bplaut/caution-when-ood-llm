@@ -10,48 +10,39 @@ class Test(object):
         bounds = args['question_range'].split('-')
         (self.start_q, self.end_q) = (int(bounds[0]), int(bounds[1]))
         self.model = generate_text.Generator(args)
+        self.args = args
 
         dset_name = args['dataset'].lower()
-        dset_args = {'hellaswag':('Rowan/hellaswag',),
-                     'arc-easy':('ai2_arc', 'ARC-Easy'),
-                     'arc-challenge':('ai2_arc', 'ARC-Challenge'),
-                     'winogrande':('winogrande', 'winogrande_l'),
-                     'mmlu':('cais/mmlu', 'all'),
-                     'truthful-qa':('truthful_qa','multiple_choice'),
-                     }
-        dset_split = {'hellaswag':'train', # test split doesn't have labels
-                      'arc-easy':'test',
-                      'arc-challenge':'test',
-                      'winogrande':'train', # test split doesn't have labels
-                      'mmlu':'test',
-                      'truthful-qa':'validation' # only split for truthful-qa
-                      }
-                      
+        # winogrande test split doesn't have labels; truthful_qa only has validation
+        # Combine different splits for winogrande and ARC to have more total questions
+        dset = (load_dataset('Rowan/hellaswag', split='validation') if dset_name=='hellaswag' else
+                sum([load_dataset('ai2_arc', 'ARC-Challenge', split=s) for s in ['train','test','validation']]) if dset_name=='arc' else
+                sum([load_dataset('winogrande', 'winogrande_debiased', split=s) for s in ['train','validation']]) if dset_name == 'winogrande' else 
+                load_dataset('cais/mmlu', 'all', split='test') if dset_name == 'mmlu' else
+                load_dataset('truthful_qa', 'multiple_choice', split='validation') if dset_name == 'truthful-qa' else None)
+        if dset is None:
+            raise Exception(f"Unsupported dataset name: {dset_name}")
+        
+        self.questions = dset
+        self.end_q = min(self.end_q, len(self.questions))
+                     
         # Different datasets have different keys for the questions and answers
         self.get_q = (lambda x:
                       x['ctx'] if dset_name == 'hellaswag' else
                       x['question'] if dset_name in ['arc-easy','arc-challenge','mmlu','truthful-qa'] else
-                      x['sentence'] if dset_name == 'winogrande' else
-                      None)
+                      x['sentence'] if dset_name == 'winogrande' else None)
         self.get_a = (lambda x:
                       self.make_letter(x['label']) if dset_name == 'hellaswag' else
                       self.make_letter(x['answerKey']) if dset_name in ['arc-easy', 'arc-challenge'] else
                       self.make_letter(x['answer'],1) if dset_name=='winogrande' else
                       self.make_letter(x['answer']) if dset_name == 'mmlu' else
-                      self.make_letter(x['mc1_targets']['labels'].index(1)) if dset_name == 'truthful-qa' else
-                      None)
+                      self.make_letter(x['mc1_targets']['labels'].index(1)) if dset_name == 'truthful-qa' else None)
         self.get_choices = (lambda x:
                             x['endings'] if dset_name == 'hellaswag' else
                             x['choices']['text'] if dset_name in ['arc-easy', 'arc-challenge'] else
                             [x['option1'], x['option2']] if dset_name=='winogrande' else
                             x['choices'] if dset_name == 'mmlu' else
-                            x['mc1_targets']['choices'] if dset_name == 'truthful-qa' else
-                            None)
-        if dset_name not in dset_args:
-            raise Exception(f"Unsupported dataset name: {dset_name}")
-        self.args = args
-        self.questions = load_dataset(*dset_args[dset_name], split=dset_split[dset_name])
-        self.end_q = min(self.end_q, len(self.questions))
+                            x['mc1_targets']['choices'] if dset_name == 'truthful-qa' else None)
         
     def make_letter(self, answer, offset=0):
         # Puts "answer" in the form of a letter if it isn't already
@@ -171,7 +162,7 @@ def main():
         (grades, confidence_levels) = test.run_test(start_q, end_q)
         all_grades += grades
         all_confidence_levels += confidence_levels
-    test.write_output(all_grades, confidence_levels)
+    test.write_output(all_grades, all_confidence_levels)
 
 if __name__ == '__main__':
     main()
