@@ -1,4 +1,0 @@
-model = Zephyr
-Correct: 10 | Wrong: 7 | Abstained: 3
-Score (even): 3
-Score (harsher): -4

@@ -1,4 +1,0 @@
-model = Zephyr
-Correct: 718 | Wrong: 269 | Abstained: 13
-Score (even): 449
-Score (harsher): 180

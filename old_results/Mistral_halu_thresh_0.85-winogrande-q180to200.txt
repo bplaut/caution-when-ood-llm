@@ -1,4 +1,0 @@
-model = Mistral_halu_thresh_0.85
-Correct: 8 | Wrong: 6 | Abstained: 6
-Score (even): 2
-Score (harsher): -4

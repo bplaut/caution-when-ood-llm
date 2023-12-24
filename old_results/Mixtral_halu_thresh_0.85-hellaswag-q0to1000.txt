@@ -1,4 +1,0 @@
-model = Mixtral_halu_thresh_0.85
-Correct: 547 | Wrong: 316 | Abstained: 137
-Score (even): 231
-Score (harsher): -85
