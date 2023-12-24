@@ -1,3 +1,0 @@
-Correct: 30
-Wrong: 15
-Abstained: 772
