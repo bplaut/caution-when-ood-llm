@@ -19,7 +19,7 @@ class Test(object):
                 concatenate_datasets([load_dataset('ai2_arc', 'ARC-Challenge', split=s) for s in ['train','test','validation']]) if dset_name=='arc' else
                 concatenate_datasets([load_dataset('winogrande', 'winogrande_debiased', split=s) for s in ['train','validation']]) if dset_name == 'winogrande' else 
                 load_dataset('cais/mmlu', 'all', split='test') if dset_name == 'mmlu' else
-                load_dataset('truthful_qa', 'multiple_choice', split='validation') if dset_name == 'truthful-qa' else None)
+                load_dataset('truthful_qa', 'multiple_choice', split='validation') if dset_name == 'truthfulqa' else None)
         if dset is None:
             raise Exception(f"Unsupported dataset name: {dset_name}")
         self.questions = dset
@@ -28,20 +28,20 @@ class Test(object):
         # Different datasets have different keys for the questions and answers
         self.get_q = (lambda x:
                       x['ctx'] if dset_name == 'hellaswag' else
-                      x['question'] if dset_name in ['arc','mmlu','truthful-qa'] else
+                      x['question'] if dset_name in ['arc','mmlu','truthfulqa'] else
                       x['sentence'] if dset_name == 'winogrande' else None)
         self.get_a = (lambda x:
                       self.make_letter(x['label']) if dset_name == 'hellaswag' else
                       self.make_letter(x['answerKey']) if dset_name == 'arc' else
                       self.make_letter(x['answer'],1) if dset_name=='winogrande' else
                       self.make_letter(x['answer']) if dset_name == 'mmlu' else
-                      self.make_letter(x['mc1_targets']['labels'].index(1)) if dset_name == 'truthful-qa' else None)
+                      self.make_letter(x['mc1_targets']['labels'].index(1)) if dset_name == 'truthfulqa' else None)
         self.get_choices = (lambda x:
                             x['endings'] if dset_name == 'hellaswag' else
                             x['choices']['text'] if dset_name == 'arc' else
                             [x['option1'], x['option2']] if dset_name=='winogrande' else
                             x['choices'] if dset_name == 'mmlu' else
-                            x['mc1_targets']['choices'] if dset_name == 'truthful-qa' else None)
+                            x['mc1_targets']['choices'] if dset_name == 'truthfulqa' else None)
         
     def make_letter(self, answer, offset=0):
         # Puts "answer" in the form of a letter if it isn't already
