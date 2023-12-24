@@ -26,7 +26,8 @@ def parse_and_convert_to_tex(input_file_path, output_file_path):
         abstained = int(lines[i+3].split(':')[1].strip())
         score_1 = correct - wrong
         score_2 = correct - 2 * wrong
-        data[group_name].append([name, correct, wrong, abstained, score_1, score_2])
+        total = correct + wrong + abstained
+        data[group_name].append([name, correct, wrong, abstained, score_1, score_2, total])
 
     # Convert the data to LaTeX table format
     with open(output_file_path, 'w') as f:
@@ -35,12 +36,12 @@ def parse_and_convert_to_tex(input_file_path, output_file_path):
         f.write('\\begin{document}\n')
         for group_name, rows in data.items():
             f.write(f'\\section*{{{group_name}}}\n')
-            f.write('\\begin{tabular}{c|c|c|c|c|c|}\n')
+            f.write('\\begin{tabular}{c|c|c|c|c|c|c}\n')
             f.write('\\hline\n')
-            f.write('Name & Correct & Wrong & Abstained & Score 1 & Score 2 \\\\\n')
+            f.write('Name & Correct & Wrong & Abstained & C - W & C - 2*W & Total \\\\\n')
             f.write('\\hline\n')
             for row in rows:
-                f.write(f'{row[0]} & {row[1]} & {row[2]} & {row[3]} & {row[4]} & {row[5]} \\\\\n')
+                f.write(f'{row[0]} & {row[1]} & {row[2]} & {row[3]} & {row[4]} & {row[5]} & {row[6]} \\\\\n')
                 f.write('\\hline\n')
             f.write('\\end{tabular}\n')
             f.write('\\newpage\n')  # Optional: Start each group table on a new page
