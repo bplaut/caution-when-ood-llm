@@ -1,14 +1,9 @@
-The main file is generate_text.py, which is a command-line interface to generate text via Hugging Face. The file take_qa_test.py uses generate_text.py to run a multiple-choice Q&A test using a Hugging Face dataset.
-
+There are two main files:
+1. generate_text.py, which is a command-line interface to generate text via Hugging Face
+2. take_qa_test.py, which runs a multiple choice Q&A test using a Hugging Face dataset and generate_text.py.
+Both files support the same command line arguments (shown below), although some arguments are only relevant for one file. For example, --dataset is only used for take_qa_test.py.
 
 ```
-usage: generate_text.py [-h] -m MODEL [-p PROMPTS] [-n MAX_NEW_TOKENS] [-k NUM_TOP_TOKENS] [-c] [-s]
-                        [-r NUM_RESPONSES] [-i] [-d DATASET] [-t THRESHOLD] [-q QUESTION_RANGE]
-                        [-b BATCH_SIZE]
-
-Use an LLM to generate text via HuggingFace.
-
-options:
   -h, --help            show this help message and exit
   -m MODEL, --model MODEL
                         Which LLM to use. Check this file for currently supported options and/or add your
