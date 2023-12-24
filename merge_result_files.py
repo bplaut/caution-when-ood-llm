@@ -18,7 +18,7 @@ def main():
                 results = f2.read()
                 result_filename = result_filepath.split('/')[-1]
                 f1.write(result_filename + '\n')
-                f1.write(results + '\n\n')
+                f1.write(results + '\n')
 
 if __name__ == '__main__':
     main()
