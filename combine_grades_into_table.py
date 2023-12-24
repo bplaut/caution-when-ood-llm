@@ -39,7 +39,6 @@ def write_to_table(output_filepath, all_grades):
     print(f"Successfully wrote to {output_filepath}")    
 
 def main():
-    # 1st arg is this file's name, 2nd is output dir, 3rd is comma-separated list of confidence thresholds, the rest are files to add up
     if len(sys.argv) <= 3:
         raise Exception('Usage: python add_up_grades.py [output_filepath] [comma-separated list of confidence thresholds] [add least one grades file]')
 
