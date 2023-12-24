@@ -13,7 +13,7 @@ class Test(object):
         self.args = args
 
         dset_name = args['dataset'].lower()
-        # winogrande test split doesn't have labels; truthful_qa only has validation
+        # hellaswag and winogrande test splits don't have labels. Truthful_qa only has validation
         # Combine different splits for winogrande and ARC to have more total questions
         dset = (load_dataset('Rowan/hellaswag', split='train') if dset_name=='hellaswag' else
                 concatenate_datasets([load_dataset('ai2_arc', 'ARC-Challenge', split=s) for s in ['train','test','validation']]) if dset_name=='arc' else
@@ -66,7 +66,8 @@ class Test(object):
                 f.write(f"{g_str} {c}\n")
 
     def make_question_string(self, choices, question):
-        assert(len(choices) <= 25) # we only have 26 capital letters and need 1 for uncertain
+        if len(choices) > 25:
+            raise Exception("We only have 26 capital letters, so you can't have more than 26 answer options (including 'I don't know'")
         choices_with_uncertain = [ascii_uppercase[i] + '. ' + choice for (i, choice) in enumerate(choices)] + [ascii_uppercase[len(choices)] + ". I don't know"]
         return question + '\n' + '\n'.join(choices_with_uncertain)
 
