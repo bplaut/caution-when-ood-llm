@@ -26,18 +26,18 @@ def main():
     
     print("Combining from these grade files:", grade_filepaths)
     filenames = [p.split('/')[-1] for p in grade_filepaths]
-    result_params = [f.split('-q')[0] for f in filenames]
-    if len(set(result_params)) > 1: # multiple different models
-        raise Exception('All results must be from the same model + parameters')
+    all_param_sets = set([f.split('-q')[0] for f in filenames])
 
     for thresh in thresholds:
-        grades_dict = get_total_results(grade_filepaths, thresh)
-        output_filename = result_params[0] + f'_thresh-{thresh}.txt'
-        output_filepath = os.path.join(output_dir, output_filename)
-        print('Writing to', output_filepath)
-        with open(output_filepath, 'w') as f:
-            for grade_type in grades_dict:
-                f.write(f"{grade_type}: {grades_dict[grade_type]}\n")
+        for param_set in all_param_sets:
+            paths_to_use = [p for p in grade_filepaths if p.split('/')[-1].split('-q')[0] == param_set]
+            grades_dict = get_total_results(paths_to_use, thresh)
+            output_filename = param_set + f'_thresh-{thresh}.txt'
+            output_filepath = os.path.join(output_dir, output_filename)
+            print('Writing to', output_filepath)
+            with open(output_filepath, 'w') as f:
+                for grade_type in grades_dict:
+                    f.write(f"{grade_type}: {grades_dict[grade_type]}\n")
 
 if __name__ == '__main__':
     main()
