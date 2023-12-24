@@ -22,16 +22,17 @@ def write_to_table(output_filepath, all_grades):
         f.write('\\renewcommand\\arraystretch{1.4}\n')
         f.write('\\begin{document}\n')
         for dataset_name in sorted(all_grades.keys()):
-            f.write(f'\\section*{{{dataset_name}}}\n')
+            f.write(f'\\section*{{Dataset: {dataset_name}}}\n')
             f.write('\\begin{tabular}{c|c|c|c|c|c|c}\n')
             f.write('\\hline\n')
-            f.write('Name & Correct & Wrong & Abstained & C - W & C - 2*W & Total \\\\\n')
+            f.write('Model name & Correct & Wrong & Abstained & C - W & C / W & Total \\\\\n')
             f.write('\\hline\n')
             for row_name in sorted(all_grades[dataset_name].keys()):
                 correct = all_grades[dataset_name][row_name]['Correct']
                 wrong = all_grades[dataset_name][row_name]['Wrong']
                 abstained = all_grades[dataset_name][row_name]['Abstained']
-                f.write(f'{row_name} & {correct} & {wrong} & {abstained} & {correct - wrong} & {correct - 2*wrong} & {correct + wrong + abstained} \\\\\n')
+                ratio = round(correct/wrong, 2) if wrong > 0 else '-'
+                f.write(f'{row_name} & {correct} & {wrong} & {abstained} & {correct - wrong} & {ratio} & {correct + wrong + abstained} \\\\\n')
                 f.write('\\hline\n')
             f.write('\\end{tabular}\n')
             f.write('\\newpage\n')  # Optional: Start each group table on a new page                          
@@ -57,11 +58,12 @@ def main():
             paths_to_use = [p for p in grade_filepaths if p.split('/')[-1].split('-q')[0] == param_set]
             grades_for_param_set = get_total_results(paths_to_use, thresh)
             dataset_name = param_set.split('_')[0]
-            other_params = param_set.split('_')[1]
+            model_name = param_set.split('_')[1]
             if dataset_name not in all_grades:
                 all_grades[dataset_name] = dict()
-            other_params = other_params.replace('_',' ')
-            all_grades[dataset_name][f"{other_params}, thresh={thresh}"] = grades_for_param_set
+            params_str = f"{model_name}, thresh={thresh}"
+            params_str = params_str.replace('_',' ').replace('thresh=0.0', 'base model')
+            all_grades[dataset_name][params_str] = grades_for_param_set
     write_to_table(output_filepath, all_grades)
 
 if __name__ == '__main__':
