@@ -9,7 +9,7 @@ class Test(object):
     def __init__(self, args):
         bounds = args['question_range'].split('-')
         (self.start_q, self.end_q) = (int(bounds[0]), int(bounds[1]))
-        #self.model = generate_text.Generator(args)
+        self.model = generate_text.Generator(args)
         self.args = args
 
         dset_name = args['dataset'].lower()
@@ -28,17 +28,17 @@ class Test(object):
         # Different datasets have different keys for the questions and answers
         self.get_q = (lambda x:
                       x['ctx'] if dset_name == 'hellaswag' else
-                      x['question'] if dset_name in ['arc-easy','arc-challenge','mmlu','truthful-qa'] else
+                      x['question'] if dset_name in ['arc','mmlu','truthful-qa'] else
                       x['sentence'] if dset_name == 'winogrande' else None)
         self.get_a = (lambda x:
                       self.make_letter(x['label']) if dset_name == 'hellaswag' else
-                      self.make_letter(x['answerKey']) if dset_name in ['arc-easy', 'arc-challenge'] else
+                      self.make_letter(x['answerKey']) if dset_name == 'arc' else
                       self.make_letter(x['answer'],1) if dset_name=='winogrande' else
                       self.make_letter(x['answer']) if dset_name == 'mmlu' else
                       self.make_letter(x['mc1_targets']['labels'].index(1)) if dset_name == 'truthful-qa' else None)
         self.get_choices = (lambda x:
                             x['endings'] if dset_name == 'hellaswag' else
-                            x['choices']['text'] if dset_name in ['arc-easy', 'arc-challenge'] else
+                            x['choices']['text'] if dset_name == 'arc' else
                             [x['option1'], x['option2']] if dset_name=='winogrande' else
                             x['choices'] if dset_name == 'mmlu' else
                             x['mc1_targets']['choices'] if dset_name == 'truthful-qa' else None)
