@@ -1,7 +1,7 @@
 import generate_text
 import json
 import os
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
 import random
 from string import ascii_uppercase
 
@@ -9,20 +9,19 @@ class Test(object):
     def __init__(self, args):
         bounds = args['question_range'].split('-')
         (self.start_q, self.end_q) = (int(bounds[0]), int(bounds[1]))
-        self.model = generate_text.Generator(args)
+        #self.model = generate_text.Generator(args)
         self.args = args
 
         dset_name = args['dataset'].lower()
         # winogrande test split doesn't have labels; truthful_qa only has validation
         # Combine different splits for winogrande and ARC to have more total questions
-        dset = (load_dataset('Rowan/hellaswag', split='validation') if dset_name=='hellaswag' else
-                sum([load_dataset('ai2_arc', 'ARC-Challenge', split=s) for s in ['train','test','validation']]) if dset_name=='arc' else
-                sum([load_dataset('winogrande', 'winogrande_debiased', split=s) for s in ['train','validation']]) if dset_name == 'winogrande' else 
+        dset = (load_dataset('Rowan/hellaswag', split='train') if dset_name=='hellaswag' else
+                concatenate_datasets([load_dataset('ai2_arc', 'ARC-Challenge', split=s) for s in ['train','test','validation']]) if dset_name=='arc' else
+                concatenate_datasets([load_dataset('winogrande', 'winogrande_debiased', split=s) for s in ['train','validation']]) if dset_name == 'winogrande' else 
                 load_dataset('cais/mmlu', 'all', split='test') if dset_name == 'mmlu' else
                 load_dataset('truthful_qa', 'multiple_choice', split='validation') if dset_name == 'truthful-qa' else None)
         if dset is None:
             raise Exception(f"Unsupported dataset name: {dset_name}")
-        
         self.questions = dset
         self.end_q = min(self.end_q, len(self.questions))
                      
