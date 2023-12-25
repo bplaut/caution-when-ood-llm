@@ -55,7 +55,7 @@ class Test(object):
 
     def write_output(self, grades, confidence_levels):
         dataset_str = self.args['dataset'].split("/")[-1]
-        p = "results/grades_per_question"
+        p = "results/"
         os.makedirs(p, exist_ok=True)
         output_filepath = f"{p}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}.txt"
         print('\nWriting results to', output_filepath)
