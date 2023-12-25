@@ -82,11 +82,14 @@ Response:\n
 """
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices):
-        # Currently, we look for the max logit corresponding to the actual letter answer. Also some models this weird underscore character, so that's why I'm including it. Also maybe we should be looking for A./B. etc instead of just the capital letter
+        # Find the max probability for the token which determines the answer
         confidence_levels = [None] * len(text_outputs)
         for (i, response) in enumerate(text_outputs):
             num_choices = len(choices[i]) if len(choices) > i else 0
-            target_tokens = [c for c in ascii_uppercase][:num_choices] + ['▁' + c for c in ascii_uppercase][:num_choices]
+            # targets are: (1) uppercase letters corresponding to choices, (2) same but with weird underscore in front because some models include that, (3) first token in the text of a choice
+            target_tokens = ([c for c in ascii_uppercase][:num_choices] +
+                             ['▁' + c for c in ascii_uppercase][:num_choices] +
+                             [self.model.tokenizer.tokenize(choice)[0] for choice in choices[i]])
             token_idx = self.model.first_token_instance(token_outputs[i], target_tokens)
             (confidence, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=True)
             confidence_levels[i] = confidence
