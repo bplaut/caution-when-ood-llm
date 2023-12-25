@@ -86,13 +86,15 @@ Response:\n
         confidence_levels = [None] * len(text_outputs)
         for (i, response) in enumerate(text_outputs):
             num_choices = len(choices[i]) if len(choices) > i else 0
-            # targets are: (1) uppercase letters corresponding to choices, (2) same but with weird underscore in front because some models include that, (3) first token in the text of a choice
-            target_tokens = ([c for c in ascii_uppercase][:num_choices] +
-                             ['▁' + c for c in ascii_uppercase][:num_choices] +
-                             [self.model.tokenizer.tokenize(choice)[0] for choice in choices[i]])
-            token_idx = self.model.first_token_instance(token_outputs[i], target_tokens)
-            (confidence, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=True)
-            confidence_levels[i] = confidence
+            # targets are: (1) uppercase letters corresponding to choices, (2) same but with weird underscore in front because some models include that, (3) first token in the text of a choice. Prioritize (1) and (2)
+            targets1 = ([c for c in ascii_uppercase][:num_choices] +
+                          ['▁' + c for c in ascii_uppercase][:num_choices])
+            targets2 = [self.model.tokenizer.tokenize(choice)[0] for choice in choices[i]]
+            token_idx1 = self.model.first_token_instance(token_outputs[i], targets1)
+            token_idx2 = self.model.first_token_instance(token_outputs[i], targets2)
+            token_idx = token_idx1 if token_idx1 < len(token_outputs[i]) else token_idx2
+            (conf, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=True)
+            confidence_levels[i] = conf
         return confidence_levels
     
     def determine_llm_answer(self, choices, llm_output):
