@@ -38,17 +38,13 @@ class Generator(object):
         scores_tensor = t.stack(list(scores), dim=0)
         scores_tensor = scores_tensor[lo:hi,::] 
         if len(scores_tensor) == 0: # For example, when we call this fn with lo=first_token_idx(x), lo=len(scores) if we don't find token x
-            return (0, None) # zero confidence level
+            print("Error in min max logit: tensor slice is empty. Defaulting to 0.")
+            return (0, None)
         if normalize:
             scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
         (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
-        # TODO: Sometimes this throws an error when the tensor is empty I think?
-        try:
-            (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
-            return (min_among_max_logits[response_idx], indices[response_idx])
-        except:
-            print("Encountered an error while computing min max logit, returning 0")
-            return (0, None)
+        (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
+        return (min_among_max_logits[response_idx], indices[response_idx])
     
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
