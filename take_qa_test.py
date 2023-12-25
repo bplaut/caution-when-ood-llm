@@ -82,22 +82,26 @@ Response:\n
 """
 
     def determine_llm_answer(self, choices, llm_output):
-        # Look for A./B./C. etc. If fail, look for the text of an answer. If fail, look for A/B/C etc
-        targets_v1 = [c + '.' for c in ascii_uppercase][:len(choices) + 1] # +1 corresponds to the "I don't know" answer we added
+        # Look for A./B./C. etc. 
+        targets_v1 = [c + '.' for c in ascii_uppercase][:len(choices) + 1] # +1 because of "I don't know"
         v1_idxs = [llm_output.find(t) for t in targets_v1 if llm_output.find(t) != -1]
-        targets_v2 = choices + ["I don't know"]
-        v2_result = [(i,t,llm_output.find(t)) for (i,t) in enumerate(targets_v2) if llm_output.find(t) != -1]
+        # If that fails, look for the text of an answer. Normalize casing.
+        targets_v2 = [(i,choice.lower()) for (i,choice) in enumerate(choices + ["I don't know"])]
+        output_lower = llm_output.lower()
+        v2_result = [(i,t,output_lower.find(t)) for (i,t) in targets_v2 if output_lower.find(t) != -1]
+        # If that fails, look for just A/B/C
         targets_v3 = [c for c in ascii_uppercase][:len(choices) + 1]
         v3_idxs = [llm_output.find(t) for t in targets_v3 if llm_output.find(t) != -1]
         if len(v1_idxs) > 0: # found A./B./C. etc
             return llm_output[min(v1_idxs)]
-        elif len(v2_result) > 0:
-            found = [(i,start) for (i,t,start) in v2_result if llm_output[start:start+len(t)] == t]
-            (choice_idx, _) = min(found, key=lambda x:x[1])
-            print("Grading: could not find A./B./C./etc, but did find the text of an answer")
-            return ascii_uppercase[choice_idx]
-        elif len(v3_idxs) > 0:
-            print("Grading: could not find A./B./C./etc or the text of an answer, but did find A/B/C etc")
+        elif len(v2_result) > 0: # found text of answer
+            found = [(i,start_idx) for (i,t,start_idx) in v2_result
+                     if output_lower[start_idx:start_idx+len(t)] == t]
+            (i, _) = min(found, key=lambda x:x[1])
+            print("Grading note: could not find A./B./C./etc, but did find the text of an answer")
+            return ascii_uppercase[i]
+        elif len(v3_idxs) > 0: # found A/B/C/
+            print("Grading note: could not find A./B./C./etc or the text of an answer, but did find A/B/C etc")
             return llm_output[min(v3_idxs)]
         else:
             return "Could not parse answer"
