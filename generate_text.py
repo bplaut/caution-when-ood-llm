@@ -2,7 +2,6 @@ from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 import argparse
 import torch as t
-import string
 
 # Still need to try beam search at some point
 class Generator(object):
@@ -48,22 +47,8 @@ class Generator(object):
             (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
             return (min_among_max_logits[response_idx], indices[response_idx])
         except:
-            print("Encountered an error while computing min max logit")
-            print("Max logit per token:", max_logit_per_token)
-            print("lo, hi =", lo, hi)
+            print("Encountered an error while computing min max logit, returning 0")
             return (0, None)
-
-    # This function should probably go in the take_qa_test.py
-    def compute_confidence_levels(self, scores, output_just_responses, text_outputs, first_pad_token_idxs, choices):
-        # Currently, we look for the first logit corresponding to the actual letter answer. Also some models this weird underscore character, so that's why I'm including it. Also maybe we should be looking for A./B. etc instead of just the capital letter
-        confidence_levels = [None] * len(text_outputs)
-        for (i, response) in enumerate(text_outputs):
-            num_choices = len(choices[i]) if len(choices) > i else 0
-            target_tokens = [c for c in string.ascii_uppercase][:num_choices] + ['▁' + c for c in string.ascii_uppercase][:num_choices]
-            token_idx = self.first_token_instance(output_just_responses[i//self.num_responses], target_tokens)
-            (confidence, _) = self.min_max_logit(scores, i//self.num_responses, lo=token_idx, hi=token_idx+1, normalize=True)
-            confidence_levels[i] = confidence
-        return confidence_levels
     
     def prepare_for_chat(self, prompts):
         chats = [[{"role": "user", "content": p}] for p in prompts]
@@ -111,19 +96,17 @@ class Generator(object):
         # Second 0 index is because we want the first index containing a target (if there are any)
         return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
 
-    def generate(self, prompts, choices=[]):
+    def generate(self, prompts):
         prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
 
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
-        output_just_responses = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output. i//num_responses in the prompt index
-        text_outputs = self.tokenizer.batch_decode(output_just_responses, skip_special_tokens=True)
-        first_pad_token_idxs = [self.first_token_instance(output_just_responses[i//self.num_responses], [self.tokenizer.pad_token]) for i in range(len(text_outputs))]
-        # TODO: Clean up this whole first_pad_token_idx thing
+        token_outputs = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output, tokenized. i//num_responses in the prompt index
+        text_outputs = self.tokenizer.batch_decode(token_outputs, skip_special_tokens=True)
+        first_pad_token_idxs = [self.first_token_instance(token_outputs[i], [self.tokenizer.pad_token]) for i in range(len(text_outputs))]
         self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
         
-        confidence_levels = self.compute_confidence_levels(output.scores, output_just_responses, text_outputs, first_pad_token_idxs, choices)
-        return (text_outputs, confidence_levels)
+        return (text_outputs, token_outputs, output.scores)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Use an LLM to generate text via HuggingFace.')
@@ -170,7 +153,8 @@ def main():
         while True:
             # Careful with typing of lists vs strs here
             prompt = base_text + generator.prepare_for_chat([user_prompt])[0]
-            base_text = generator.generate([prompt])[0] # output text becomes the base text for next prompt
+            (text_outputs, _, _) = generator.generate([prompt])
+            base_text = text_outputs[0] # output text becomes the base text for next prompt
             user_prompt = input("User response: ")
         
 if __name__ == '__main__':

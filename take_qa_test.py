@@ -81,6 +81,17 @@ Question:
 Response:\n
 """
 
+    def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices):
+        # Currently, we look for the max logit corresponding to the actual letter answer. Also some models this weird underscore character, so that's why I'm including it. Also maybe we should be looking for A./B. etc instead of just the capital letter
+        confidence_levels = [None] * len(text_outputs)
+        for (i, response) in enumerate(text_outputs):
+            num_choices = len(choices[i]) if len(choices) > i else 0
+            target_tokens = [c for c in ascii_uppercase][:num_choices] + ['▁' + c for c in ascii_uppercase][:num_choices]
+            token_idx = self.model.first_token_instance(token_outputs[i], target_tokens)
+            (confidence, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=True)
+            confidence_levels[i] = confidence
+        return confidence_levels
+    
     def determine_llm_answer(self, choices, llm_output):
         # Look for A./B./C. etc. 
         targets_v1 = [c + '.' for c in ascii_uppercase][:len(choices) + 1] # +1 because of "I don't know"
@@ -139,12 +150,13 @@ Response:\n
 
         # Batch inference
         print("Running inference...\n")
-        (llm_outputs, confidence_levels) = self.model.generate(prompts, choices) 
+        (text_outputs, token_outputs, scores) = self.model.generate(prompts)
+        confidence_levels = self.compute_confidence_levels(text_outputs, token_outputs, scores, choices)
 
         # Grade outputs
         print("Grading answers...\n")
-        grades = [None] * len(llm_outputs)
-        for (i, llm_output) in enumerate(llm_outputs):
+        grades = [None] * len(text_outputs)
+        for (i, llm_output) in enumerate(text_outputs):
             print(f"Question {i+1+start_q}: {question_strings[i]}")
             print(f"LLM output: {llm_output}")
             (answer_output, grade) = self.grade_answer(choices[i], correct_answers[i], llm_output)
