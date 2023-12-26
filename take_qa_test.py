@@ -32,10 +32,10 @@ class Test(object):
                       x['sentence'] if dset_name == 'winogrande' else None)
         self.get_a = (lambda x:
                       self.make_index(x['label']) if dset_name == 'hellaswag' else
-                      self.make_index(x['answerKey']) if dset_name == 'arc' else
+                      self.make_index(x['answerKey'],1) if dset_name == 'arc' else # nearly all ARC answers are letters, but a few are numbers with offset 1
                       self.make_index(x['answer'],1) if dset_name=='winogrande' else
                       self.make_index(x['answer']) if dset_name == 'mmlu' else
-                      self.make_index(x['mc1_targets']['labels'].index(1)) if dset_name == 'truthfulqa' else None)
+                      x['mc1_targets']['labels'].index(1) if dset_name == 'truthfulqa' else None)
         self.get_choices = (lambda x:
                             x['endings'] if dset_name == 'hellaswag' else
                             x['choices']['text'] if dset_name == 'arc' else
