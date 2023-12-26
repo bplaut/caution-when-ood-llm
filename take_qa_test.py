@@ -1,5 +1,4 @@
 import generate_text
-import json
 import os
 from datasets import load_dataset, concatenate_datasets
 import random
