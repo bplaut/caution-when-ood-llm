@@ -104,7 +104,7 @@ class Generator(object):
         return (text_outputs, token_outputs, output.scores)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Use an LLM to generate text via HuggingFace.')
+    parser = argparse.ArgumentParser(description='Perform text generation and Q&A tasks via Hugging Face models.')
     parser.add_argument('-m', '--model', type=str, help='Which LLM to use. Check this file for currently supported options and/or add your own.',required=True)
     parser.add_argument('-p', '--prompts', type=str, help='List of prompts, separated by |. For example "Hello my name is Ben|What a time to be alive". If not provided, you will be asked for a prompt by command line.', default=None)
     parser.add_argument('-n', '--max_new_tokens', type=int, help='Number of new tokens to generate on top of the prompt', default=10)
