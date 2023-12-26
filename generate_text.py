@@ -37,8 +37,7 @@ class Generator(object):
         # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
         scores_tensor = t.stack(list(scores), dim=0)
         scores_tensor = scores_tensor[lo:hi,::] 
-        if len(scores_tensor) == 0: # For example, when we call this fn with lo=first_token_idx(x), lo=len(scores) if we don't find token x
-            print("Error in min max logit: tensor slice is empty. Defaulting to 0.")
+        if len(scores_tensor) == 0: # For example, when we call this fn with lo=first_token_idx(x)=len(scores) if we don't find token x
             return (0, None)
         if normalize:
             scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
@@ -50,36 +49,37 @@ class Generator(object):
         chats = [[{"role": "user", "content": p}] for p in prompts]
         return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
 
-    def print_output(self, output, model_inputs, prompts, text_outputs, first_pad_token_idxs):
+    def print_output(self, prompts, text_outputs, token_outputs, scores):
+
         print('\n')
         for i in range(len(text_outputs)):
             prompt_idx = i//self.num_responses
             print('PROMPT %d: "%s"\n' % (prompt_idx+1, prompts[prompt_idx]))
             print('OUTPUT %d: "%s"\n' % (i % self.num_responses + 1, text_outputs[i]))
-            token_ids = output.sequences[i][len(model_inputs[prompt_idx]):]
+            first_pad_idx = self.first_token_instance(token_outputs[i], [self.tokenizer.pad_token])
 
             if self.args['num_top_tokens'] > 0:
-                (mm_logit, mm_logit_idx) = self.min_max_logit(output.scores, i, lo=0, hi=first_pad_token_idxs[i], normalize=False)
-                (mm_prob, mm_prob_idx) = self.min_max_logit(output.scores, i, lo=0, hi=first_pad_token_idxs[i], normalize=True)
+                (mm_logit, mm_logit_idx) = self.min_max_logit(scores, i, lo=0, hi=first_pad_idx, normalize=False)
+                (mm_prob, mm_prob_idx) = self.min_max_logit(scores, i, lo=0, hi=first_pad_idx, normalize=True)
                 print("Min max prob  =", t_to_str(mm_prob), "| Index =", t_to_str(mm_prob_idx))
                 print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
-                for j in range(len(token_ids)):
-                    if self.tokenizer.decode(token_ids[j]) == self.tokenizer.pad_token:
+                for j in range(len(token_outputs[i])):
+                    if self.tokenizer.decode(token_outputs[i][j]) == self.tokenizer.pad_token:
                         # If we have prompts/responses of different lengths, some will get padded
-                        break             
+                        break
 
                     # This isn't that efficient right now, I should be sorting/exping/etc in batch
                     # scores has shape (response_length, num_responses, vocab_size)
  
-                    (sorted_scores, top_token_ids) = t.sort(output.scores[j][i], descending=True)
+                    (sorted_scores, top_token_ids) = t.sort(scores[j][i], descending=True)
                     sorted_probs = t.exp(sorted_scores) / t.sum(t.exp(sorted_scores))
                     top_tokens = self.tokenizer.batch_decode(top_token_ids[:self.args['num_top_tokens']])
                     if self.args['num_top_tokens'] == 1:
-                        max_token_idx_len = len(str(len(token_ids)))
+                        max_token_idx_len = len(str(len(token_outputs[i])))
                         idx_str = str(j).zfill(max_token_idx_len) # pad with 0s for prettiness
                         print("Token %s |" % idx_str, t_to_str(sorted_probs[0]), '|', t_to_str(sorted_scores[0]), '|', repr(top_tokens[0]))
                     else:
-                        print('\nToken %d:' % j, repr(self.tokenizer.decode(token_ids[j])))
+                        print('\nToken %d:' % j, repr(self.tokenizer.decode(token_outputs[i][j])))
                         print("Top tokens:", top_tokens)
                         print("Top probs:", t_to_str(sorted_probs[:self.args['num_top_tokens']]))
                         print("Top logits:", t_to_str(sorted_scores[:self.args['num_top_tokens']]))
@@ -99,8 +99,7 @@ class Generator(object):
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
         token_outputs = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output, tokenized. i//num_responses in the prompt index
         text_outputs = self.tokenizer.batch_decode(token_outputs, skip_special_tokens=True)
-        first_pad_token_idxs = [self.first_token_instance(token_outputs[i], [self.tokenizer.pad_token]) for i in range(len(text_outputs))]
-        self.print_output(output, model_inputs, prompts, text_outputs, first_pad_token_idxs)
+        self.print_output(prompts, text_outputs, token_outputs, output.scores)
         
         return (text_outputs, token_outputs, output.scores)
 
