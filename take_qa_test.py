@@ -21,20 +21,22 @@ class Test(object):
                 load_dataset('truthful_qa', 'multiple_choice', split='validation') if dset_name == 'truthfulqa' else None)
         if dset is None:
             raise Exception(f"Unsupported dataset name: {dset_name}")
-        self.questions = dset
+        self.questions = list(dset)
+        random.shuffle(self.questions) # The fixed seed in main() ensures consistency across runs
+        print(self.questions[:5])
         self.end_q = min(self.end_q, len(self.questions))
                      
-        # Different datasets have different keys for the questions and answers
+        # Different datasets have different ways of accessing the question, answer, and choices
         self.get_q = (lambda x:
                       x['ctx'] if dset_name == 'hellaswag' else
                       x['question'] if dset_name in ['arc','mmlu','truthfulqa'] else
                       x['sentence'] if dset_name == 'winogrande' else None)
         self.get_a = (lambda x:
-                      self.make_letter(x['label']) if dset_name == 'hellaswag' else
-                      self.make_letter(x['answerKey']) if dset_name == 'arc' else
-                      self.make_letter(x['answer'],1) if dset_name=='winogrande' else
-                      self.make_letter(x['answer']) if dset_name == 'mmlu' else
-                      self.make_letter(x['mc1_targets']['labels'].index(1)) if dset_name == 'truthfulqa' else None)
+                      self.make_index(x['label']) if dset_name == 'hellaswag' else
+                      self.make_index(x['answerKey']) if dset_name == 'arc' else
+                      self.make_index(x['answer'],1) if dset_name=='winogrande' else
+                      self.make_index(x['answer']) if dset_name == 'mmlu' else
+                      self.make_index(x['mc1_targets']['labels'].index(1)) if dset_name == 'truthfulqa' else None)
         self.get_choices = (lambda x:
                             x['endings'] if dset_name == 'hellaswag' else
                             x['choices']['text'] if dset_name == 'arc' else
@@ -42,13 +44,13 @@ class Test(object):
                             x['choices'] if dset_name == 'mmlu' else
                             x['mc1_targets']['choices'] if dset_name == 'truthfulqa' else None)
         
-    def make_letter(self, answer, offset=0):
-        # Puts "answer" in the form of a letter if it isn't already
+    def make_index(self, answer, offset=0):
+        # Puts "answer" in the form of a index if it isn't already
         answer = str(answer)
         if answer in ascii_uppercase:
-            return answer
+            return ascii_uppercase.index(answer)        
         elif answer in [str(n) for n in range(10)]:
-            return ascii_uppercase[int(answer) - offset]
+            return int(answer) - offset
         else:
             raise Exception(f"Unknown answer format: {answer}")
 
@@ -144,7 +146,10 @@ Response:\n
             question_data = self.questions[i]
             choices_for_q = self.get_choices(question_data)
             question = self.get_q(question_data)
-            correct_answer = self.get_a(question_data)
+            # Shuffle choices. Recall that self.get_a returns an index
+            correct_answer_text = choices_for_q[self.get_a(question_data)]
+            random.shuffle(choices_for_q)
+            correct_answer = ascii_uppercase[choices_for_q.index(correct_answer_text)]
             question_string = self.make_question_string(choices_for_q, question)
             prompt = self.make_prompt(question_string)
             prompts[i - start_q] = prompt
@@ -171,6 +176,7 @@ Response:\n
         return (grades, confidence_levels)
 
 def main():
+    random.seed(2549900867) # for consistency across runs
     args = generate_text.parse_args()
     test = Test(args)
     all_grades = []
