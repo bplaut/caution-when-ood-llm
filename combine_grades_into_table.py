@@ -19,20 +19,28 @@ def write_to_table(output_filepath, all_grades):
     # Convert the data to LaTeX table format                                                               
     with open(output_filepath, 'w') as f:
         f.write('\\documentclass{article}\n')
+        f.write('\\usepackage[left=1in, right=1in, top=1in, bottom=1in]{geometry}\n')
         f.write('\\renewcommand\\arraystretch{1.4}\n')
+        f.write('\\usepackage{amsmath}\n')
         f.write('\\begin{document}\n')
         for dataset_name in sorted(all_grades.keys()):
             f.write(f'\\section*{{Dataset: {dataset_name}}}\n')
-            f.write('\\begin{tabular}{c|c|c|c|c|c|c}\n')
+            f.write('\\begin{tabular}{c|c|c|c|c|c|c|c|c}\n')
             f.write('\\hline\n')
-            f.write('Model name & Correct & Wrong & Abstained & C - W & C / W & Total \\\\\n')
+            f.write('Model name & Correct & Wrong & Abstained & C - W & $\\frac{\\text{C-W}}{\\text{Total}}$ & Coverage & Accuracy  & Total \\\\\n')
             f.write('\\hline\n')
             for row_name in sorted(all_grades[dataset_name].keys()):
                 correct = all_grades[dataset_name][row_name]['Correct']
                 wrong = all_grades[dataset_name][row_name]['Wrong']
                 abstained = all_grades[dataset_name][row_name]['Abstained']
-                ratio = round(correct/wrong, 2) if wrong > 0 else '-'
-                f.write(f'{row_name} & {correct} & {wrong} & {abstained} & {correct - wrong} & {ratio} & {correct + wrong + abstained} \\\\\n')
+                coverage = round((correct + wrong) / (correct + wrong + abstained), 3)
+                accuracy = round(correct/(correct + wrong), 3) if (correct + wrong) > 0 else '-'
+                net_score = round((correct - wrong)/(correct + wrong + abstained), 3)
+                # bold rows for base models
+                if "base model" in row_name:
+                    f.write(f'\\textbf{{{row_name}}} & \\textbf{{{correct}}} & \\textbf{{{wrong}}} & \\textbf{{{abstained}}} & \\textbf{{{correct - wrong}}} & \\textbf{{{net_score}}}  & \\textbf{{{coverage}}} & \\textbf{{{accuracy}}} & {correct + wrong + abstained} \\\\\n')
+                else:
+                    f.write(f'{row_name} & {correct} & {wrong} & {abstained} & {correct - wrong} & {net_score}  & {coverage} & {accuracy} & {correct + wrong + abstained} \\\\\n')
                 f.write('\\hline\n')
             f.write('\\end{tabular}\n')
             f.write('\\newpage\n')  # Optional: Start each group table on a new page                          
