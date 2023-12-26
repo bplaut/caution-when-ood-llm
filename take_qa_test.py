@@ -23,7 +23,6 @@ class Test(object):
             raise Exception(f"Unsupported dataset name: {dset_name}")
         self.questions = list(dset)
         random.shuffle(self.questions) # The fixed seed in main() ensures consistency across runs
-        print(self.questions[:5])
         self.end_q = min(self.end_q, len(self.questions))
                      
         # Different datasets have different ways of accessing the question, answer, and choices
