@@ -22,10 +22,10 @@ class Test(object):
         if dset is None:
             raise Exception(f"Unsupported dataset name: {dset_name}")
         self.questions = list(dset)
-        random.shuffle(self.questions) # The fixed seed in main() ensures consistency across runs
+        random.shuffle(self.questions)
         self.end_q = min(self.end_q, len(self.questions))
                      
-        # Different datasets have different ways of accessing the question, answer, and choices
+        # Different datasets have different ways of accessing questions/answers/choices
         self.get_q = (lambda x:
                       x['ctx'] if dset_name == 'hellaswag' else
                       x['question'] if dset_name in ['arc','mmlu','truthfulqa'] else
@@ -175,7 +175,7 @@ Response:\n
         return (grades, confidence_levels)
 
 def main():
-    random.seed(2549900867) # for consistency across runs
+    random.seed(2549900867) # We'll randomize the order of questions and of answer choices, but we want every run to have the same randomization
     args = generate_text.parse_args()
     test = Test(args)
     all_grades = []
