@@ -20,25 +20,28 @@ get_batch_size() {
 
     case "$model_name" in
         "Llama-70b")
-            batch_size=16
+            batch_size=20
             ;;
         "Llama-7b")
-            batch_size=28
+            batch_size=40
             ;;
         "Llama-13b")
-            batch_size=22
+            batch_size=30
             ;;
         "Mistral"|"Zephyr")
-            batch_size=120
+            batch_size=160
             ;;
         *)
-            batch_size=60 # Default value
+            batch_size=80 # Default value
             ;;
     esac
 
-    # For some reason, mmlu crashes with large batch sizes
+    # For some reason, mmlu and piqa crash with large batch sizes
     if [ "$dataset_name" = "mmlu" ]; then
         batch_size=$((batch_size / 2))
+    fi
+    if [ "$dataset_name" = "piqa" ]; then
+	batch_size=$((2 * batch_size / 3))
     fi
 
     echo "$batch_size"
