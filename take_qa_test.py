@@ -98,6 +98,8 @@ Response:\n
             token_idx2 = self.model.first_token_instance(token_outputs[i], backup_targets)
             token_idx = token_idx1 if just_letter or token_idx1<len(token_outputs[i]) else token_idx2
             (conf, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=True)
+            if token_idx1 == len(token_outputs[i]) and token_idx2 < len(token_outputs[i]):
+                print(f"Computing confidence for batch output {i}: could not find a letter corresponding to a choice, but did find the first token of a choice.")
             confidence_levels[i] = conf
         return confidence_levels
     
