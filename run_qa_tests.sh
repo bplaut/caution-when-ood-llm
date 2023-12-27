@@ -20,23 +20,23 @@ get_batch_size() {
 
     case "$model_name" in
         "Llama-70b")
-            batch_size=20
+            batch_size=16
             ;;
         "Llama-7b")
-            batch_size=40
+            batch_size=28
             ;;
         "Llama-13b")
-            batch_size=30
+            batch_size=22
             ;;
         "Mistral"|"Zephyr")
-            batch_size=200
+            batch_size=120
             ;;
         *)
-            batch_size=100 # Default value
+            batch_size=60 # Default value
             ;;
     esac
 
-    # For some reason, mmlu crashes with larger batch sizes sometimes
+    # For some reason, mmlu crashes with large batch sizes
     if [ "$dataset_name" = "mmlu" ]; then
         batch_size=$((batch_size / 2))
     fi
