@@ -94,7 +94,7 @@ Response:\n
             # Main targets are (1) uppercase letters corresponding to choices, (2) same but with weird underscore in front because some models include that. Backup targets are the first tokens in the text of each choice. If just_letter=True, ignore (3).
             main_targets = ([c for c in ascii_uppercase][:num_choices] +
                           ['▁' + c for c in ascii_uppercase][:num_choices])
-            backup_targets = [self.model.tokenizer.tokenize(choice)[0] for choice in choices[i]]
+            backup_targets = [self.model.tokenizer.tokenize(ch)[0] for ch in choices[i]]
             # Currently excluding the "I don't know" letter from targets. If the LLM's answer is "I don't know", then the confidence level doesn't matter because we'll abstain anyway.
             token_idx1 = self.model.first_token_instance(token_outputs[i], main_targets)
             token_idx2 = self.model.first_token_instance(token_outputs[i], backup_targets)
@@ -108,7 +108,7 @@ Response:\n
         targets_v1 = [c + '.' for c in ascii_uppercase][:len(choices) + 1] # +1 because of "I don't know"
         v1_idxs = [llm_output.find(t) for t in targets_v1 if llm_output.find(t) != -1]
         # If that fails, look for the text of an answer. Normalize casing.
-        targets_v2 = [(i,choice.lower()) for (i,choice) in enumerate(choices + ["I don't know"])]
+        targets_v2 = [(i,ch.lower()) for (i,ch) in enumerate(choices + ["I don't know"])]
         output_lower = llm_output.lower()
         v2_result = [(i,t,output_lower.find(t)) for (i,t) in targets_v2 if output_lower.find(t) != -1]
         # If that fails, look for just A/B/C
@@ -154,7 +154,7 @@ Response:\n
             correct_answer_text = choices_for_q[self.get_a(question_data)]
             if self.args['two_choices'] and len(choices_for_q) > 2:
                 # Reduce the choice set to two
-                wrong_choices = [c for c in choices_for_q if c != correct_answer_text]
+                wrong_choices = [ch for ch in choices_for_q if ch != correct_answer_text]
                 choices_for_q = [correct_answer_text, random.choice(wrong_choices)]
             
             # Shuffle choices. Recall that self.get_a returns an index
