@@ -86,7 +86,7 @@ Question:
 Response:\n
 """
 
-    def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, just_letter=True):
+    def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, just_letter=False):
         # Find the max probability for the token which determines the answer
         confidence_levels = [None] * len(text_outputs)
         for (i, response) in enumerate(text_outputs):

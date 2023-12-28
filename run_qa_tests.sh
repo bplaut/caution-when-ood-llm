@@ -20,19 +20,19 @@ get_batch_size() {
 
     case "$model_name" in
         "Llama-70b")
-            batch_size=20
+            batch_size=16
             ;;
         "Llama-7b")
-            batch_size=40
-            ;;
-        "Llama-13b")
             batch_size=30
             ;;
+        "Llama-13b")
+            batch_size=24
+            ;;
         "Mistral"|"Zephyr")
-            batch_size=160
+            batch_size=140
             ;;
         *)
-            batch_size=80 # Default value
+            batch_size=70 # Default value
             ;;
     esac
 
@@ -41,7 +41,7 @@ get_batch_size() {
         batch_size=$((batch_size / 2))
     fi
     if [ "$dataset_name" = "piqa" ]; then
-	batch_size=$((2 * batch_size / 3))
+	batch_size=$((batch_size / 3))
     fi
 
     echo "$batch_size"
