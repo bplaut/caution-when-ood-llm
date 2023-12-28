@@ -59,9 +59,10 @@ class Test(object):
 
     def write_output(self, grades, confidence_levels):
         dataset_str = self.args['dataset'].split("/")[-1]
-        p = "results/"
-        os.makedirs(p, exist_ok=True)
-        output_filepath = f"{p}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}.txt"
+        two_choices_str = "_two_choices" if self.args['two_choices'] else ""
+        out_dir = "results"
+        os.makedirs(out_dir, exist_ok=True)
+        output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{two_choices_str}.txt"
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
             f.write("grade confidence_level\n")
@@ -94,12 +95,11 @@ Response:\n
             main_targets = ([c for c in ascii_uppercase][:num_choices] +
                           ['▁' + c for c in ascii_uppercase][:num_choices])
             backup_targets = [self.model.tokenizer.tokenize(choice)[0] for choice in choices[i]]
+            # Currently excluding the "I don't know" letter from targets. If the LLM's answer is "I don't know", then the confidence level doesn't matter because we'll abstain anyway.
             token_idx1 = self.model.first_token_instance(token_outputs[i], main_targets)
             token_idx2 = self.model.first_token_instance(token_outputs[i], backup_targets)
-            token_idx = token_idx1 if just_letter or token_idx1<len(token_outputs[i]) else token_idx2
+            token_idx = token_idx1 if just_letter or token_idx1 < len(token_outputs[i]) else token_idx2
             (conf, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=True)
-            if token_idx1 == len(token_outputs[i]) and token_idx2 < len(token_outputs[i]):
-                print(f"Computing confidence for batch output {i}: could not find a letter corresponding to a choice, but did find the first token of a choice.")
             confidence_levels[i] = conf
         return confidence_levels
     
@@ -151,8 +151,13 @@ Response:\n
             question_data = self.questions[i]
             choices_for_q = self.get_choices(question_data)
             question = self.get_q(question_data)
-            # Shuffle choices. Recall that self.get_a returns an index
             correct_answer_text = choices_for_q[self.get_a(question_data)]
+            if self.args['two_choices']:
+                # Reduce the choice set to two
+                wrong_choices = [c for c in choices_for_q if c != correct_answer_text]
+                choices_for_q = [correct_answer_text, random.choice(wrong_choices)]
+            
+            # Shuffle choices. Recall that self.get_a returns an index
             random.shuffle(choices_for_q)
             correct_answer = ascii_uppercase[choices_for_q.index(correct_answer_text)]
             question_string = self.make_question_string(choices_for_q, question)
