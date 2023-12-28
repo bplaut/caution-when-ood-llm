@@ -152,7 +152,7 @@ Response:\n
             choices_for_q = self.get_choices(question_data)
             question = self.get_q(question_data)
             correct_answer_text = choices_for_q[self.get_a(question_data)]
-            if self.args['two_choices']:
+            if self.args['two_choices'] and len(choices_for_q) > 2:
                 # Reduce the choice set to two
                 wrong_choices = [c for c in choices_for_q if c != correct_answer_text]
                 choices_for_q = [correct_answer_text, random.choice(wrong_choices)]
