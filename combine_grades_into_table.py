@@ -2,17 +2,27 @@ import os
 import sys
 
 def get_total_results(grade_filepaths, thresh):
-    grades = {'Correct':0, 'Wrong':0, 'Abstained':0}
+    grades = {'Correct':0, 'Wrong':0, 'Abstained':0, 'TP':0, 'FP':0, 'P':0, 'N':0}
     for p in grade_filepaths:
         with open(p) as f:
             for line in f:
                 grade = line.split(' ')[0]
                 confidence = line.split(' ')[1]
                 if grade in grades: # this skips the header line
+                    # For computing the score
                     if float(confidence) < thresh:
                         grades['Abstained'] += 1
                     else:
                         grades[grade] += 1
+                    # For computing the FPR and TPR
+                    if grade == 'Correct':
+                        grades['P'] += 1
+                        if float(confidence) >= thresh:
+                            grades['TP'] += 1
+                    elif grade == 'Wrong':
+                        grades['N'] += 1
+                        if float(confidence) >= thresh:
+                            grades['FP'] += 1
     return grades
 
 def write_to_table(output_filepath, all_grades):
@@ -20,14 +30,14 @@ def write_to_table(output_filepath, all_grades):
     with open(output_filepath, 'w') as f:
         f.write('\\documentclass{article}\n')
         f.write('\\usepackage[left=1in, right=1in, top=1in, bottom=1in]{geometry}\n')
-        f.write('\\renewcommand\\arraystretch{1.4}\n')
+        f.write('\\renewcommand\\arraystretch{1.39}\n')
         f.write('\\usepackage{amsmath}\n')
         f.write('\\begin{document}\n')
         for dataset_name in sorted(all_grades.keys()):
             f.write(f'\\section*{{Dataset: {dataset_name}}}\n')
             f.write('\\begin{tabular}{c|c|c|c|c|c|c|c|c}\n')
             f.write('\\hline\n')
-            f.write('Model name & Correct & Wrong & Abstained & C - W & $\\frac{\\text{C-W}}{\\text{Total}}$ & Coverage & Accuracy  & Total \\\\\n')
+            f.write('Model name & Correct & Wrong & Abstained & C - W & $\\frac{\\text{C-W}}{\\text{Total}}$ & FPR & TPR & Total \\\\\n')
             f.write('\\hline\n')
             for row_name in sorted(all_grades[dataset_name].keys()):
                 correct = all_grades[dataset_name][row_name]['Correct']
@@ -36,11 +46,13 @@ def write_to_table(output_filepath, all_grades):
                 coverage = round((correct + wrong) / (correct + wrong + abstained), 3)
                 accuracy = round(correct/(correct + wrong), 3) if (correct + wrong) > 0 else '-'
                 net_score = round((correct - wrong)/(correct + wrong + abstained), 3)
+                fpr = round(all_grades[dataset_name][row_name]['FP'] / all_grades[dataset_name][row_name]['N'], 3) if all_grades[dataset_name][row_name]['N'] > 0 else '-'
+                tpr = round(all_grades[dataset_name][row_name]['TP'] / all_grades[dataset_name][row_name]['P'], 3) if all_grades[dataset_name][row_name]['P'] > 0 else '-'
                 # bold rows for base models
                 if "base model" in row_name:
-                    f.write(f'\\textbf{{{row_name}}} & \\textbf{{{correct}}} & \\textbf{{{wrong}}} & \\textbf{{{abstained}}} & \\textbf{{{correct - wrong}}} & \\textbf{{{net_score}}}  & \\textbf{{{coverage}}} & \\textbf{{{accuracy}}} & {correct + wrong + abstained} \\\\\n')
+                    f.write(f'\\textbf{{{row_name}}} & \\textbf{{{correct}}} & \\textbf{{{wrong}}} & \\textbf{{{abstained}}} & \\textbf{{{correct - wrong}}} & \\textbf{{{net_score}}}  & \\textbf{{{fpr}}} & \\textbf{{{tpr}}} & {correct + wrong + abstained} \\\\\n')
                 else:
-                    f.write(f'{row_name} & {correct} & {wrong} & {abstained} & {correct - wrong} & {net_score}  & {coverage} & {accuracy} & {correct + wrong + abstained} \\\\\n')
+                    f.write(f'{row_name} & {correct} & {wrong} & {abstained} & {correct - wrong} & {net_score}  & {fpr} & {tpr} & {correct + wrong + abstained} \\\\\n')
                 f.write('\\hline\n')
             f.write('\\end{tabular}\n')
             f.write('\\newpage\n')  # Optional: Start each group table on a new page                          
