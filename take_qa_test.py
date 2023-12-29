@@ -60,21 +60,25 @@ class Test(object):
     def write_output(self, grades, confidence_levels):
         dataset_str = self.args['dataset'].split("/")[-1]
         two_choices_str = "_two_choices" if self.args['two_choices'] else ""
+        abstain_str = "" if self.args['abstain_option'] else "_no_abstain"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
-        output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{two_choices_str}.txt"
+        output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{two_choices_str}{abstain_str}.txt"
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
             f.write("grade confidence_level\n")
             for (g,c) in zip(grades, confidence_levels):
-                g_str = "Correct" if g == 1 else "Abstained" if g == 0 else "Wrong"
+                g_str = ("Correct" if g == 1
+                         else "Abstained" if g == 0
+                         else "Wrong" if g == -1
+                         else "Unparseable")
                 f.write(f"{g_str} {c}\n")
 
     def make_question_string(self, choices, question):
         if len(choices) > 25:
             raise Exception("We only have 26 capital letters, so you can't have more than 26 answer options (including 'I don't know'")
-        choices_with_uncertain = [ascii_uppercase[i] + '. ' + choice for (i, choice) in enumerate(choices)] + [ascii_uppercase[len(choices)] + ". I don't know"]
-        return question + '\n' + '\n'.join(choices_with_uncertain)
+        formatted_choices = [ascii_uppercase[i] + '. ' + ch for (i,ch) in enumerate(choices)]
+        return question + '\n' + '\n'.join(formatted_choices)
 
     def make_prompt(self, question_string):
             return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
@@ -91,11 +95,12 @@ Response:\n
         confidence_levels = [None] * len(text_outputs)
         for (i, response) in enumerate(text_outputs):
             num_choices = len(choices[i]) if len(choices) > i else 0
+            if len(choices) <= i:
+                print(f"This should not happen: {i}\n {choices}")
             # Main targets are (1) uppercase letters corresponding to choices, (2) same but with weird underscore in front because some models include that. Backup targets are the first tokens in the text of each choice. If just_letter=True, ignore (3).
             main_targets = ([c for c in ascii_uppercase][:num_choices] +
                           ['▁' + c for c in ascii_uppercase][:num_choices])
             backup_targets = [self.model.tokenizer.tokenize(ch)[0] for ch in choices[i]]
-            # Currently excluding the "I don't know" letter from targets. If the LLM's answer is "I don't know", then the confidence level doesn't matter because we'll abstain anyway.
             token_idx1 = self.model.first_token_instance(token_outputs[i], main_targets)
             token_idx2 = self.model.first_token_instance(token_outputs[i], backup_targets)
             token_idx = token_idx1 if just_letter or token_idx1 < len(token_outputs[i]) else token_idx2
@@ -105,14 +110,14 @@ Response:\n
     
     def determine_llm_answer(self, choices, llm_output):
         # Look for A./B./C. etc. 
-        targets_v1 = [c + '.' for c in ascii_uppercase][:len(choices) + 1] # +1 because of "I don't know"
+        targets_v1 = [c + '.' for c in ascii_uppercase][:len(choices)]
         v1_idxs = [llm_output.find(t) for t in targets_v1 if llm_output.find(t) != -1]
         # If that fails, look for the text of an answer. Normalize casing.
-        targets_v2 = [(i,ch.lower()) for (i,ch) in enumerate(choices + ["I don't know"])]
+        targets_v2 = [(i,ch.lower()) for (i,ch) in enumerate(choices)]
         output_lower = llm_output.lower()
         v2_result = [(i,t,output_lower.find(t)) for (i,t) in targets_v2 if output_lower.find(t) != -1]
-        # If that fails, look for just A/B/C
-        targets_v3 = [c for c in ascii_uppercase][:len(choices) + 1]
+        # If that fails, look for just A/B/C etc
+        targets_v3 = [c for c in ascii_uppercase][:len(choices)]
         v3_idxs = [llm_output.find(t) for t in targets_v3 if llm_output.find(t) != -1]
         if len(v1_idxs) > 0: # found A./B./C. etc
             return llm_output[min(v1_idxs)]
@@ -122,19 +127,20 @@ Response:\n
             (i, _) = min(found, key=lambda x:x[1])
             print("Grading note: could not find A./B./C./etc, but did find the text of an answer")
             return ascii_uppercase[i]
-        elif len(v3_idxs) > 0: # found A/B/C/
+        elif len(v3_idxs) > 0: # found A/B/C etc
             print("Grading note: could not find A./B./C./etc or the text of an answer, but did find A/B/C etc")
             return llm_output[min(v3_idxs)]
         else:
             return "Could not parse answer"
 
     def grade_answer(self, choices, correct_answer, llm_output):
-        uncertain_answer = ascii_uppercase[len(choices)]
         llm_answer = self.determine_llm_answer(choices, llm_output)
-        if llm_answer == uncertain_answer:
+        if self.args['abstain_option'] and llm_answer == ascii_uppercase[len(choices)-1]:
             return (f"{llm_answer} (uncertain)", 0)
         elif llm_answer == correct_answer:
             return (f"{llm_answer}. (correct)", 1)
+        elif llm_answer == "Could not parse answer":
+            return (f"{llm_answer}", None)
         else:
             return (f"{llm_answer}. (incorrect {correct_answer}.)", -1)
 
@@ -152,13 +158,17 @@ Response:\n
             choices_for_q = self.get_choices(question_data)
             question = self.get_q(question_data)
             correct_answer_text = choices_for_q[self.get_a(question_data)]
+            
             if self.args['two_choices'] and len(choices_for_q) > 2:
                 # Reduce the choice set to two
                 wrong_choices = [ch for ch in choices_for_q if ch != correct_answer_text]
                 choices_for_q = [correct_answer_text, random.choice(wrong_choices)]
-            
-            # Shuffle choices. Recall that self.get_a returns an index
+                
             random.shuffle(choices_for_q)
+            # Shuffle before adding abstain option; that should always be last
+            if self.args['abstain_option']:
+                choices_for_q = choices_for_q + ["I don't know"]
+                
             correct_answer = ascii_uppercase[choices_for_q.index(correct_answer_text)]
             question_string = self.make_question_string(choices_for_q, question)
             prompt = self.make_prompt(question_string)

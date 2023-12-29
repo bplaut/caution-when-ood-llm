@@ -118,6 +118,7 @@ def parse_args():
     parser.add_argument('-q', '--question_range', type=str, help='When running a Q&A test, what range of questions should we test? Format is "-q startq-endq", 0 indexed. For example, "-q 0-100".', default=None)
     parser.add_argument('-b', '--batch_size', type=int, help='Maximum number of prompts to batch together. Only used for experiments', default=1)
     parser.add_argument('-w', '--two_choices', action="store_true", help='When running a Q&A test, should we reduce the number of possible choices to two?', default=False)
+    parser.add_argument('-a', '--abstain_option', action="store_true", help='When running a Q&A test, should we add an option that says "I don\'t know"?', default=False)
     return dict(vars(parser.parse_args())) # turn it into a dictionary so we can easily modify it
     
 def t_to_str(T):
