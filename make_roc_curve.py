@@ -31,19 +31,13 @@ def plot_and_save_roc_curves(data, output_dir, dataset):
         labels = np.concatenate(labels)
         scores = np.concatenate(scores)
         fpr, tpr, thresholds = roc_curve(labels, scores)
-        # For each dataset and model, print fpr and tpr when thresholds[i] is in 0.5, 0.75,0.85,0.95
-        x = [0.5, 0.75, 0.85, 0.95]
-        # for each value in x, find the index of the closest value in thresholds
-        indices = [np.argmin(np.abs(thresholds - i)) for i in x]
-        for i in indices:
-            print(f"{dataset} {model}, thresh = {round(thresholds[i],3)}: FPR = {round(fpr[i],3)}, TPR = {round(tpr[i],3)}")
                 
         roc_auc = auc(fpr, tpr)
         plt.plot(fpr, tpr, lw=2, label=f'{model} (area = {roc_auc:.2f})')
 
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
     plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
+    plt.ylim([0.0, 1.0])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title(f'Receiver Operating Characteristic - {dataset}')
