@@ -28,7 +28,7 @@ get_batch_size() {
             batch_size=40
             ;;
         "Llama-13b")
-            batch_size=30
+            batch_size=22
             ;;
         "Mistral"|"Zephyr"|"Sakura-Solar")
             batch_size=160
@@ -71,7 +71,7 @@ do
             if [ -z "$two_choices" ]; then
                 python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 &> "$log_file"
             else
-                python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 --two_choices="$two_choices" &> "$log_file"
+                python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 --two_choices &> "$log_file"
             fi	    
         done
     done
