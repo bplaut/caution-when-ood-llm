@@ -60,7 +60,7 @@ class Test(object):
     def write_output(self, grades, confidence_levels):
         dataset_str = self.args['dataset'].split("/")[-1]
         two_choices_str = "_two_choices" if self.args['two_choices'] else ""
-        abstain_str = "" if self.args['abstain_option'] else "_no_abstain"
+        abstain_str = "_yes_abstain" if self.args['abstain_option'] else "_no_abstain"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
         output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{two_choices_str}{abstain_str}.txt"

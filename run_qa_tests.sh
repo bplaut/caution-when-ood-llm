@@ -61,18 +61,18 @@ do
 
             # Modify log file name based on the presence of abstain_option
             if [ -z "$abstain_option" ]; then
-                log_file="logs/${model}_${dataset}_${question_range}_log.txt"
+                log_file="logs/${model}_${dataset}_${question_range}_no-abstain-option_log.txt"
             else
-                log_file="logs/${model}_${dataset}_${question_range}_${abstain_option}_log.txt"
+                log_file="logs/${model}_${dataset}_${question_range}_yes-abstain-option_log.txt"
             fi
 	    
             # Running the command with the arguments
             if [ -z "$abstain_option" ]; then
-		echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size --max_new_tokens=100"
-                python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 &> "$log_file"
+		echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size"
+                python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 --num_top_tokens=1 &> "$log_file"
             else
-		echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size --max_new_tokens=100 --abstain_option"
-                python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 --abstain_option &> "$log_file"
+		echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size --abstain_option"
+                python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --max_new_tokens=100 --num_top_tokens=1 --abstain_option &> "$log_file"
             fi	    
         done
     done
