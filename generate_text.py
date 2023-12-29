@@ -17,6 +17,7 @@ class Generator(object):
                           'Llama-7b':'meta-llama/Llama-2-7b-chat-hf',
                           'Llama-70b':'meta-llama/Llama-2-70b-chat-hf',
                           'MPT-30b': 'mosaicml/mpt-30b-instruct',
+                          'Sakura-Solar':"kyujinpy/Sakura-SOLAR-Instruct",
                           'Vicuna-33b': 'lmsys/vicuna-33b-v1.3'
         }
         if args['model'] not in model_name_map:
