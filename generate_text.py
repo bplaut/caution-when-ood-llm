@@ -94,7 +94,7 @@ class Generator(object):
         return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
 
     def generate(self, prompts):
-        prompts = self.prepare_for_chat(prompts) if self.args['chat'] and not self.args['interactive'] else prompts # interactive mode is handled separately
+        prompts = self.prepare_for_chat(prompts) if not self.args['completion_mode'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
 
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
@@ -110,10 +110,10 @@ def parse_args():
     parser.add_argument('-p', '--prompts', type=str, help='List of prompts, separated by |. For example "Hello my name is Ben|What a time to be alive". If not provided, you will be asked for a prompt by command line.', default=None)
     parser.add_argument('-n', '--max_new_tokens', type=int, help='Number of new tokens to generate on top of the prompt', default=10)
     parser.add_argument('-k', '--num_top_tokens', type=int, help='For each token, print out the top candidates considered by the model and their probabilities', default=0)
-    parser.add_argument('-c', '--chat', action="store_true", help='Whether to treat the prompt as a chat message and generate a chatbot response, vs just normal text auto-complete', default=True)
+    parser.add_argument('-c', '--completion_mode', action="store_true", help='Use traditional auto-complete mode, rather than user-assistant chat', default=False)
     parser.add_argument('-s', '--do_sample', action="store_true", help='Should we sample from the probability distribution, or greedily pick the most likely token?', default=False)
     parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
-    parser.add_argument('-i', '--interactive', action="store_true", help='Run the LLM in interactive mode where you can go back and forth with the LLM indefinitely. Automatically activates chat mode.', default=False)
+    parser.add_argument('-i', '--interactive', action="store_true", help='Run the LLM in interactive chat mode where you can go back and forth with the LLM indefinitely', default=False)
     parser.add_argument('-d', '--dataset', type=str, default=None, help='The name of the Hugging Face dataset (needed for experiments and such)')
     parser.add_argument('-q', '--question_range', type=str, help='When running a Q&A test, what range of questions should we test? Format is "-q startq-endq", 0 indexed. For example, "-q 0-100".', default=None)
     parser.add_argument('-b', '--batch_size', type=int, help='Maximum number of prompts to batch together. Only used for experiments', default=1)
@@ -145,15 +145,13 @@ def main():
     if not generator.args['interactive']:
         output_text = generator.generate(prompts)
     else:
-        base_text = ""
-        # All the zero indices are because the functions return lists for batching, which doesn't make sense in interactive mode
-        user_prompt = prompts[0] # Only use first prompt
+        # All the zero indices and list brackets are because the functions return lists for batching, which doesn't make sense in interactive mode, where we use a single prompt
+        prompt = generator.prepare_for_chat([prompts[0]])[0]
         while True:
             # Careful with typing of lists vs strs here
-            prompt = base_text + generator.prepare_for_chat([user_prompt])[0]
             (text_outputs, _, _) = generator.generate([prompt])
-            base_text = text_outputs[0] # output text becomes the base text for next prompt
-            user_prompt = input("User response: ")
+            user_prompt = generator.prepare_for_chat([input("User response: ")])[0]
+            prompt = prompt + '\n' + text_outputs[0] + '\n' + user_prompt
         
 if __name__ == '__main__':
     main()
