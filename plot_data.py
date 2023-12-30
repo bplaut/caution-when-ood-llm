@@ -71,7 +71,7 @@ def plot_and_save_aupr_curves(data, output_dir, dataset):
     plt.close()
     print(f"AUPR curve for {dataset} saved to {output_path}")
     
-def compute_accuracy_per_confidence_bin(labels, scores, n_bins=5, min_conf=0.95):
+def compute_accuracy_per_confidence_bin(labels, scores, n_bins=10, min_conf=0):
     bins = np.linspace(min_conf, 1, n_bins + 1)
     accuracies = []
 
