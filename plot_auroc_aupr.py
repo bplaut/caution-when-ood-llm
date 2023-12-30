@@ -11,16 +11,14 @@ def parse_file_name(file_name):
     model = parts[1].split('-q')[0]
     return dataset, model
 
-def parse_data(file_path):
+def parse_data(file_path, incl_unparseable):
     labels = []
     scores = []
     try:
         with open(file_path, 'r') as f:
             for line in f:
                 parts = line.strip().split()
-                if parts[0] not in ("grade", "Abstained", "Unparseable"): # parts[0]=="grade" is the header
-                    if parts[0] not in ("Correct", "Wrong"):
-                        raise Exception(f"Invalid grade: {parts[0]}")
+                if parts[0] in ("Correct", "Wrong") or (incl_unparseable and parts[0] == "Unparseable"):
                     labels.append(1 if parts[0] == "Correct" else 0)
                     scores.append(float(parts[1]))
     except IOError:
@@ -74,21 +72,25 @@ def plot_and_save_aupr_curves(data, output_dir, dataset):
     print(f"AUPR curve for {dataset} saved to {output_path}")
     
 def main():
-    if len(sys.argv) < 3:
-        print("Usage: python script.py <output_directory> <data_file1> [<data_file2> ...]")
+    if len(sys.argv) < 4:
+        print("Usage: python plot_auroc_aupr.py <output_directory> <incl_unparseable> <data_file1> [<data_file2> ...]")
         sys.exit(1)
 
     output_dir = sys.argv[1]
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
-    file_paths = sys.argv[2:]
+    incl_unparseable = (False if sys.argv[2].lower() == 'false' else
+                        True if sys.argv[2].lower() == 'true' else None)
+    if incl_unparseable is None:
+        raise Exception('Second argument incl_unparseable must be a boolean (True or False)')
+        
+    file_paths = sys.argv[3:]
 
     # Data aggregation
     aggregated_data = defaultdict(lambda: defaultdict(list))
     for file_path in file_paths:
         dataset, model = parse_file_name(os.path.basename(file_path))
-        labels, scores = parse_data(file_path)
+        labels, scores = parse_data(file_path, incl_unparseable)
         aggregated_data[dataset][model].append((np.array(labels), np.array(scores)))
 
     # Generating and saving plots

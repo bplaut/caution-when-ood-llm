@@ -1,15 +1,17 @@
 import os
 import sys
 
-def get_total_results(grade_filepaths, thresh):
+def get_total_results(grade_filepaths, thresh, incl_unparseable):
     grades = {'Correct':0, 'Wrong':0, 'Abstained':0, 'TP':0, 'FP':0, 'P':0, 'N':0}
     for p in grade_filepaths:
         with open(p) as f:
             for line in f:
                 grade = line.split(' ')[0]
                 confidence = line.split(' ')[1]
-                if grade in grades: # this skips the header line
-                    # For computing the score
+                # If incl_unparseable, we count unparseable responses as wrong
+                if grade in grades or (grade == 'Unparseable' and incl_unparseable): # skips header
+                    grade = 'Wrong' if grade == 'Unparseable' else grade
+                    # For computing the net score
                     if float(confidence) < thresh:
                         grades['Abstained'] += 1
                     else:
@@ -60,12 +62,16 @@ def write_to_table(output_filepath, all_grades):
     print(f"Successfully wrote to {output_filepath}")    
 
 def main():
-    if len(sys.argv) <= 3:
-        raise Exception('Usage: python add_up_grades.py [output_filepath] [comma-separated list of confidence thresholds] [add least one grades file]')
+    if len(sys.argv) <= 4:
+        raise Exception('Usage: python add_up_grades.py [output_filepath] [comma-separated list of confidence thresholds] [exclude unparseable grades] [add least one grades file]')
 
     output_filepath = sys.argv[1]
     thresholds = [float(t) for t in sys.argv[2].split(',')]
-    grade_filepaths = sys.argv[3:]
+    incl_unparseable = (False if sys.argv[3].lower() == 'false' else
+                        True if sys.argv[3].lower() == 'true' else None)
+    if incl_unparseable is None:
+        raise Exception('Third argument incl_unparseable must be a boolean (True or False)')
+    grade_filepaths = sys.argv[4:]
     
     print("Combining from these grade files:")
     [print(f) for f in grade_filepaths]
@@ -76,7 +82,7 @@ def main():
     for thresh in thresholds:
         for param_set in all_param_sets:
             paths_to_use = [p for p in grade_filepaths if p.split('/')[-1].split('-q')[0] == param_set]
-            grades_for_param_set = get_total_results(paths_to_use, thresh)
+            grades_for_param_set = get_total_results(paths_to_use, thresh, incl_unparseable)
             dataset_name = param_set.split('_')[0]
             model_name = param_set.split('_')[1]
             if dataset_name not in all_grades:
