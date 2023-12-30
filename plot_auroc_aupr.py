@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, precision_recall_curve
 import sys
 import os
 from collections import defaultdict
@@ -42,10 +42,31 @@ def plot_and_save_roc_curves(data, output_dir, dataset):
     plt.ylabel('True Positive Rate')
     plt.title(f'Receiver Operating Characteristic - {dataset}')
     plt.legend(loc="lower right")
-    output_path = os.path.join(output_dir, f"{dataset}_roc_curve.png")
+    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.png")
     plt.savefig(output_path)
     print(f"ROC curve for {dataset} saved to {output_path}")
 
+def plot_and_save_aupr_curves(data, output_dir, dataset):
+    plt.figure()
+    for model, values in data.items():
+        labels, scores = zip(*values)
+        labels = np.concatenate(labels)
+        scores = np.concatenate(scores)
+        precision, recall, thresholds = precision_recall_curve(labels, scores)
+                
+        aupr = auc(recall, precision)
+        plt.plot(recall, precision, lw=2, label=f'{model} (area = {aupr:.2f})')
+
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.0])
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title(f'Precision Recall curve - {dataset}')
+    plt.legend(loc="lower right")
+    output_path = os.path.join(output_dir, f"aupr_curve_{dataset}.png")
+    plt.savefig(output_path)
+    print(f"AUPR curve for {dataset} saved to {output_path}")
+    
 def main():
     if len(sys.argv) < 3:
         print("Usage: python script.py <output_directory> <data_file1> [<data_file2> ...]")
@@ -64,6 +85,7 @@ def main():
     # Generating and saving plots
     for dataset, data in aggregated_data.items():
         plot_and_save_roc_curves(data, output_dir, dataset)
+        plot_and_save_aupr_curves(data, output_dir, dataset)
 
 if __name__ == "__main__":
     main()
