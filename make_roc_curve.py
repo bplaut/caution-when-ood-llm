@@ -17,7 +17,7 @@ def parse_data(file_path):
     with open(file_path, 'r') as f:
         for line in f:
             parts = line.strip().split()
-            if parts[0] not in ("grade", "Abstained"): # Ignore header and Abstained lines
+            if parts[0] not in ("grade", "Abstained", "Unparseable"): # parts[0]=="grade" is the header
                 if parts[0] not in ("Correct", "Wrong"):
                     raise Exception(f"Invalid grade: {parts[0]}")
                 labels.append(1 if parts[0] == "Correct" else 0)
