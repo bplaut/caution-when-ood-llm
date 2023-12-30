@@ -71,6 +71,44 @@ def plot_and_save_aupr_curves(data, output_dir, dataset):
     plt.close()
     print(f"AUPR curve for {dataset} saved to {output_path}")
     
+def compute_accuracy_per_confidence_bin(labels, scores, n_bins=5, min_conf=0.95):
+    bins = np.linspace(min_conf, 1, n_bins + 1)
+    accuracies = []
+
+    for i in range(len(bins) - 1): 
+        idx = (scores >= bins[i]) & (scores < bins[i + 1])
+        bin_mid = (bins[i] + bins[i+1]) / 2
+        print(f"Bin {i}: {np.sum(idx)}, start: {bins[i]}, end: {bins[i+1]}")
+        if np.sum(idx) > 0:
+            acc = np.mean(labels[idx] == 1)
+            accuracies.append((bin_mid, acc))
+        else:
+            accuracies.append((bin_mid, None))
+
+    return accuracies
+
+def plot_accuracy_vs_confidence(data, output_dir, dataset):
+    plt.figure()
+    for model, values in data.items():
+        # Aggregate all labels and scores for this model
+        all_labels = np.concatenate([labels for labels, _ in values])
+        all_scores = np.concatenate([scores for _, scores in values])
+
+        accuracies = compute_accuracy_per_confidence_bin(all_labels, all_scores)
+        bins, accs = zip(*accuracies)
+        accs = [a if a is not None else 0 for a in accs]  # Replace None with 0
+
+        plt.plot(bins, accs, label=model, marker='o')
+
+    plt.xlabel('Confidence Level')
+    plt.ylabel('Average Accuracy')
+    plt.title(f'Average Accuracy per Confidence Level - {dataset}')
+    plt.legend()
+    output_path = os.path.join(output_dir, f"calibration_{dataset}.png")
+    plt.savefig(output_path)
+    plt.close()
+    print(f"Calibration plot for {dataset} saved to {output_path}")
+
 def main():
     if len(sys.argv) < 4:
         print("Usage: python plot_auroc_aupr.py <output_directory> <incl_unparseable> <data_file1> [<data_file2> ...]")
@@ -96,7 +134,8 @@ def main():
     # Generating and saving plots
     for dataset, data in aggregated_data.items():
         plot_and_save_roc_curves(data, output_dir, dataset)
-        plot_and_save_aupr_curves(data, output_dir, dataset)
+        # plot_and_save_aupr_curves(data, output_dir, dataset)
+        # plot_accuracy_vs_confidence(data, output_dir, dataset)
 
 if __name__ == "__main__":
     main()
