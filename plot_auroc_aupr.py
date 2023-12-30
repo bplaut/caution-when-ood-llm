@@ -14,14 +14,18 @@ def parse_file_name(file_name):
 def parse_data(file_path):
     labels = []
     scores = []
-    with open(file_path, 'r') as f:
-        for line in f:
-            parts = line.strip().split()
-            if parts[0] not in ("grade", "Abstained", "Unparseable"): # parts[0]=="grade" is the header
-                if parts[0] not in ("Correct", "Wrong"):
-                    raise Exception(f"Invalid grade: {parts[0]}")
-                labels.append(1 if parts[0] == "Correct" else 0)
-                scores.append(float(parts[1]))
+    try:
+        with open(file_path, 'r') as f:
+            for line in f:
+                parts = line.strip().split()
+                if parts[0] not in ("grade", "Abstained", "Unparseable"): # parts[0]=="grade" is the header
+                    if parts[0] not in ("Correct", "Wrong"):
+                        raise Exception(f"Invalid grade: {parts[0]}")
+                    labels.append(1 if parts[0] == "Correct" else 0)
+                    scores.append(float(parts[1]))
+    except IOError:
+        print(f"Error opening file: {file_path}")
+        sys.exit(1)
     return labels, scores
 
 def plot_and_save_roc_curves(data, output_dir, dataset):
@@ -44,6 +48,7 @@ def plot_and_save_roc_curves(data, output_dir, dataset):
     plt.legend(loc="lower right")
     output_path = os.path.join(output_dir, f"roc_curve_{dataset}.png")
     plt.savefig(output_path)
+    plt.close()
     print(f"ROC curve for {dataset} saved to {output_path}")
 
 def plot_and_save_aupr_curves(data, output_dir, dataset):
@@ -65,6 +70,7 @@ def plot_and_save_aupr_curves(data, output_dir, dataset):
     plt.legend(loc="lower right")
     output_path = os.path.join(output_dir, f"aupr_curve_{dataset}.png")
     plt.savefig(output_path)
+    plt.close()
     print(f"AUPR curve for {dataset} saved to {output_path}")
     
 def main():
@@ -73,6 +79,9 @@ def main():
         sys.exit(1)
 
     output_dir = sys.argv[1]
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     file_paths = sys.argv[2:]
 
     # Data aggregation
