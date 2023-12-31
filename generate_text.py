@@ -48,8 +48,11 @@ class Generator(object):
         return (min_among_max_logits[response_idx], indices[response_idx])
     
     def prepare_for_chat(self, prompts):
-        chats = [[{"role": "user", "content": p}] for p in prompts]
-        return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
+        if 'Falcon' in self.args['model']:
+            return prompts # Falcon doesn't use chat templates
+        else:
+            chats = [[{"role": "user", "content": p}] for p in prompts]
+            return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
 
     def print_output(self, prompts, text_outputs, token_outputs, scores):
 
@@ -125,7 +128,7 @@ def parse_args():
     parser.add_argument('-b', '--batch_size', type=int, help='Maximum number of prompts to batch together. Only used for experiments', default=1)
     parser.add_argument('-w', '--two_choices', action="store_true", help='When running a Q&A test, should we reduce the number of possible choices to two?', default=False)
     parser.add_argument('-a', '--abstain_option', action="store_true", help='When running a Q&A test, should we add an option that says "I don\'t know"?', default=False)
-    return dict(vars(parser.parse_args())) # turn it into a dictionary so we can easily modify it
+    return dict(vars(parser.parse_args())) # dictionaries are easier to manipulate sometimes
     
 def t_to_str(T):
     # Get rid of a bunch of stuff in the tensor format that I don't like
