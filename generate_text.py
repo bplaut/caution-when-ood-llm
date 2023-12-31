@@ -16,9 +16,11 @@ class Generator(object):
                           'Llama-7b-raw':'meta-llama/Llama-2-7b-hf',
                           'Llama-7b':'meta-llama/Llama-2-7b-chat-hf',
                           'Llama-70b':'meta-llama/Llama-2-70b-chat-hf',
-                          'MPT-30b': 'mosaicml/mpt-30b-instruct',
+                          'MPT-30b':'mosaicml/mpt-30b-instruct',
                           'Sakura-Solar':"kyujinpy/Sakura-SOLAR-Instruct",
-                          'Vicuna-33b': 'lmsys/vicuna-33b-v1.3'
+                          'Vicuna-33b':'lmsys/vicuna-33b-v1.3',
+                          'Falcon-40b':'tiiuae/falcon-40b-instruct',
+                          'Falcon-7b':'tiiuae/falcon-7b-instruct',
         }
         if args['model'] not in model_name_map:
             raise Exception("Unrecognized model name. Check model_name_map")
@@ -35,14 +37,13 @@ class Generator(object):
             self.num_responses = self.args['num_responses']
             
     def min_max_logit(self, scores, response_idx, lo=0, hi=None, normalize=True):
-        # scores has shape (response_length, num_responses, vocab_size). It's a tuple of tensors
-        scores_tensor = t.stack(list(scores), dim=0)
-        scores_tensor = scores_tensor[lo:hi,::] 
-        if len(scores_tensor) == 0: # For example, when we call this fn with lo=first_token_idx(x)=len(scores) if we don't find token x
+        # scores has shape (response_length, num_responses, vocab_size)
+        scores = scores[lo:hi,::] 
+        if len(scores) == 0: # For example, when we call this fn with lo=first_token_idx(x)=len(scores) if we don't find token x
             return (0, None)
         if normalize:
-            scores_tensor = t.exp(scores_tensor) / t.sum(t.exp(scores_tensor), dim=2, keepdim=True)
-        (max_logit_per_token, _) = t.max(scores_tensor, dim=2)
+            scores = t.exp(scores) / t.sum(t.exp(scores), dim=2, keepdim=True)
+        (max_logit_per_token, _) = t.max(scores, dim=2)
         (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
         return (min_among_max_logits[response_idx], indices[response_idx])
     
@@ -89,8 +90,8 @@ class Generator(object):
     def first_token_instance(self, token_id_seq, target_tokens):
         target_token_ids = self.tokenizer.convert_tokens_to_ids(target_tokens)
         # The first 0 index is because t.where returns a tuple with one elem per dim
-        where_each_token = [t.where(token_id_seq == token)[0] for token in target_token_ids]
-        # Second 0 index is because we want the first index containing a target (if there are any)
+        where_each_token = [t.where(token_id_seq == token)[0] for token in target_token_ids if token is not None]
+        # The next 0 index is because we want the 1st index containing a target (if any exist)
         return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
 
     def generate(self, prompts):
@@ -100,9 +101,14 @@ class Generator(object):
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
         token_outputs = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output, tokenized. i//num_responses in the prompt index
         text_outputs = self.tokenizer.batch_decode(token_outputs, skip_special_tokens=True)
-        self.print_output(prompts, text_outputs, token_outputs, output.scores)
-        
-        return (text_outputs, token_outputs, output.scores)
+
+        scores = t.stack(list(output.scores), dim=0) # initially it's a tuple of tensors
+        if scores.dtype != t.float32:
+            print("Casting scores to float32")
+            scores = scores.to(t.float32)
+            
+        self.print_output(prompts, text_outputs, token_outputs, scores)
+        return (text_outputs, token_outputs, scores)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Perform text generation and Q&A tasks via Hugging Face models.')
@@ -124,11 +130,15 @@ def parse_args():
 def t_to_str(T):
     # Get rid of a bunch of stuff in the tensor format that I don't like
     s = str(T)
-    s = s[:s.rfind(',')] # remove everything after the last comma
+    last_bracket_idx = s.rfind(']')
+    if last_bracket_idx != -1:
+        s = s[:last_bracket_idx + 1] # remove everything after the last bracket
+    else:
+        s = s[:s.rfind(',')] # singleton tensor. Remove last comma and afterwards
     s = s.replace("tensor(", "")
     s = s.replace("\n", "")
     s = s.replace("    ", "")
-    target_len = 5 # e.g. 0.5348
+    target_len = 5 # e.g. 0.534
     return s + '0' * (target_len - len(s)) if '.' in s else s # pad with 0s if decimal
     
 def main():
@@ -152,6 +162,7 @@ def main():
             (text_outputs, _, _) = generator.generate([prompt])
             user_prompt = generator.prepare_for_chat([input("User response: ")])[0]
             prompt = prompt + '\n' + text_outputs[0] + '\n' + user_prompt
+            # This doesn't quite work correctly because of start/end tokens. We should really be calling the chat template with the whole transcript.
         
 if __name__ == '__main__':
     main()

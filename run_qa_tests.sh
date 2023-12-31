@@ -30,11 +30,11 @@ get_batch_size() {
         "Llama-13b")
             batch_size=22
             ;;
-        "Mistral"|"Zephyr")
-            batch_size=168
+        "Mistral"|"Zephyr"|"Falcon-7b")
+            batch_size=128
             ;;
         *)
-            batch_size=128 # Default value
+            batch_size=63 # Default value
             ;;
     esac
 

@@ -191,7 +191,8 @@ Response:\n
             (answer_output, grade) = self.grade_answer(choices[i], correct_answers[i], llm_output)
             print(f"LLM answer: {answer_output}\n")
             confidence_str = generate_text.t_to_str(confidence_levels[i])
-            print(f"Confidence level: {confidence_str}\n")
+            # Sometimes we get "" because of how t_to_str works
+            print(f"Confidence level: {0 if confidence_str=='' else confidence_str}\n")
             grades[i] = grade
         return (grades, confidence_levels)
 
