@@ -210,7 +210,7 @@ Response:\n
             # Sometimes we get "" because of how t_to_str works
             print(f"Confidence level: {0 if confidence_str=='' else confidence_str}\n")
             if confidence_levels[i] != confidence_levels_old[i]:
-                print(f"Confidence level mismatch: {confidence_levels[i]} vs {confidence_levels_old[i]}")
+                print(f"Confidence level mismatch: {confidence_levels[i]} vs {confidence_levels_old[i]}\n")
             grades[i] = grade
         return (grades, confidence_levels)
 
