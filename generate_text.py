@@ -46,6 +46,25 @@ class Generator(object):
         (max_logit_per_token, _) = t.max(scores, dim=2)
         (min_among_max_logits, indices) = t.min(max_logit_per_token, dim=0)
         return (min_among_max_logits[response_idx], indices[response_idx])
+
+    def token_idx_of_first_target(self, s, targets):
+        # Find the first index of a target in s. Then find the index of the corresponding token in the tokenized version of s
+        target_idxs = [s.find(target) for target in targets if s.find(target) != -1]
+        if len(target_idxs) > 0:
+            i = min(target_idxs)
+            # Find the index of the token that contains the character at index i
+            tokens = self.tokenizer(s, return_offsets_mapping=True, add_special_tokens=False)
+            for token_index, (start, end) in enumerate(tokens.offset_mapping):
+                if start <= i < end:
+                    return token_index
+        return -1
+
+    def first_token_instance(self, token_id_seq, target_tokens):
+        target_token_ids = self.tokenizer.convert_tokens_to_ids(target_tokens)
+        # The first 0 index is because t.where returns a tuple with one elem per dim
+        where_each_token = [t.where(token_id_seq == token)[0] for token in target_token_ids if token is not None]
+        # The next 0 index is because we want the 1st index containing a target (if any exist)
+        return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
     
     def prepare_for_chat(self, prompts):
         if 'Falcon' in self.args['model']:
@@ -55,27 +74,25 @@ class Generator(object):
             return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
 
     def print_output(self, prompts, text_outputs, token_outputs, scores):
-
         print('\n')
         for i in range(len(text_outputs)):
             prompt_idx = i//self.num_responses
             print('PROMPT %d: "%s"\n' % (prompt_idx+1, prompts[prompt_idx]))
             print('OUTPUT %d: "%s"\n' % (i % self.num_responses + 1, text_outputs[i]))
-            first_pad_idx = self.first_token_instance(token_outputs[i], [self.tokenizer.pad_token])
+            pad_token_idxs = (token_outputs[i] == self.tokenizer.pad_token_id).nonzero(as_tuple=True)[0]
+            first_pad_idx = pad_token_idxs[0].item() if len(pad_token_idxs) > 0 else len(token_outputs[i])
 
             if self.args['num_top_tokens'] > 0:
-                (mm_logit, mm_logit_idx) = self.min_max_logit(scores, i, lo=0, hi=first_pad_idx, normalize=False)
-                (mm_prob, mm_prob_idx) = self.min_max_logit(scores, i, lo=0, hi=first_pad_idx, normalize=True)
+                (mm_logit,mm_logit_idx) = self.min_max_logit(scores,i,lo=0,hi=first_pad_idx,normalize=False)
+                (mm_prob,mm_prob_idx) = self.min_max_logit(scores,i,lo=0,hi=first_pad_idx,normalize=True)
                 print("Min max prob  =", t_to_str(mm_prob), "| Index =", t_to_str(mm_prob_idx))
                 print("Min max logit =", t_to_str(mm_logit), "| Index =", t_to_str(mm_logit_idx))
                 for j in range(len(token_outputs[i])):
                     if self.tokenizer.decode(token_outputs[i][j]) == self.tokenizer.pad_token:
                         # If we have prompts/responses of different lengths, some will get padded
                         break
-
-                    # This isn't that efficient right now, I should be sorting/exping/etc in batch
-                    # scores has shape (response_length, num_responses, vocab_size)
- 
+                    
+                    # scores has shape (response_length, num_responses, vocab_size) 
                     (sorted_scores, top_token_ids) = t.sort(scores[j][i], descending=True)
                     sorted_probs = t.exp(sorted_scores) / t.sum(t.exp(sorted_scores))
                     top_tokens = self.tokenizer.batch_decode(top_token_ids[:self.args['num_top_tokens']])
@@ -89,14 +106,7 @@ class Generator(object):
                         print("Top probs:", t_to_str(sorted_probs[:self.args['num_top_tokens']]))
                         print("Top logits:", t_to_str(sorted_scores[:self.args['num_top_tokens']]))
             print('\n')
-
-    def first_token_instance(self, token_id_seq, target_tokens):
-        target_token_ids = self.tokenizer.convert_tokens_to_ids(target_tokens)
-        # The first 0 index is because t.where returns a tuple with one elem per dim
-        where_each_token = [t.where(token_id_seq == token)[0] for token in target_token_ids if token is not None]
-        # The next 0 index is because we want the 1st index containing a target (if any exist)
-        return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
-
+            
     def generate(self, prompts):
         prompts = self.prepare_for_chat(prompts) if not self.args['completion_mode'] and not self.args['interactive'] else prompts # interactive mode is handled separately
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
@@ -156,7 +166,7 @@ def main():
         prompts = args['prompts'].split('|')
     
     if not generator.args['interactive']:
-        output_text = generator.generate(prompts)
+        generator.generate(prompts)
     else:
         # All the zero indices and list brackets are because the functions return lists for batching, which doesn't make sense in interactive mode, where we use a single prompt
         prompt = generator.prepare_for_chat([prompts[0]])[0]
