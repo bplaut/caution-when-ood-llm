@@ -81,7 +81,7 @@ class Test(object):
         return question + '\n' + '\n'.join(formatted_choices)
 
     def make_prompt(self, question_string):
-            return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
+        prompt = f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
 
 Question:
 
@@ -89,6 +89,8 @@ Question:
 
 Response:\n
 """
+        # For some reason the final newline makes the Falcon models act really weird
+        return prompt if 'Falcon' not in self.args['model'] else prompt[:-1]
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, just_letter=False):
         # Find the max probability for the token which determines the answer
