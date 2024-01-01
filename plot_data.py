@@ -80,7 +80,7 @@ def compute_accuracy_per_confidence_bin(labels, scores, n_bins=10, min_conf=0):
         bin_mid = (bins[i] + bins[i+1]) / 2
         if np.sum(idx) > 0:
             acc = np.mean(labels[idx] == 1)
-            print(f"Bin {i}: {round(np.sum(idx),3)}, start: {round(bins[i],3)}, end: {round(bins[i+1],3)}, acc: {round(acc,3)}")
+            print(f"Bin from {round(bins[i],3)} to {round(bins[i+1],3)} contains {np.sum(idx)} points with average accuracy {round(acc,3)}")
             accuracies.append((bin_mid, acc))
         else:
             accuracies.append((bin_mid, None))

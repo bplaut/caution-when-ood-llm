@@ -30,7 +30,13 @@ get_batch_size() {
         "Llama-13b")
             batch_size=22
             ;;
-        "Mistral"|"Zephyr"|"Falcon-7b")
+        "Falcon-40b")
+            batch_size=12
+            ;;
+	"Falcon-7b")
+	    batch_size=253
+	    ;;
+        "Mistral"|"Zephyr")
             batch_size=128
             ;;
         *)
