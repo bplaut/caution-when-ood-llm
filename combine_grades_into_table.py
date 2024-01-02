@@ -63,7 +63,7 @@ def write_to_table(output_filepath, all_grades):
 
 def main():
     if len(sys.argv) <= 4:
-        raise Exception('Usage: python add_up_grades.py [output_filepath] [comma-separated list of confidence thresholds] [exclude unparseable grades] [add least one grades file]')
+        raise Exception('Usage: python combine_grades_into_table.py [output_filepath] [comma-separated list of confidence thresholds] [include unparseable grades] [add least one grades file]')
 
     output_filepath = sys.argv[1]
     thresholds = [float(t) for t in sys.argv[2].split(',')]
