@@ -31,12 +31,12 @@ get_batch_size() {
             batch_size=22
             ;;
         "Falcon-40b")
-            batch_size=12
+            batch_size=10
             ;;
 	"Falcon-7b")
 	    batch_size=253
 	    ;;
-        "Mistral"|"Zephyr")
+        "Mistral"|"Zephyr"|"Solar")
             batch_size=128
             ;;
         *)
@@ -49,7 +49,7 @@ get_batch_size() {
         batch_size=$((batch_size / 3))
     fi
     if [ "$dataset_name" = "piqa" ]; then
-	batch_size=$((batch_size / 3))
+	batch_size=$((batch_size / 2))
     fi
 
     echo "$batch_size"
