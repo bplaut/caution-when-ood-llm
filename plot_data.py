@@ -41,7 +41,7 @@ def expand_model_name(name):
 def model_size(name):
     full_name = expand_model_name(name)
     size_term = full_name.split('-')[-1]
-    return 12.9 if name == 'Mixtral' else float(size_term[:-1])
+    return 46.7 if name == 'Mixtral' else float(size_term[:-1])
 
 def plot_and_save_roc_curves(data, output_dir, dataset):
     plt.figure()
@@ -127,7 +127,7 @@ def plot_accuracy_vs_confidence(data, output_dir, dataset):
     plt.close()
     print(f"Calibration plot for {dataset} saved to {output_path}")
 
-def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=False):
+def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True):
     plt.figure()
     
     # Set x-axis scale based on log_scale parameter
@@ -158,11 +158,13 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=Fals
     z = np.polyfit(x_for_fit, ys, 1)
     p = np.poly1d(z)
     if log_scale:
-        plt.plot(xs, p(np.log(xs)), "r--")
+        plt.plot(xs, p(np.log(xs)), "r-")
     else:
-        plt.plot(xs, p(xs), "r--")
+        plt.plot(xs, p(xs), "r-")
 
-    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}.png")
+    xlabel_str = 'size' if xlabel == 'Model Size' else xlabel
+    ylabel_str = 'auc' if ylabel == 'Average AUC' else 'acc' if ylabel == 'Average Accuracy' else ylabel
+    output_path = os.path.join(output_dir, f"{ylabel_str}_vs_{xlabel_str}_logscale={log_scale}.png")
     plt.savefig(output_path)
     plt.close()
     print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
