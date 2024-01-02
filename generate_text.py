@@ -21,6 +21,7 @@ class Generator(object):
                           'Vicuna-33b':'lmsys/vicuna-33b-v1.3',
                           'Falcon-40b':'tiiuae/falcon-40b-instruct',
                           'Falcon-7b':'tiiuae/falcon-7b-instruct',
+                          'Solar':'upstage/SOLAR-10.7B-Instruct-v1.0',
         }
         if args['model'] not in model_name_map:
             raise Exception("Unrecognized model name. Check model_name_map")
@@ -67,8 +68,8 @@ class Generator(object):
         return min([w[0].item() if len(w) > 0 else len(token_id_seq) for w in where_each_token])
     
     def prepare_for_chat(self, prompts):
-        if 'Falcon' in self.args['model']:
-            return prompts # Falcon doesn't use chat templates
+        if self.args['model'] in ('Falcon-7b', 'Falcon-40b'):
+            return prompts # These models doesn't use chat templates
         else:
             chats = [[{"role": "user", "content": p}] for p in prompts]
             return [self.tokenizer.apply_chat_template(c, tokenize=False, add_generation_prompt=True, return_tensors="pt") for c in chats]
