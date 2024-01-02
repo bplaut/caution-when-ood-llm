@@ -127,17 +127,26 @@ def plot_accuracy_vs_confidence(data, output_dir, dataset):
     plt.close()
     print(f"Calibration plot for {dataset} saved to {output_path}")
 
-def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel):
+def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=False):
     plt.figure()
-    plt.xscale('log')
+    
+    # Set x-axis scale based on log_scale parameter
+    if log_scale:
+        plt.xscale('log')
+        x_for_fit = np.log(xs)  # log transform for fitting
+    else:
+        x_for_fit = xs
+
     scatter = plt.scatter(xs, ys)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(f'{ylabel} vs {xlabel}')
 
-    max_x = max(xs)
-    tick_values = [x for x in range(10, int(max_x) + 10, 10)]
-    plt.xticks(tick_values, [f'{x}B' for x in tick_values])
+    # Adjust x-ticks for log-scale
+    if log_scale:
+        max_x = max(xs)
+        tick_values = [x for x in range(10, int(max_x) + 10, 10)]
+        plt.xticks(tick_values, [f'{x}B' for x in tick_values])
 
     texts = []
     for i in range(len(model_names)):
@@ -145,15 +154,19 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel):
     
     adjust_text(texts)
 
-    z = np.polyfit(np.log(xs), ys, 1)
+    # Fit and plot regression line appropriate to the scale
+    z = np.polyfit(x_for_fit, ys, 1)
     p = np.poly1d(z)
-    plt.plot(xs, p(np.log(xs)), "r--")
+    if log_scale:
+        plt.plot(xs, p(np.log(xs)), "r--")
+    else:
+        plt.plot(xs, p(xs), "r--")
 
     output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}.png")
     plt.savefig(output_path)
     plt.close()
     print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
-    
+       
 def model_size_plots(aggregated_data, all_aucs, output_dir):
     # For each model, compute (1) avg AUC across datasets and (2) avg accuracy across datasets
     # Then plot AUC vs model size and accuracy vs model size
