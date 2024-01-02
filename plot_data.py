@@ -4,6 +4,7 @@ from sklearn.metrics import roc_curve, auc, precision_recall_curve
 import sys
 import os
 from collections import defaultdict
+from adjustText import adjust_text
 
 def parse_file_name(file_name):
     parts = file_name.split('_')
@@ -26,8 +27,25 @@ def parse_data(file_path, incl_unparseable):
         sys.exit(1)
     return labels, scores
 
+def expand_model_name(name):
+    return ('Mistral-7B' if name == 'Mistral' else
+            'Mixtral-8x7B' if name == 'Mixtral' else
+            'SOLAR-10.7B' if name == 'Solar' else
+            'Llama2-13B' if name == 'Llama-13b' else
+            'Llama2-7B' if name == 'Llama-7b' else
+            'Llama2-70B' if name == 'Llama-70b' else
+            'Falcon-7B' if name == 'Falcon-7b' else
+            'Falcon-40B' if name == 'Falcon-40b' else
+            name)
+
+def model_size(name):
+    full_name = expand_model_name(name)
+    size_term = full_name.split('-')[-1]
+    return 12.9 if name == 'Mixtral' else float(size_term[:-1])
+
 def plot_and_save_roc_curves(data, output_dir, dataset):
     plt.figure()
+    aucs = dict()
     for model, values in data.items():
         labels, scores = zip(*values)
         labels = np.concatenate(labels)
@@ -35,7 +53,8 @@ def plot_and_save_roc_curves(data, output_dir, dataset):
         fpr, tpr, thresholds = roc_curve(labels, scores)
                 
         roc_auc = auc(fpr, tpr)
-        plt.plot(fpr, tpr, lw=2, label=f'{model} (area = {roc_auc:.2f})')
+        aucs[model] = roc_auc
+        plt.plot(fpr, tpr, lw=2, label=f'{expand_model_name(model)} (area = {roc_auc:.2f})')
 
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
     plt.xlim([0.0, 1.0])
@@ -48,6 +67,7 @@ def plot_and_save_roc_curves(data, output_dir, dataset):
     plt.savefig(output_path)
     plt.close()
     print(f"ROC curve for {dataset} saved to {output_path}")
+    return aucs
 
 def plot_and_save_aupr_curves(data, output_dir, dataset):
     plt.figure()
@@ -58,7 +78,7 @@ def plot_and_save_aupr_curves(data, output_dir, dataset):
         precision, recall, thresholds = precision_recall_curve(labels, scores)
                 
         aupr = auc(recall, precision)
-        plt.plot(recall, precision, lw=2, label=f'{model} (area = {aupr:.2f})')
+        plt.plot(recall, precision, lw=2, label=f'{expand_model_name(model)} (area = {aupr:.2f})')
 
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.0])
@@ -80,7 +100,6 @@ def compute_accuracy_per_confidence_bin(labels, scores, n_bins=10, min_conf=0):
         bin_mid = (bins[i] + bins[i+1]) / 2
         if np.sum(idx) > 0:
             acc = np.mean(labels[idx] == 1)
-            print(f"Bin from {round(bins[i],3)} to {round(bins[i+1],3)} contains {np.sum(idx)} points with average accuracy {round(acc,3)}")
             accuracies.append((bin_mid, acc))
         else:
             accuracies.append((bin_mid, None))
@@ -93,12 +112,11 @@ def plot_accuracy_vs_confidence(data, output_dir, dataset):
         # Aggregate all labels and scores for this model
         all_labels = np.concatenate([labels for labels, _ in values])
         all_scores = np.concatenate([scores for _, scores in values])
-        print("Model:", model, "dataset:", dataset)
         accuracies = compute_accuracy_per_confidence_bin(all_labels, all_scores)
         bins, accs = zip(*accuracies)
         accs = [a if a is not None else 0 for a in accs]  # Replace None with 0
 
-        plt.plot(bins, accs, label=model, marker='o')
+        plt.plot(bins, accs, label=expand_model_name(model), marker='o')
 
     plt.xlabel('Confidence Level')
     plt.ylabel('Average Accuracy')
@@ -108,6 +126,61 @@ def plot_accuracy_vs_confidence(data, output_dir, dataset):
     plt.savefig(output_path)
     plt.close()
     print(f"Calibration plot for {dataset} saved to {output_path}")
+
+def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel):
+    plt.figure()
+    plt.xscale('log')
+    scatter = plt.scatter(xs, ys)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(f'{ylabel} vs {xlabel}')
+
+    max_x = max(xs)
+    tick_values = [x for x in range(10, int(max_x) + 10, 10)]
+    plt.xticks(tick_values, [f'{x}B' for x in tick_values])
+
+    texts = []
+    for i in range(len(model_names)):
+        texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
+    
+    adjust_text(texts)
+
+    z = np.polyfit(np.log(xs), ys, 1)
+    p = np.poly1d(z)
+    plt.plot(xs, p(np.log(xs)), "r--")
+
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}.png")
+    plt.savefig(output_path)
+    plt.close()
+    print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
+    
+def model_size_plots(aggregated_data, all_aucs, output_dir):
+    # For each model, compute (1) avg AUC across datasets and (2) avg accuracy across datasets
+    # Then plot AUC vs model size and accuracy vs model size
+    model_aucs = dict()
+    model_accs = dict()
+    for dataset in all_aucs:
+        # Same set of models in each dict, so we can just iterate over one dict
+        for model in all_aucs[dataset]:
+            if model not in model_aucs:
+                model_aucs[model] = []
+                model_accs[model] = []    
+            model_aucs[model].append(all_aucs[dataset][model])
+            all_labels = np.concatenate([labels for labels, _ in aggregated_data[dataset][model]])
+            model_accs[model].append(np.mean(all_labels))
+
+    model_sizes = []
+    avg_aucs = []
+    avg_accs = []
+    model_names = []
+    for model in model_aucs:
+        model_sizes.append(model_size(model))
+        avg_aucs.append(np.mean(model_aucs[model]))
+        avg_accs.append(np.mean(model_accs[model]))
+        model_names.append(model)
+
+    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'Model Size', 'Average AUC')
+    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'Model Size', 'Average Accuracy')
 
 def main():
     if len(sys.argv) < 4:
@@ -132,10 +205,12 @@ def main():
         aggregated_data[dataset][model].append((np.array(labels), np.array(scores)))
 
     # Generating and saving plots
+    all_aucs = dict()
     for dataset, data in aggregated_data.items():
-        plot_and_save_roc_curves(data, output_dir, dataset)
-#        plot_and_save_aupr_curves(data, output_dir, dataset)
-        plot_accuracy_vs_confidence(data, output_dir, dataset)
+        all_aucs[dataset] = plot_and_save_roc_curves(data, output_dir, dataset)
+        # plot_and_save_aupr_curves(data, output_dir, dataset)
+        # plot_accuracy_vs_confidence(data, output_dir, dataset)
+    model_size_plots(aggregated_data, all_aucs, output_dir)
 
 if __name__ == "__main__":
     main()

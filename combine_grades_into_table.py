@@ -73,8 +73,7 @@ def main():
         raise Exception('Third argument incl_unparseable must be a boolean (True or False)')
     grade_filepaths = sys.argv[4:]
     
-    print("Combining from these grade files:")
-    [print(f) for f in grade_filepaths]
+    print(f"Combining {len(grade_filepaths)} grade files into {output_filepath}...")
     filenames = [p.split('/')[-1] for p in grade_filepaths]
     all_param_sets = set([f.split('-q')[0] for f in filenames])
 
