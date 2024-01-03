@@ -32,8 +32,9 @@ def write_to_table(output_filepath, all_grades):
     with open(output_filepath, 'w') as f:
         f.write('\\documentclass{article}\n')
         f.write('\\usepackage[left=1in, right=1in, top=1in, bottom=1in]{geometry}\n')
-        f.write('\\renewcommand\\arraystretch{1.39}\n')
+        f.write('\\renewcommand\\arraystretch{1.35}\n')
         f.write('\\usepackage{amsmath}\n')
+        f.write('\\pagestyle{empty}\n')
         f.write('\\begin{document}\n')
         for dataset_name in sorted(all_grades.keys()):
             f.write(f'\\section*{{Dataset: {dataset_name}}}\n')

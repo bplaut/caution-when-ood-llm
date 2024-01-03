@@ -41,7 +41,7 @@ def expand_model_name(name):
 def model_size(name):
     full_name = expand_model_name(name)
     size_term = full_name.split('-')[-1]
-    return 12.9 if name == 'Mixtral' else float(size_term[:-1])
+    return 46.7 if name == 'Mixtral' else float(size_term[:-1])
 
 def plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     plt.figure()
