@@ -162,9 +162,8 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True
     else:
         plt.plot(xs, p(xs), "r-")
 
-    xlabel_str = 'size' if xlabel == 'Model Size' else xlabel
-    ylabel_str = 'auc' if ylabel == 'Average AUC' else 'acc' if ylabel == 'Average Accuracy' else ylabel
-    output_path = os.path.join(output_dir, f"{ylabel_str}_vs_{xlabel_str}_logscale={log_scale}.png")
+    label_str = lambda label: 'size' if label == 'Model Size' else 'auc' if label == 'Average AUC' else 'acc' if label == 'Average Accuracy' else label
+    output_path = os.path.join(output_dir, f"{label_str(ylabel)}_vs_{label_str(xlabel)}_logscale={log_scale}.png")
     plt.savefig(output_path)
     plt.close()
     print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
@@ -196,6 +195,7 @@ def model_size_plots(aggregated_data, all_aucs, output_dir):
 
     scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'Model Size', 'Average AUC')
     scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'Model Size', 'Average Accuracy')
+    scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'Average AUC', 'Average Accuracy', log_scale=False)
 
 def main():
     if len(sys.argv) < 4:
