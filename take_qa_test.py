@@ -61,9 +61,10 @@ class Test(object):
         dataset_str = self.args['dataset'].split("/")[-1]
         two_choices_str = "_two_choices" if self.args['two_choices'] else ""
         abstain_str = "_yes_abstain" if self.args['abstain_option'] else "_no_abstain"
+        logit_str = "_normed_logits" if self.args['normalize_logits'] else "_raw_logits"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
-        output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{two_choices_str}{abstain_str}.txt"
+        output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{two_choices_str}{abstain_str}{logit_str}.txt"
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
             f.write("grade confidence_level\n")
@@ -92,24 +93,6 @@ Response:\n
         # For some reason the final newline makes the Falcon models act really weird
         return prompt if 'Falcon' not in self.args['model'] else prompt[:-1]
 
-    def compute_confidence_levels_old(self, text_outputs, token_outputs, scores, choices, just_letter=False):
-        # Find the max probability for the token which determines the answer
-        confidence_levels = [None] * len(text_outputs)
-        for (i, response) in enumerate(text_outputs):
-            num_choices = len(choices[i]) if len(choices) > i else 0
-            if len(choices) <= i:
-                print(f"This should not happen: {i}\n {choices}")
-            # Main targets are (1) uppercase letters corresponding to choices, (2) same but with weird underscore in front because some models include that. Backup targets are the first tokens in the text of each choice. If just_letter=True, ignore (3).
-            main_targets = ([c for c in ascii_uppercase][:num_choices] +
-                          ['▁' + c for c in ascii_uppercase][:num_choices])
-            backup_targets = [self.model.tokenizer.tokenize(ch)[0] for ch in choices[i]]
-            token_idx1 = self.model.first_token_instance(token_outputs[i], main_targets)
-            token_idx2 = self.model.first_token_instance(token_outputs[i], backup_targets)
-            token_idx = token_idx1 if just_letter or token_idx1 < len(token_outputs[i]) else token_idx2
-            (conf, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=True)
-            confidence_levels[i] = conf
-        return confidence_levels
-
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices):
         # Find the max probability for the token which determines the answer
         confidence_levels = [None] * len(text_outputs)
@@ -120,7 +103,7 @@ Response:\n
             token_idx1 = self.model.token_idx_of_first_target(response, main_targets)
             token_idx2 = self.model.token_idx_of_first_target(response, backup_targets)
             token_idx = token_idx1 if token_idx1 != -1 else token_idx2
-            (conf, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=True)
+            (conf, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=self.args['normalize_logits'])
             confidence_levels[i] = conf
         return confidence_levels
     
@@ -197,7 +180,7 @@ Response:\n
         print("Running inference...\n")
         (text_outputs, token_outputs, scores) = self.model.generate(prompts)
         confidence_levels = self.compute_confidence_levels(text_outputs, token_outputs, scores, choices)
-        confidence_levels_old = self.compute_confidence_levels_old(text_outputs, token_outputs, scores, choices)
+
         # Grade outputs
         print("Grading answers...\n")
         grades = [None] * len(text_outputs)
@@ -209,8 +192,6 @@ Response:\n
             confidence_str = generate_text.t_to_str(confidence_levels[i])
             # Sometimes we get "" because of how t_to_str works
             print(f"Confidence level: {0 if confidence_str=='' else confidence_str}\n")
-            if confidence_levels[i] != confidence_levels_old[i]:
-                print(f"Confidence level mismatch: {confidence_levels[i]} vs {confidence_levels_old[i]}\n")
             grades[i] = grade
         return (grades, confidence_levels)
 
