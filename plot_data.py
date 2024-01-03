@@ -41,7 +41,7 @@ def expand_model_name(name):
 def model_size(name):
     full_name = expand_model_name(name)
     size_term = full_name.split('-')[-1]
-    return 46.7 if name == 'Mixtral' else float(size_term[:-1])
+    return 12.9 if name == 'Mixtral' else float(size_term[:-1])
 
 def plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     plt.figure()
@@ -122,9 +122,12 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True
         x_for_fit = xs
 
     scatter = plt.scatter(xs, ys)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.title(f'{ylabel} vs {xlabel}')
+
+    full_label = lambda label: 'Model Size' if label == 'size' else 'Average AUC' if label == 'auc' else 'Average Accuracy' if label == 'acc' else label
+    
+    plt.xlabel(full_label(xlabel))
+    plt.ylabel(full_label(ylabel))
+    plt.title(f'{full_label(ylabel)} vs {full_label(xlabel)}')
 
     # Adjust x-ticks for log-scale
     if log_scale:
@@ -146,8 +149,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True
     else:
         plt.plot(xs, p(xs), "r-")
 
-    label_str = lambda label: 'size' if label == 'Model Size' else 'auc' if label == 'Average AUC' else 'acc' if label == 'Average Accuracy' else label
-    output_path = os.path.join(output_dir, f"{label_str(ylabel)}_vs_{label_str(xlabel)}_logscale={log_scale}.png")
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}_logscale={log_scale}.png")
     plt.savefig(output_path)
     plt.close()
     print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
@@ -177,9 +179,11 @@ def model_size_plots(aggregated_data, all_aucs, output_dir):
         avg_accs.append(np.mean(model_accs[model]))
         model_names.append(model)
 
-    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'Model Size', 'Average AUC')
-    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'Model Size', 'Average Accuracy')
-    scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'Average AUC', 'Average Accuracy', log_scale=False)
+    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc', log_scale=True)
+    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=True)
+    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc', log_scale=False)
+    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=False)
+    scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', log_scale=False)
 
 def main():
     if len(sys.argv) < 5:
