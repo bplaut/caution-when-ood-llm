@@ -43,7 +43,7 @@ def model_size(name):
     size_term = full_name.split('-')[-1]
     return 46.7 if name == 'Mixtral' else float(size_term[:-1])
 
-def plot_and_save_roc_curves(data, output_dir, dataset):
+def plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     plt.figure()
     aucs = dict()
     for model, values in data.items():
@@ -51,45 +51,29 @@ def plot_and_save_roc_curves(data, output_dir, dataset):
         labels = np.concatenate(labels)
         scores = np.concatenate(scores)
         fpr, tpr, thresholds = roc_curve(labels, scores)
-                
-        roc_auc = auc(fpr, tpr)
+
+        # Filter the FPR and TPR based on the fpr_range
+        valid_range = (fpr >= fpr_range[0]) & (fpr <= fpr_range[1])
+        fpr_filtered = fpr[valid_range]
+        tpr_filtered = tpr[valid_range]
+
+        # Calculate the partial AUROC
+        roc_auc = auc(fpr_filtered, tpr_filtered)
         aucs[model] = roc_auc
-        plt.plot(fpr, tpr, lw=2, label=f'{expand_model_name(model)} (area = {roc_auc:.2f})')
+        plt.plot(fpr_filtered, tpr_filtered, lw=2, label=f'{expand_model_name(model)} (area = {roc_auc:.2f})')
 
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    plt.xlim([0.0, 1.0])
+    plt.xlim([fpr_range[0], fpr_range[1]])
     plt.ylim([0.0, 1.0])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title(f'Receiver Operating Characteristic - {dataset}')
     plt.legend(loc="lower right")
-    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.png")
+    output_path = os.path.join(output_dir, f"roc_curve_{dataset}_fpr_{fpr_range[0]}_{fpr_range[1]}.png")
     plt.savefig(output_path)
     plt.close()
-    print(f"ROC curve for {dataset} saved to {output_path}")
+    print(f"ROC curve for {dataset} saved to {output_path} for FPR range {fpr_range}")
     return aucs
-
-def plot_and_save_aupr_curves(data, output_dir, dataset):
-    plt.figure()
-    for model, values in data.items():
-        labels, scores = zip(*values)
-        labels = np.concatenate(labels)
-        scores = np.concatenate(scores)
-        precision, recall, thresholds = precision_recall_curve(labels, scores)
-                
-        aupr = auc(recall, precision)
-        plt.plot(recall, precision, lw=2, label=f'{expand_model_name(model)} (area = {aupr:.2f})')
-
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.0])
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.title(f'Precision Recall curve - {dataset}')
-    plt.legend(loc="lower right")
-    output_path = os.path.join(output_dir, f"aupr_curve_{dataset}.png")
-    plt.savefig(output_path)
-    plt.close()
-    print(f"AUPR curve for {dataset} saved to {output_path}")
     
 def compute_accuracy_per_confidence_bin(labels, scores, n_bins=10, min_conf=0):
     bins = np.linspace(min_conf, 1, n_bins + 1)
@@ -198,8 +182,8 @@ def model_size_plots(aggregated_data, all_aucs, output_dir):
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'Average AUC', 'Average Accuracy', log_scale=False)
 
 def main():
-    if len(sys.argv) < 4:
-        print("Usage: python plot_data.py <output_directory> <incl_unparseable> <data_file1> [<data_file2> ...]")
+    if len(sys.argv) < 5:
+        print("Usage: python plot_data.py <output_directory> <incl_unparseable> <fpr_range> <data_file1> [<data_file2> ...]")
         sys.exit(1)
 
     output_dir = sys.argv[1]
@@ -210,7 +194,9 @@ def main():
     if incl_unparseable is None:
         raise Exception('Second argument incl_unparseable must be a boolean (True or False)')
         
-    file_paths = sys.argv[3:]
+    file_paths = sys.argv[4:]
+    fpr_range_str = sys.argv[3]
+    fpr_range = tuple(float(x) for x in fpr_range_str.split('-'))
 
     # Data aggregation
     aggregated_data = defaultdict(lambda: defaultdict(list))
@@ -222,7 +208,7 @@ def main():
     # Generating and saving plots
     all_aucs = dict()
     for dataset, data in aggregated_data.items():
-        all_aucs[dataset] = plot_and_save_roc_curves(data, output_dir, dataset)
+        all_aucs[dataset] = plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=fpr_range)
         # plot_and_save_aupr_curves(data, output_dir, dataset)
         # plot_accuracy_vs_confidence(data, output_dir, dataset)
     model_size_plots(aggregated_data, all_aucs, output_dir)
