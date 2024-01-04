@@ -155,9 +155,9 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True
     plt.close()
     print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
        
-def model_size_plots(aggregated_data, all_aucs, output_dir):
-    # For each model, compute (1) avg AUC across datasets and (2) avg accuracy across datasets
-    # Then plot AUC vs model size and accuracy vs model size
+def meta_plots(aggregated_data, all_aucs, output_dir):
+    # Main three meta metrics are: model size, avg AUC, avg accuracy
+    # Create a scatter plot for each pair of metrics
     model_aucs = dict()
     model_accs = dict()
     for dataset in all_aucs:
@@ -216,7 +216,7 @@ def main():
         all_aucs[dataset] = plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=fpr_range)
         # plot_and_save_aupr_curves(data, output_dir, dataset)
         # plot_accuracy_vs_confidence(data, output_dir, dataset)
-    model_size_plots(aggregated_data, all_aucs, output_dir)
+    meta_plots(aggregated_data, all_aucs, output_dir)
 
 if __name__ == "__main__":
     main()
