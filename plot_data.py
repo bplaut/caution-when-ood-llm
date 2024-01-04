@@ -69,7 +69,7 @@ def plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     plt.ylabel('True Positive Rate')
     plt.title(f'Receiver Operating Characteristic - {dataset}')
     plt.legend(loc="lower right")
-    fpr_str = f"fpr_{fpr_range[0]}_{fpr_range[1]}" if fpr_range != (0, 1) else ""
+    fpr_str = f"_fpr_{fpr_range[0]}_{fpr_range[1]}" if fpr_range != (0, 1) else ""
     output_path = os.path.join(output_dir, f"roc_curve_{dataset}{fpr_str}.png")
     plt.savefig(output_path)
     plt.close()
