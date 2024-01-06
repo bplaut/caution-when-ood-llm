@@ -184,19 +184,19 @@ def compute_score(labels, conf_levels, thresh):
 def plot_symlog(data, output_dir, xlabel, ylabel, dataset):
     plt.figure()
     plt.yscale('symlog')
-    texts = []
-
-    for (model, xs, ys) in data:
-        plt.plot(xs, ys, label=expand_model_name(model), zorder=1)
 
     # For each model, identify the maximum y value and mark it with a black dot and its value
+    texts = []
     for (model, xs, ys) in data:
         max_y = max(ys)
         max_x = xs[ys.index(max_y)]
         # zorder determines precedence when objects overlap
         plt.scatter([max_x], [max_y], color='black', zorder=2)
-        text = plt.text(max_x, max_y, f'{max_y}', ha='right', va='bottom', alpha=0.7, fontsize=12, fontweight='bold', zorder=3)
+        text = plt.text(max_x,max_y,f'{max_y}',ha='right',va='bottom',alpha=0.7,fontsize=12,zorder=3)
         texts.append(text)
+
+    for (model, xs, ys) in data:
+        plt.plot(xs, ys, label=f"{expand_model_name(model)}: max = {max(ys)}", zorder=1)
 
     # Use adjust_text to avoid overlapping
     adjust_text(texts)
