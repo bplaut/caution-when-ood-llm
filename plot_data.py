@@ -177,61 +177,55 @@ def meta_plots(all_data, all_aucs, output_dir):
     # scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=True)
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', log_scale=False)
 
-def compute_score(labels, conf_levels, thresh):
+def compute_score(labels, conf_levels, thresh, wrong_penalty=1):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
-    return sum([0 if conf < thresh else (1 if label == 1 else -1) for label, conf in zip(labels, conf_levels)])
+    return sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
 
-def plot_symlog(data, output_dir, xlabel, ylabel, dataset):
+def score_plot(data, output_dir, xlabel, ylabel, dataset, yscale='linear'):
     plt.figure()
-    plt.yscale('symlog')
+    plt.yscale(yscale)
 
-    # For each model, identify the maximum y value and mark it with a black dot and its value
-    texts = []
     for (model, xs, ys) in data:
+        base_score = ys[0] # threshold of 0 is equivalent to the base model
         max_y = max(ys)
         max_x = xs[ys.index(max_y)]
-        # zorder determines precedence when objects overlap
-        plt.scatter([max_x], [max_y], color='black', zorder=2)
-        text = plt.text(max_x,max_y,f'{max_y}',ha='right',va='bottom',alpha=0.7,fontsize=12,zorder=3)
-        texts.append(text)
-
-    for (model, xs, ys) in data:
-        plt.plot(xs, ys, label=f"{expand_model_name(model)}: max = {max(ys)}", zorder=1)
-
-    # Use adjust_text to avoid overlapping
-    adjust_text(texts)
+        
+        # Mark the max score with a black dot. zorder=2 to make sure it's on top of the line
+        # plt.scatter([max_x], [max_y], color='black', zorder=2)
+        plt.plot(xs, ys, label=f"{expand_model_name(model)}: {base_score} to {max_y}")
 
     # Add dashed black line at y=0
     plt.plot([min(xs), max(xs)], [0, 0], color='black', linestyle='--')
 
-    label_str = lambda x: 'Confidence Threshold' if x == 'conf' else 'Change in Score' if x == 'delta' else 'Score' if x == 'score' else x
+    label_str = lambda x: 'Confidence Threshold' if x == 'conf' else 'Change in Score' if x == 'delta' else 'Score' if x == 'score' else 'Score (harsh)' if x == 'harsh-score' else x
     plt.xlabel(label_str(xlabel))
     plt.ylabel(label_str(ylabel))
-    plt.title(f'{label_str(ylabel)} vs {label_str(xlabel)}')
-    plt.legend()
+    plt.title(f'{label_str(ylabel)} vs {label_str(xlabel)}: {dataset}')
+    plt.legend(loc='lower right', fontsize='small')
     output_path = os.path.join(output_dir, f"{dataset}_{ylabel}_vs_{xlabel}.png")
     plt.savefig(output_path)
     plt.close()
     print(f"{ylabel} vs {xlabel} plot for {dataset} saved --> {output_path}")
     
-def plot_score_vs_conf_threshold(data, output_dir, dataset):
+def plot_score_vs_conf_thresholds(data, output_dir, dataset):
     # Max confidence across all models for this dataset
     max_conf = max([max(conf_levels) for _, (_, conf_levels) in data.items()])
     results = []
+    results_harsh = []
     for model, (labels, conf_levels) in data.items():
         thresholds = np.linspace(0, max_conf, 100)
-        score_deltas = []
         scores  = []
+        scores_harsh = []
         for thresh in thresholds:
             score = compute_score(labels, conf_levels, thresh)
             scores.append(score)
-            score_deltas.append(compute_score(labels, conf_levels, thresh) - scores[0])
-        results.append((model, thresholds, score_deltas, scores))
+            score_harsh = compute_score(labels, conf_levels, thresh, wrong_penalty=2)
+            scores_harsh.append(score_harsh)
+        results.append((model, thresholds, scores))
+        results_harsh.append((model, thresholds, scores_harsh))
 
-    data1 = [(model, thresholds, score_deltas) for (model, thresholds, score_deltas, _) in results]
-    data2 = [(model, thresholds, scores) for (model, thresholds, _, scores) in results]
-    plot_symlog(data1, output_dir, 'conf', 'delta', dataset)
-    plot_symlog(data2, output_dir, 'conf', 'score', dataset)
+    score_plot(results, output_dir, 'conf', 'score', dataset)
+    score_plot(results_harsh, output_dir, 'conf', 'harsh-score', dataset)
     
 def main():
     if len(sys.argv) < 5:
@@ -263,7 +257,7 @@ def main():
     all_aucs = dict()
     for dataset, data in all_data.items():
         all_aucs[dataset] = plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=fpr_range)
-        plot_score_vs_conf_threshold(data, output_dir, dataset)
+        plot_score_vs_conf_thresholds(data, output_dir, dataset)
         # plot_and_save_aupr_curves(data, output_dir, dataset)
         # plot_accuracy_vs_confidence(data, output_dir, dataset)
     meta_plots(all_data, all_aucs, output_dir)
