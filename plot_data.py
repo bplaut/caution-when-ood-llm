@@ -184,8 +184,22 @@ def compute_score(labels, conf_levels, thresh):
 def plot_symlog(data, output_dir, xlabel, ylabel, dataset):
     plt.figure()
     plt.yscale('symlog')
+    texts = []
+
     for (model, xs, ys) in data:
-        plt.plot(xs, ys, label=expand_model_name(model))
+        plt.plot(xs, ys, label=expand_model_name(model), zorder=1)
+
+    # For each model, identify the maximum y value and mark it with a black dot and its value
+    for (model, xs, ys) in data:
+        max_y = max(ys)
+        max_x = xs[ys.index(max_y)]
+        # zorder determines precedence when objects overlap
+        plt.scatter([max_x], [max_y], color='black', zorder=2)
+        text = plt.text(max_x, max_y, f'{max_y}', ha='right', va='bottom', alpha=0.7, fontsize=12, fontweight='bold', zorder=3)
+        texts.append(text)
+
+    # Use adjust_text to avoid overlapping
+    adjust_text(texts)
 
     # Add dashed black line at y=0
     plt.plot([min(xs), max(xs)], [0, 0], color='black', linestyle='--')
@@ -200,7 +214,6 @@ def plot_symlog(data, output_dir, xlabel, ylabel, dataset):
     plt.close()
     print(f"{ylabel} vs {xlabel} plot for {dataset} saved --> {output_path}")
     
-
 def plot_score_vs_conf_threshold(data, output_dir, dataset):
     # Max confidence across all models for this dataset
     max_conf = max([max(conf_levels) for _, (_, conf_levels) in data.items()])
@@ -234,6 +247,7 @@ def main():
         raise Exception('Second argument incl_unparseable must be a boolean (True or False)')
         
     file_paths = sys.argv[4:]
+    print(f"Reading from {len(file_paths)} files...")
     fpr_range_str = sys.argv[3]
     fpr_range = tuple(float(x) for x in fpr_range_str.split('-'))
 
