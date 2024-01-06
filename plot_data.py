@@ -217,6 +217,9 @@ def plot_score_vs_conf_thresholds(data, output_dir, dataset):
     results_harsh = []
     for model, (labels, conf_levels) in data.items():
         thresholds = np.linspace(0, max_conf, 200) # 200 data points per plot
+        if abs(max_conf - 1) < 0.01:
+            # We're dealing with probabilities: add more points near 1
+            thresholds = np.append(thresholds, np.linspace(0.99, 1, 100))
         scores  = []
         scores_harsh = []
         for thresh in thresholds:
