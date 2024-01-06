@@ -70,7 +70,7 @@ def plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     output_path = os.path.join(output_dir, f"roc_curve_{dataset}{fpr_str}.png")
     plt.savefig(output_path)
     plt.close()
-    print(f"ROC curve for {dataset} saved to {output_path} for FPR range {fpr_range}")
+    print(f"ROC curve for {dataset} saved --> {output_path}")
     return aucs
     
 def compute_accuracy_per_confidence_bin(labels, scores, n_bins=10, min_conf=0):
@@ -103,7 +103,7 @@ def plot_accuracy_vs_confidence(data, output_dir, dataset):
     output_path = os.path.join(output_dir, f"calibration_{dataset}.png")
     plt.savefig(output_path)
     plt.close()
-    print(f"Calibration plot for {dataset} saved to {output_path}")
+    print(f"Calibration for {dataset} saved --> {output_path}")
 
 def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True):
     plt.figure()
@@ -146,7 +146,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True
     output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{logscale_str}.png")
     plt.savefig(output_path)
     plt.close()
-    print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
+    print(f"{ylabel} vs {xlabel} plot saved --> {output_path}")
        
 def meta_plots(all_data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
@@ -198,7 +198,7 @@ def plot_symlog(data, output_dir, xlabel, ylabel, dataset):
     output_path = os.path.join(output_dir, f"{dataset}_{ylabel}_vs_{xlabel}.png")
     plt.savefig(output_path)
     plt.close()
-    print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
+    print(f"{ylabel} vs {xlabel} plot for {dataset} saved --> {output_path}")
     
 
 def plot_score_vs_conf_threshold(data, output_dir, dataset):
