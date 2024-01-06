@@ -46,10 +46,7 @@ def model_size(name):
 def plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     plt.figure()
     aucs = dict()
-    for model, values in data.items():
-        labels, scores = zip(*values)
-        labels = np.concatenate(labels)
-        scores = np.concatenate(scores)
+    for model, (labels, scores) in data.items():
         fpr, tpr, thresholds = roc_curve(labels, scores)
 
         # Filter the FPR and TPR based on the fpr_range
@@ -93,14 +90,10 @@ def compute_accuracy_per_confidence_bin(labels, scores, n_bins=10, min_conf=0):
 
 def plot_accuracy_vs_confidence(data, output_dir, dataset):
     plt.figure()
-    for model, values in data.items():
-        # Aggregate all labels and scores for this model
-        all_labels = np.concatenate([labels for labels, _ in values])
-        all_scores = np.concatenate([scores for _, scores in values])
-        accuracies = compute_accuracy_per_confidence_bin(all_labels, all_scores)
+    for model, (labels, scores) in data.items():
+        accuracies = compute_accuracy_per_confidence_bin(labels, scores)
         bins, accs = zip(*accuracies)
         accs = [a if a is not None else 0 for a in accs]  # Replace None with 0
-
         plt.plot(bins, accs, label=expand_model_name(model), marker='o')
 
     plt.xlabel('Confidence Level')
@@ -114,7 +107,6 @@ def plot_accuracy_vs_confidence(data, output_dir, dataset):
 
 def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True):
     plt.figure()
-    
     # Set x-axis scale based on log_scale parameter
     if log_scale:
         plt.xscale('log')
@@ -150,12 +142,13 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True
     else:
         plt.plot(xs, p(xs), "r-")
 
-    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}_logscale={log_scale}.png")
+    logscale_str = '_logscale' if log_scale else ''
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{logscale_str}.png")
     plt.savefig(output_path)
     plt.close()
     print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
        
-def meta_plots(aggregated_data, all_aucs, output_dir):
+def meta_plots(all_data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
     # Create a scatter plot for each pair of metrics
     model_aucs = dict()
@@ -167,8 +160,8 @@ def meta_plots(aggregated_data, all_aucs, output_dir):
                 model_aucs[model] = []
                 model_accs[model] = []    
             model_aucs[model].append(all_aucs[dataset][model])
-            all_labels = np.concatenate([labels for labels, _ in aggregated_data[dataset][model]])
-            model_accs[model].append(np.mean(all_labels))
+            (labels, _) = all_data[dataset][model]
+            model_accs[model].append(np.mean(labels))
 
     model_sizes = []
     avg_aucs = []
@@ -180,12 +173,53 @@ def meta_plots(aggregated_data, all_aucs, output_dir):
         avg_accs.append(np.mean(model_accs[model]))
         model_names.append(model)
 
-    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc', log_scale=True)
-    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=True)
-    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc', log_scale=False)
-    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=False)
+    # scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc', log_scale=True)
+    # scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=True)
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', log_scale=False)
 
+def compute_score(labels, conf_levels, thresh):
+    # Score = num correct - num wrong, with abstaining when confidence < threshold
+    return sum([0 if conf < thresh else (1 if label == 1 else -1) for label, conf in zip(labels, conf_levels)])
+
+def plot_symlog(data, output_dir, xlabel, ylabel, dataset):
+    plt.figure()
+    plt.yscale('symlog')
+    for (model, xs, ys) in data:
+        plt.plot(xs, ys, label=expand_model_name(model))
+
+    # Add dashed black line at y=0
+    plt.plot([min(xs), max(xs)], [0, 0], color='black', linestyle='--')
+
+    label_str = lambda x: 'Confidence Threshold' if x == 'conf' else 'Change in Score' if x == 'delta' else 'Score' if x == 'score' else x
+    plt.xlabel(label_str(xlabel))
+    plt.ylabel(label_str(ylabel))
+    plt.title(f'{label_str(ylabel)} vs {label_str(xlabel)}')
+    plt.legend()
+    output_path = os.path.join(output_dir, f"{dataset}_{ylabel}_vs_{xlabel}.png")
+    plt.savefig(output_path)
+    plt.close()
+    print(f"{ylabel} vs {xlabel} plot for saved to {output_path}")
+    
+
+def plot_score_vs_conf_threshold(data, output_dir, dataset):
+    # Max confidence across all models for this dataset
+    max_conf = max([max(conf_levels) for _, (_, conf_levels) in data.items()])
+    results = []
+    for model, (labels, conf_levels) in data.items():
+        thresholds = np.linspace(0, max_conf, 100)
+        score_deltas = []
+        scores  = []
+        for thresh in thresholds:
+            score = compute_score(labels, conf_levels, thresh)
+            scores.append(score)
+            score_deltas.append(compute_score(labels, conf_levels, thresh) - scores[0])
+        results.append((model, thresholds, score_deltas, scores))
+
+    data1 = [(model, thresholds, score_deltas) for (model, thresholds, score_deltas, _) in results]
+    data2 = [(model, thresholds, scores) for (model, thresholds, _, scores) in results]
+    plot_symlog(data1, output_dir, 'conf', 'delta', dataset)
+    plot_symlog(data2, output_dir, 'conf', 'score', dataset)
+    
 def main():
     if len(sys.argv) < 5:
         print("Usage: python plot_data.py <output_directory> <incl_unparseable> <fpr_range> <data_file1> [<data_file2> ...]")
@@ -204,19 +238,21 @@ def main():
     fpr_range = tuple(float(x) for x in fpr_range_str.split('-'))
 
     # Data aggregation
-    aggregated_data = defaultdict(lambda: defaultdict(list))
+    all_data = defaultdict(lambda: defaultdict(list))
     for file_path in file_paths:
         dataset, model = parse_file_name(os.path.basename(file_path))
         labels, scores = parse_data(file_path, incl_unparseable)
-        aggregated_data[dataset][model].append((np.array(labels), np.array(scores)))
-
+        old_labels, old_scores = all_data[dataset][model] if len(all_data[dataset][model]) > 0 else (np.array([]), np.array([]))
+        all_data[dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_scores, scores]))
+            
     # Generating and saving plots
     all_aucs = dict()
-    for dataset, data in aggregated_data.items():
+    for dataset, data in all_data.items():
         all_aucs[dataset] = plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=fpr_range)
+        plot_score_vs_conf_threshold(data, output_dir, dataset)
         # plot_and_save_aupr_curves(data, output_dir, dataset)
         # plot_accuracy_vs_confidence(data, output_dir, dataset)
-    meta_plots(aggregated_data, all_aucs, output_dir)
+    meta_plots(all_data, all_aucs, output_dir)
 
 if __name__ == "__main__":
     main()
