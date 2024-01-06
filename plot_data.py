@@ -200,8 +200,11 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, yscale='linear'):
     label_str = lambda x: 'Confidence Threshold' if x == 'conf' else 'Change in Score' if x == 'delta' else 'Score' if x == 'score' else 'Score (harsh)' if x == 'harsh-score' else x
     plt.xlabel(label_str(xlabel))
     plt.ylabel(label_str(ylabel))
+    current_ylim = plt.ylim()
+    new_min_y = max(current_ylim[0], -300) # No need to go below -200
+    plt.ylim(bottom=new_min_y)
     plt.title(f'{label_str(ylabel)} vs {label_str(xlabel)}: {dataset}')
-    plt.legend(loc='lower right', fontsize='small')
+    plt.legend(fontsize='small')
     output_path = os.path.join(output_dir, f"{dataset}_{ylabel}_vs_{xlabel}.png")
     plt.savefig(output_path)
     plt.close()
@@ -213,7 +216,7 @@ def plot_score_vs_conf_thresholds(data, output_dir, dataset):
     results = []
     results_harsh = []
     for model, (labels, conf_levels) in data.items():
-        thresholds = np.linspace(0, max_conf, 100)
+        thresholds = np.linspace(0, max_conf, 200) # 200 data points per plot
         scores  = []
         scores_harsh = []
         for thresh in thresholds:
