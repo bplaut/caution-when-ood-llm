@@ -71,10 +71,6 @@ do
             # Running the command with the arguments
             echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size --normalize_logits=$normalize_logits --abstain_option=$abstain_option"
             python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --normalize_logits="$normalize_logits" --abstain_option="$abstain_option" --max_new_tokens=100 --num_top_tokens=1 &> "$log_file"
-
-	    echo -e "\nUpdating data plots..."
-	    # Supress output from do_post_processing.sh
-	    bash do_post_processing.sh 0,0.4,0.7,0.85,0.95 0,18,21,24,27 > /dev/null
         done
     done
 done
