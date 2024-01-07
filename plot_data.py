@@ -228,8 +228,9 @@ def plot_score_vs_conf_thresholds(all_data, output_dir, datasets, normalize=True
     for model in results:
         results_for_model, results_for_model_harsh = [], []
         for i in range(len(thresholds)):
-            scores_for_thresh = [results[model][dataset][i] for dataset in datasets]
-            scores_for_thresh_harsh = [results_harsh[model][dataset][i] for dataset in datasets]
+            # Some models might not have results for all datasets (although eventually they should)
+            scores_for_thresh = [results[model][dataset][i] for dataset in results[model]]
+            scores_for_thresh_harsh = [results_harsh[model][dataset][i] for dataset in results[model]]
             precision = 3
             round_fn = lambda x: round(x, precision) if normalize else x
             avg_score = round_fn(np.mean(scores_for_thresh))
