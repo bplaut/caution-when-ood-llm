@@ -17,11 +17,12 @@ class Generator(object):
                           'Llama-7b':'meta-llama/Llama-2-7b-chat-hf',
                           'Llama-70b':'meta-llama/Llama-2-70b-chat-hf',
                           'MPT-30b':'mosaicml/mpt-30b-instruct',
-                          'Sakura-Solar':"kyujinpy/Sakura-SOLAR-Instruct",
                           'Vicuna-33b':'lmsys/vicuna-33b-v1.3',
                           'Falcon-40b':'tiiuae/falcon-40b-instruct',
                           'Falcon-7b':'tiiuae/falcon-7b-instruct',
                           'Solar':'upstage/SOLAR-10.7B-Instruct-v1.0',
+                          'Yi-34b':'01-ai/Yi-34B-Chat',
+                          'Yi-6b':'01-ai/Yi-6B-Chat',
         }
         if args['model'] not in model_name_map:
             raise Exception("Unrecognized model name. Check model_name_map")
@@ -113,7 +114,8 @@ class Generator(object):
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
 
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
-        token_outputs = [output.sequences[i][len(model_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output, tokenized. i//num_responses in the prompt index
+        token_inputs = model_inputs['input_ids'] if 'Yi' in self.args['model'] else model_inputs
+        token_outputs = [output.sequences[i][len(token_inputs[i//self.num_responses]):] for i in range(len(output.sequences))] # non-prompt part of the output, tokenized. i//num_responses in the prompt index
         text_outputs = self.tokenizer.batch_decode(token_outputs, skip_special_tokens=True)
 
         scores = t.stack(list(output.scores), dim=0) # initially it's a tuple of tensors
