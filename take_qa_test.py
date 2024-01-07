@@ -59,12 +59,11 @@ class Test(object):
 
     def write_output(self, grades, confidence_levels):
         dataset_str = self.args['dataset'].split("/")[-1]
-        two_choices_str = "_two_choices" if self.args['two_choices'] else ""
         abstain_str = "_yes_abst" if self.args['abstain_option'] else "_no_abst"
         logit_str = "_norm_logits" if self.args['normalize_logits'] else "_raw_logits"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
-        output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{two_choices_str}{abstain_str}{logit_str}.txt"
+        output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}.txt"
         print('\nWriting results to', output_filepath)
         with open(output_filepath, 'w') as f:
             f.write("grade confidence_level\n")
@@ -157,12 +156,7 @@ Response:\n
             choices_for_q = self.get_choices(question_data)
             question = self.get_q(question_data)
             correct_answer_text = choices_for_q[self.get_a(question_data)]
-            
-            if self.args['two_choices'] and len(choices_for_q) > 2:
-                # Reduce the choice set to two
-                wrong_choices = [ch for ch in choices_for_q if ch != correct_answer_text]
-                choices_for_q = [correct_answer_text, random.choice(wrong_choices)]
-                
+                            
             random.shuffle(choices_for_q)
             # Shuffle before adding abstain option; that should always be last
             if self.args['abstain_option']:
