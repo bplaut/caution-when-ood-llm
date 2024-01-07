@@ -35,7 +35,7 @@ get_batch_size() {
 	"Falcon-7b")
 	    batch_size=168
 	    ;;
-	"Yi-6b")
+	"Yi-6b") # For some reason, this crashes for batch_size > 1
 	    batch_size=1
 	    ;;
         "Mistral"|"Zephyr"|"Solar")
@@ -46,12 +46,12 @@ get_batch_size() {
             ;;
     esac
 
-    # For some datasets, adjust batch sizes
+    # For some datasets, adjust batch sizes. +2 to ensure that it doesn't go to 0
     if [ "$dataset_name" = "mmlu" ]; then
-        batch_size=$((batch_size / 3))
+        batch_size=$(( (batch_size + 2) / 3 ))
     fi
     if [ "$dataset_name" = "piqa" ]; then
-	    batch_size=$((batch_size / 3))
+	    batch_size=$(( (batch_size + 2) / 3 ))
     fi
 
     echo "$batch_size"
