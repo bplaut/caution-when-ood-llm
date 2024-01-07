@@ -36,6 +36,7 @@ def expand_model_name(name):
             'Llama2-13B' if name == 'Llama-13b' else
             'Llama2-7B' if name == 'Llama-7b' else
             'Llama2-70B' if name == 'Llama-70b' else
+            'Yi-6B' if name == 'Yi-6b' else
             'Falcon-7B' if name == 'Falcon-7b' else
             'Falcon-40B' if name == 'Falcon-40b' else name)
 
