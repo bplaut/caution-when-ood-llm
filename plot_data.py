@@ -69,7 +69,7 @@ def plot_roc_curves(all_data, output_dir, dataset, fpr_range=(0.0, 1.0)):
         aucs[model] = roc_auc
         plt.plot(fpr_filtered, tpr_filtered, lw=2, label=f'{expand_model_name(model)} (area = {roc_auc:.2f})')
 
-    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='--')
     plt.xlim([fpr_range[0], fpr_range[1]])
     plt.ylim([0.0, 1.0])
     plt.xlabel('False Positive Rate')
