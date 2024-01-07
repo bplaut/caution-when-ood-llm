@@ -35,18 +35,25 @@ def expand_model_name(name):
             'Llama2-7B' if name == 'Llama-7b' else
             'Llama2-70B' if name == 'Llama-70b' else
             'Falcon-7B' if name == 'Falcon-7b' else
-            'Falcon-40B' if name == 'Falcon-40b' else
-            name)
+            'Falcon-40B' if name == 'Falcon-40b' else name)
+
+def expand_label(label):
+        return ('Confidence Threshold' if label == 'conf' else
+                'Score' if label == 'score' else
+                'Score (harsh)' if label == 'harsh-score' else
+                'Model Size' if label == 'size' else
+                'Average AUC' if label == 'auc' else
+                'Average Accuracy' if label == 'acc' else label)    
 
 def model_size(name):
     full_name = expand_model_name(name)
     size_term = full_name.split('-')[-1]
     return 46.7 if name == 'Mixtral' else float(size_term[:-1])
 
-def plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=(0.0, 1.0)):
+def plot_roc_curves(all_data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     plt.figure()
     aucs = dict()
-    for model, (labels, scores) in data.items():
+    for model, (labels, scores) in all_data[dataset].items():
         fpr, tpr, thresholds = roc_curve(labels, scores)
 
         # Filter the FPR and TPR based on the fpr_range
@@ -76,7 +83,6 @@ def plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=(0.0, 1.0)):
 def compute_accuracy_per_confidence_bin(labels, scores, n_bins=10, min_conf=0):
     bins = np.linspace(min_conf, 1, n_bins + 1)
     accuracies = []
-
     for i in range(len(bins) - 1): 
         idx = (scores >= bins[i]) & (scores < bins[i + 1])
         bin_mid = (bins[i] + bins[i+1]) / 2
@@ -85,8 +91,22 @@ def compute_accuracy_per_confidence_bin(labels, scores, n_bins=10, min_conf=0):
             accuracies.append((bin_mid, acc))
         else:
             accuracies.append((bin_mid, None))
-
     return accuracies
+
+def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', normalize=True):
+    # No need to go too negative
+    min_y_normed, min_y_unnormed = -0.15, -300
+    curr_min_y = plt.ylim()[0]
+    new_min_y = max(curr_min_y, min_y_normed) if normalize else max(curr_min_y, min_y_unnormed)
+    plt.ylim(bottom = new_min_y)
+
+    plt.xlabel(expand_label(xlabel))
+    plt.ylabel(expand_label(ylabel))
+    plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}: {dataset}')
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}_{dataset.replace(' ','_')}.png")
+    plt.savefig(output_path)
+    plt.close()
+    print(f"{ylabel} vs {xlabel} for {dataset} saved --> {output_path}")
 
 def plot_accuracy_vs_confidence(data, output_dir, dataset):
     plt.figure()
@@ -95,15 +115,8 @@ def plot_accuracy_vs_confidence(data, output_dir, dataset):
         bins, accs = zip(*accuracies)
         accs = [a if a is not None else 0 for a in accs]  # Replace None with 0
         plt.plot(bins, accs, label=expand_model_name(model), marker='o')
-
-    plt.xlabel('Confidence Level')
-    plt.ylabel('Average Accuracy')
-    plt.title(f'Average Accuracy per Confidence Level - {dataset}')
     plt.legend()
-    output_path = os.path.join(output_dir, f"calibration_{dataset}.png")
-    plt.savefig(output_path)
-    plt.close()
-    print(f"Calibration for {dataset} saved --> {output_path}")
+    generic_finalize_plot(output_dir, 'conf', 'acc', dataset)
 
 def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True):
     plt.figure()
@@ -115,13 +128,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True
         x_for_fit = xs
 
     scatter = plt.scatter(xs, ys)
-
-    full_label = lambda label: 'Model Size' if label == 'size' else 'Average AUC' if label == 'auc' else 'Average Accuracy' if label == 'acc' else label
     
-    plt.xlabel(full_label(xlabel))
-    plt.ylabel(full_label(ylabel))
-    plt.title(f'{full_label(ylabel)} vs {full_label(xlabel)}')
-
     # Adjust x-ticks for log-scale
     if log_scale:
         max_x = max(xs)
@@ -130,8 +137,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True
 
     texts = []
     for i in range(len(model_names)):
-        texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
-    
+        texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))    
     adjust_text(texts)
 
     # Fit and plot regression line appropriate to the scale
@@ -142,17 +148,12 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True
     else:
         plt.plot(xs, p(xs), "r-")
 
-    logscale_str = '_logscale' if log_scale else ''
-    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{logscale_str}.png")
-    plt.savefig(output_path)
-    plt.close()
-    print(f"{ylabel} vs {xlabel} plot saved --> {output_path}")
-       
-def meta_plots(all_data, all_aucs, output_dir):
+    generic_finalize_plot(output_dir, xlabel, ylabel)
+           
+def auc_acc_plots(all_data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
     # Create a scatter plot for each pair of metrics
-    model_aucs = dict()
-    model_accs = dict()
+    model_aucs, model_accs = dict(), dict()
     for dataset in all_aucs:
         # Same set of models in each dict, so we can just iterate over one dict
         for model in all_aucs[dataset]:
@@ -163,10 +164,7 @@ def meta_plots(all_data, all_aucs, output_dir):
             (labels, _) = all_data[dataset][model]
             model_accs[model].append(np.mean(labels))
 
-    model_sizes = []
-    avg_aucs = []
-    avg_accs = []
-    model_names = []
+    model_sizes, avg_aucs, avg_accs, model_names = [], [], [], []
     for model in model_aucs:
         model_sizes.append(model_size(model))
         avg_aucs.append(np.mean(model_aucs[model]))
@@ -177,9 +175,10 @@ def meta_plots(all_data, all_aucs, output_dir):
     # scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=True)
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', log_scale=False)
 
-def compute_score(labels, conf_levels, thresh, wrong_penalty=1):
+def compute_score(labels, conf_levels, thresh, normalize, wrong_penalty=1):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
-    return sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
+    total = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
+    return total / len(labels) if normalize else total
 
 def score_plot(data, output_dir, xlabel, ylabel, dataset, yscale='linear'):
     plt.figure()
@@ -189,49 +188,58 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, yscale='linear'):
         base_score = ys[0] # threshold of 0 is equivalent to the base model
         max_y = max(ys)
         max_x = xs[ys.index(max_y)]
-        
-        # Mark the max score with a black dot. zorder=2 to make sure it's on top of the line
-        # plt.scatter([max_x], [max_y], color='black', zorder=2)
         plt.plot(xs, ys, label=f"{expand_model_name(model)}: {base_score} to {max_y}")
 
     # Add dashed black line at y=0
     plt.plot([min(xs), max(xs)], [0, 0], color='black', linestyle='--')
 
-    label_str = lambda x: 'Confidence Threshold' if x == 'conf' else 'Change in Score' if x == 'delta' else 'Score' if x == 'score' else 'Score (harsh)' if x == 'harsh-score' else x
-    plt.xlabel(label_str(xlabel))
-    plt.ylabel(label_str(ylabel))
-    current_ylim = plt.ylim()
-    new_min_y = max(current_ylim[0], -300) # No need to go below -200
-    plt.ylim(bottom=new_min_y)
-    plt.title(f'{label_str(ylabel)} vs {label_str(xlabel)}: {dataset}')
     plt.legend(fontsize='small')
-    output_path = os.path.join(output_dir, f"{dataset}_{ylabel}_vs_{xlabel}.png")
-    plt.savefig(output_path)
-    plt.close()
-    print(f"{ylabel} vs {xlabel} plot for {dataset} saved --> {output_path}")
+    generic_finalize_plot(output_dir, xlabel, ylabel, dataset)
     
-def plot_score_vs_conf_thresholds(data, output_dir, dataset):
-    # Max confidence across all models for this dataset
-    max_conf = max([max(conf_levels) for _, (_, conf_levels) in data.items()])
-    results = []
-    results_harsh = []
-    for model, (labels, conf_levels) in data.items():
-        thresholds = np.linspace(0, max_conf, 200) # 200 data points per plot
-        if abs(max_conf - 1) < 0.01:
-            # We're dealing with probabilities: add more points near 1
-            thresholds = np.append(thresholds, np.linspace(0.99, 1, 100))
-        scores  = []
-        scores_harsh = []
-        for thresh in thresholds:
-            score = compute_score(labels, conf_levels, thresh)
-            scores.append(score)
-            score_harsh = compute_score(labels, conf_levels, thresh, wrong_penalty=2)
-            scores_harsh.append(score_harsh)
-        results.append((model, thresholds, scores))
-        results_harsh.append((model, thresholds, scores_harsh))
+def plot_score_vs_conf_thresholds(all_data, output_dir, datasets, normalize=True):
+    # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
+    max_conf = max([max([max(conf_levels) for _, (_, conf_levels) in all_data[dataset].items()])
+                    for dataset in datasets])
+    thresholds = np.linspace(0, max_conf, 200) # 200 data points per plot
+    if abs(max_conf - 1) < 0.01:
+        # We're dealing with probabilities: add more points near 1
+        thresholds = np.append(thresholds, np.linspace(0.99, 1, 100))
 
-    score_plot(results, output_dir, 'conf', 'score', dataset)
-    score_plot(results_harsh, output_dir, 'conf', 'harsh-score', dataset)
+    # For each model and dataset, compute the score for each threshold
+    results = defaultdict(lambda: defaultdict(list))        
+    results_harsh = defaultdict(lambda: defaultdict(list))        
+    for dataset in datasets:
+        for model, (labels, conf_levels) in all_data[dataset].items():
+            scores  = []
+            scores_harsh = []
+            for thresh in thresholds:
+                score = compute_score(labels, conf_levels, thresh, normalize, wrong_penalty=1)
+                scores.append(score)
+                score_harsh = compute_score(labels, conf_levels, thresh, normalize, wrong_penalty=2)
+                scores_harsh.append(score_harsh)
+            results[model][dataset] = scores
+            results_harsh[model][dataset] = scores_harsh
+            
+    # Now for each model and threshold, average the scores across datasets
+    overall_results = []
+    overall_results_harsh = []
+    for model in results:
+        results_for_model, results_for_model_harsh = [], []
+        for i in range(len(thresholds)):
+            scores_for_thresh = [results[model][dataset][i] for dataset in datasets]
+            scores_for_thresh_harsh = [results_harsh[model][dataset][i] for dataset in datasets]
+            precision = 3
+            round_fn = lambda x: round(x, precision) if normalize else x
+            avg_score = round_fn(np.mean(scores_for_thresh))
+            avg_score_harsh = round_fn(np.mean(scores_for_thresh_harsh))
+            results_for_model.append(avg_score)
+            results_for_model_harsh.append(avg_score_harsh)
+        overall_results.append((model, thresholds, results_for_model))
+        overall_results_harsh.append((model, thresholds, results_for_model_harsh))
+            
+    dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
+    score_plot(overall_results, output_dir, 'conf', 'score', dataset_name)
+    score_plot(overall_results_harsh, output_dir, 'conf', 'harsh-score', dataset_name)
     
 def main():
     if len(sys.argv) < 5:
@@ -261,12 +269,12 @@ def main():
             
     # Generating and saving plots
     all_aucs = dict()
-    for dataset, data in all_data.items():
-        all_aucs[dataset] = plot_and_save_roc_curves(data, output_dir, dataset, fpr_range=fpr_range)
-        plot_score_vs_conf_thresholds(data, output_dir, dataset)
-        # plot_and_save_aupr_curves(data, output_dir, dataset)
+    for dataset in all_data:
+        all_aucs[dataset] = plot_roc_curves(all_data, output_dir, dataset, fpr_range=fpr_range)
+        plot_score_vs_conf_thresholds(all_data, output_dir, [dataset])
         # plot_accuracy_vs_confidence(data, output_dir, dataset)
-    meta_plots(all_data, all_aucs, output_dir)
+    auc_acc_plots(all_data, all_aucs, output_dir)
+    plot_score_vs_conf_thresholds(all_data, output_dir, all_data.keys())
 
 if __name__ == "__main__":
     main()
