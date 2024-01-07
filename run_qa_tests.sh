@@ -33,9 +33,9 @@ get_batch_size() {
         "Falcon-40b")
             batch_size=10
             ;;
-	    "Falcon-7b")
-	        batch_size=253
-	        ;;
+	"Falcon-7b")
+	    batch_size=168
+	    ;;
         "Mistral"|"Zephyr"|"Solar")
             batch_size=128
             ;;
