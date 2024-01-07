@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Check if the correct number of arguments are provided
-if [ "$#" -ne 5 ]; then
+if [ "$#" -ne 4 ]; then
     echo "Error: Incorrect number of arguments."
-    echo "Usage: ./run_qa_tests.sh 'model1,model2' 'dataset1,dataset2' 'question_range1,question_range2' normalize_logits abstain_option"
+    echo "Usage: ./run_qa_tests.sh 'model1,model2' 'dataset1,dataset2' 'question_range1,question_range2' abstain_option"
     exit 1
 fi
 
@@ -11,8 +11,7 @@ fi
 IFS=',' read -r -a model_options <<< "$1"
 IFS=',' read -r -a dataset_options <<< "$2"
 IFS=',' read -r -a question_ranges <<< "$3"
-normalize_logits="$4"
-abstain_option="$5"
+abstain_option="$4"
 
 # Function to determine batch_size based on model and dataset names
 get_batch_size() {
@@ -35,6 +34,9 @@ get_batch_size() {
             ;;
 	"Falcon-7b")
 	    batch_size=168
+	    ;;
+	"Yi-6b")
+	    batch_size=1
 	    ;;
         "Mistral"|"Zephyr"|"Solar")
             batch_size=128
@@ -66,11 +68,11 @@ do
             batch_size=$(get_batch_size "$model" "$dataset")
 
             # Define log file name
-            log_file="logs/${model}_${dataset}_${question_range}_normalize-logits-${normalize_logits}_abstain-option-${abstain_option}_log.txt"
+            log_file="logs/${model}_${dataset}_${question_range}_abstain-option-${abstain_option}_log.txt"
 
             # Running the command with the arguments
-            echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size --normalize_logits=$normalize_logits --abstain_option=$abstain_option"
-            python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --normalize_logits="$normalize_logits" --abstain_option="$abstain_option" --max_new_tokens=100 --num_top_tokens=1 &> "$log_file"
+            echo -e "\nRunning take_qa_test.py with arguments: --model=$model --dataset=$dataset --question_range=$question_range --batch_size=$batch_size --abstain_option=$abstain_option"
+            python take_qa_test.py --model="$model" --dataset="$dataset" --question_range="$question_range" --batch_size="$batch_size" --abstain_option="$abstain_option" --max_new_tokens=100 --num_top_tokens=1 &> "$log_file"
         done
     done
 done

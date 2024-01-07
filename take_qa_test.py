@@ -57,22 +57,23 @@ class Test(object):
         else:
             raise Exception(f"Unknown answer format: {answer}")
 
-    def write_output(self, grades, confidence_levels):
+    def write_output(self, grades, conf_levels_normed, conf_levels_raw):
         dataset_str = self.args['dataset'].split("/")[-1]
         abstain_str = "_yes_abst" if self.args['abstain_option'] else "_no_abst"
-        logit_str = "_norm_logits" if self.args['normalize_logits'] else "_raw_logits"
+        logit_strs = ["_norm_logits", "_raw_logits"]
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
-        output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}.txt"
-        print('\nWriting results to', output_filepath)
-        with open(output_filepath, 'w') as f:
-            f.write("grade confidence_level\n")
-            for (g,c) in zip(grades, confidence_levels):
-                g_str = ("Correct" if g == 1
-                         else "Abstained" if g == 0
-                         else "Wrong" if g == -1
-                         else "Unparseable")
-                f.write(f"{g_str} {c}\n")
+        for (logit_str, conf_levels) in zip(logit_strs, [conf_levels_normed, conf_levels_raw]):
+            output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}.txt"
+            print('\nWriting results to', output_filepath)
+            with open(output_filepath, 'w') as f:
+                f.write("grade confidence_level\n")
+                for (g,c) in zip(grades, conf_levels):
+                    g_str = ("Correct" if g == 1
+                             else "Abstained" if g == 0
+                             else "Wrong" if g == -1
+                             else "Unparseable")
+                    f.write(f"{g_str} {c}\n")
 
     def make_question_string(self, choices, question):
         if len(choices) > 25:
@@ -92,7 +93,7 @@ Response:\n
         # For some reason the final newline makes the Falcon models act really weird
         return prompt if 'Falcon' not in self.args['model'] else prompt[:-1]
 
-    def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices):
+    def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
         # Find the max probability for the token which determines the answer
         confidence_levels = [None] * len(text_outputs)
         for (i, response) in enumerate(text_outputs):
@@ -102,7 +103,7 @@ Response:\n
             token_idx1 = self.model.token_idx_of_first_target(response, main_targets)
             token_idx2 = self.model.token_idx_of_first_target(response, backup_targets)
             token_idx = token_idx1 if token_idx1 != -1 else token_idx2
-            (conf, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=self.args['normalize_logits'])
+            (conf, _) = self.model.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=normalize)
             confidence_levels[i] = conf
         return confidence_levels
     
@@ -156,7 +157,7 @@ Response:\n
             choices_for_q = self.get_choices(question_data)
             question = self.get_q(question_data)
             correct_answer_text = choices_for_q[self.get_a(question_data)]
-                            
+            
             random.shuffle(choices_for_q)
             # Shuffle before adding abstain option; that should always be last
             if self.args['abstain_option']:
@@ -173,7 +174,8 @@ Response:\n
         # Batch inference
         print("Running inference...\n")
         (text_outputs, token_outputs, scores) = self.model.generate(prompts)
-        confidence_levels = self.compute_confidence_levels(text_outputs, token_outputs, scores, choices)
+        confidence_levels_normed = self.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=True)
+        confidence_levels_raw = self.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=False)
 
         # Grade outputs
         print("Grading answers...\n")
@@ -183,26 +185,27 @@ Response:\n
             print(f"LLM output: {llm_output}")
             (answer_output, grade) = self.grade_answer(choices[i], correct_answers[i], llm_output)
             print(f"LLM answer: {answer_output}\n")
-            confidence_str = generate_text.t_to_str(confidence_levels[i])
+            conf_str = lambda x: 0 if generate_text.t_to_str(x)=='' else generate_text.t_to_str(x)
             # Sometimes we get "" because of how t_to_str works
-            print(f"Confidence level: {0 if confidence_str=='' else confidence_str}\n")
+            print(f"Confidence level normalized: {conf_str(confidence_levels_normed[i])}\n")
+            print(f"Confidence level raw: {conf_str(confidence_levels_raw[i])}\n")
             grades[i] = grade
-        return (grades, confidence_levels)
+        return (grades, confidence_levels_normed, confidence_levels_raw)
 
 def main():
     random.seed(2549900867) # We'll randomize the order of questions and of answer choices, but we want every run to have the same randomization
     args = generate_text.parse_args()
     test = Test(args)
-    all_grades = []
-    all_confidence_levels = []
+    all_grades, all_conf_levels_normed, all_conf_levels_raw = [], [], []
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
         end_q = min(start_q + args['batch_size'], test.end_q)
         if args['batch_size'] > 1:
             print(f"\nSTARTING NEW BATCH: questions {start_q} to {end_q}\n")
-        (grades, confidence_levels) = test.run_test(start_q, end_q)
+        (grades, conf_levels_normed, conf_levels_raw) = test.run_test(start_q, end_q)
         all_grades += grades
-        all_confidence_levels += confidence_levels
-    test.write_output(all_grades, all_confidence_levels)
+        all_conf_levels_normed += conf_levels_normed
+        all_conf_levels_raw += conf_levels_raw
+    test.write_output(all_grades, all_conf_levels_normed, all_conf_levels_raw)
 
 if __name__ == '__main__':
     main()
