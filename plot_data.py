@@ -19,6 +19,8 @@ def parse_data(file_path, incl_unparseable):
         with open(file_path, 'r') as f:
             for line in f:
                 parts = line.strip().split()
+                # skip Abstained answers, which don't affect the score or auc
+                # skip Unparseable lines if incl_unparseable is False
                 if parts[0] in ("Correct", "Wrong") or (incl_unparseable and parts[0] == "Unparseable"):
                     labels.append(1 if parts[0] == "Correct" else 0)
                     scores.append(float(parts[1]))
