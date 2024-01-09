@@ -111,7 +111,7 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', no
     plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}: {dataset}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}_{dataset.replace(' ','_')}.png")
+    output_path = os.path.join(output_dir, f"{dataset.replace(' ','_')}_{ylabel}_vs_{xlabel}.png")
     
     plt.savefig(output_path)
     plt.close()
