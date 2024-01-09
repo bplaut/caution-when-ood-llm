@@ -199,7 +199,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, yscale='linear'):
     plt.legend(fontsize='small')
     generic_finalize_plot(output_dir, xlabel, ylabel, dataset)
     
-def plot_score_vs_conf_thresholds(all_data, output_dir, datasets, normalize=True):
+def plot_score_vs_conf_thresholds(all_data, output_dir, datasets, normalize=True, wrong_penalty=1):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
     max_conf = max([max([max(conf_levels) for _, (_, conf_levels) in all_data[dataset].items()])
                     for dataset in datasets])
@@ -210,42 +210,34 @@ def plot_score_vs_conf_thresholds(all_data, output_dir, datasets, normalize=True
 
     # For each model and dataset, compute the score for each threshold
     results = defaultdict(lambda: defaultdict(list))        
-    results_harsh = defaultdict(lambda: defaultdict(list))        
     for dataset in datasets:
         for model, (labels, conf_levels) in all_data[dataset].items():
             scores  = []
             scores_harsh = []
             for thresh in thresholds:
-                score = compute_score(labels, conf_levels, thresh, normalize, wrong_penalty=1)
+                score = compute_score(labels, conf_levels, thresh, normalize, wrong_penalty)
                 scores.append(score)
-                score_harsh = compute_score(labels, conf_levels, thresh, normalize, wrong_penalty=2)
-                scores_harsh.append(score_harsh)
             results[model][dataset] = scores
-            results_harsh[model][dataset] = scores_harsh
             
     # Now for each model and threshold, average the scores across datasets
     overall_results = []
-    overall_results_harsh = []
     for model in results:
-        results_for_model, results_for_model_harsh = [], []
+        results_for_model = []
         for i in range(len(thresholds)):
             # Some models might not have results for all datasets (although eventually they should)
             scores_for_thresh = [results[model][dataset][i] for dataset in results[model]]
-            scores_for_thresh_harsh = [results_harsh[model][dataset][i] for dataset in results[model]]
             precision = 3
             round_fn = lambda x: round(x, precision) if normalize else x
             avg_score = round_fn(np.mean(scores_for_thresh))
-            avg_score_harsh = round_fn(np.mean(scores_for_thresh_harsh))
             results_for_model.append(avg_score)
-            results_for_model_harsh.append(avg_score_harsh)
         overall_results.append((model, thresholds, results_for_model))
-        overall_results_harsh.append((model, thresholds, results_for_model_harsh))
             
     dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
-    score_plot(overall_results, output_dir, 'conf', 'score', dataset_name)
-    score_plot(overall_results_harsh, output_dir, 'conf', 'harsh-score', dataset_name)
+    ylabel = 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else f'score with wrong penalty {wrong_penalty}'
+    score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name)
     
 def main():
+    # Setup
     if len(sys.argv) < 5:
         print("Usage: python plot_data.py <output_directory> <incl_unparseable> <fpr_range> <data_file1> [<data_file2> ...]")
         sys.exit(1)
@@ -256,8 +248,7 @@ def main():
     incl_unparseable = (False if sys.argv[2].lower() == 'false' else
                         True if sys.argv[2].lower() == 'true' else None)
     if incl_unparseable is None:
-        raise Exception('Second argument incl_unparseable must be a boolean (True or False)')
-        
+        raise Exception('Second argument incl_unparseable must be a boolean (True or False)')    
     file_paths = sys.argv[4:]
     print(f"Reading from {len(file_paths)} files...")
     fpr_range_str = sys.argv[3]
@@ -275,10 +266,11 @@ def main():
     all_aucs = dict()
     for dataset in all_data:
         all_aucs[dataset] = plot_roc_curves(all_data, output_dir, dataset, fpr_range=fpr_range)
-        plot_score_vs_conf_thresholds(all_data, output_dir, [dataset])
-        # plot_accuracy_vs_confidence(data, output_dir, dataset)
+        plot_score_vs_conf_thresholds(all_data, output_dir, [dataset], wrong_penalty=1)
+        plot_score_vs_conf_thresholds(all_data, output_dir, [dataset], wrong_penalty=2)
     auc_acc_plots(all_data, all_aucs, output_dir)
-    plot_score_vs_conf_thresholds(all_data, output_dir, all_data.keys())
+    plot_score_vs_conf_thresholds(all_data, output_dir, all_data.keys(), wrong_penalty=1)
+    plot_score_vs_conf_thresholds(all_data, output_dir, all_data.keys(), wrong_penalty=2)
 
 if __name__ == "__main__":
     main()
