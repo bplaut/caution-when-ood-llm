@@ -77,6 +77,9 @@ def plot_roc_curves(all_data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     plt.title(f'Receiver Operating Characteristic - {dataset}')
     plt.legend(loc="lower right")
     fpr_str = f"_fpr_{fpr_range[0]}_{fpr_range[1]}" if fpr_range != (0, 1) else ""
+    # Make output directory if it doesn't exist
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     output_path = os.path.join(output_dir, f"roc_curve_{dataset}{fpr_str}.png")
     plt.savefig(output_path)
     plt.close()
@@ -106,7 +109,10 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', no
     plt.xlabel(expand_label(xlabel))
     plt.ylabel(expand_label(ylabel))
     plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}: {dataset}')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}_{dataset.replace(' ','_')}.png")
+    
     plt.savefig(output_path)
     plt.close()
     print(f"{ylabel} vs {xlabel} for {dataset} saved --> {output_path}")
@@ -183,35 +189,47 @@ def compute_score(labels, conf_levels, thresh, normalize, wrong_penalty=1):
     total = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
     return total / len(labels) if normalize else total
 
-def score_plot(data, output_dir, xlabel, ylabel, dataset, yscale='linear'):
+def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dict(), yscale='linear'):
     plt.figure()
     plt.yscale(yscale)
 
     for (model, xs, ys) in data:
+        # Mark the provided threshold, or if none exists, the threshold with the highest score
+        if model in thresholds_to_mark:
+            thresh_to_mark = thresholds_to_mark[model]
+            thresh_idx = np.where(xs == thresh_to_mark)[0][0] # First zero idx is because np.where returns a tuple, second zero idx is because we only want the first index (although there should only be one)
+            score_to_mark = ys[thresh_idx]
+        else:
+            thresh_to_mark_idx = np.argmax(ys)
+            thresh_to_mark = xs[thresh_to_mark_idx]
+            score_to_mark = max(ys)
+        # zorder determines which objects are on top
+        plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # threshold of 0 is equivalent to the base model
-        max_y = max(ys)
-        max_x = xs[ys.index(max_y)]
-        plt.plot(xs, ys, label=f"{expand_model_name(model)}: {base_score} to {max_y}")
+        plt.plot(xs, ys, label=f"{expand_model_name(model)}: {base_score} to {score_to_mark}", zorder=2)
 
     # Add dashed black line at y=0
-    plt.plot([min(xs), max(xs)], [0, 0], color='black', linestyle='--')
+    overall_min_x = min([min(xs) for _, xs, _ in data])
+    overall_max_x = max([max(xs) for _, xs, _ in data])
+    plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='--')
 
     plt.legend(fontsize='small')
     generic_finalize_plot(output_dir, xlabel, ylabel, dataset)
     
-def plot_score_vs_conf_thresholds(all_data, output_dir, datasets, normalize=True, wrong_penalty=1):
+def plot_score_vs_conf_thresholds(data, output_dir, datasets, normalize=True, wrong_penalty=1, thresholds_to_mark=dict()):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
-    max_conf = max([max([max(conf_levels) for _, (_, conf_levels) in all_data[dataset].items()])
+    max_conf = max([max([max(conf_levels) for _, (_, conf_levels) in data[dataset].items()])
                     for dataset in datasets])
     thresholds = np.linspace(0, max_conf, 200) # 200 data points per plot
-    if abs(max_conf - 1) < 0.01:
-        # We're dealing with probabilities: add more points near 1
+    if abs(max_conf - 1) < 0.01: # We're dealing with probabilities: add more points near 1
         thresholds = np.append(thresholds, np.linspace(0.99, 1, 100))
+    # Add all keys in thresholds_to_mark to thresholds, and sort
+    thresholds = np.sort(np.unique(np.append(thresholds, list(thresholds_to_mark.values()))))
 
     # For each model and dataset, compute the score for each threshold
     results = defaultdict(lambda: defaultdict(list))        
     for dataset in datasets:
-        for model, (labels, conf_levels) in all_data[dataset].items():
+        for model, (labels, conf_levels) in data[dataset].items():
             scores  = []
             scores_harsh = []
             for thresh in thresholds:
@@ -221,6 +239,7 @@ def plot_score_vs_conf_thresholds(all_data, output_dir, datasets, normalize=True
             
     # Now for each model and threshold, average the scores across datasets
     overall_results = []
+    optimal_thresholds = dict()
     for model in results:
         results_for_model = []
         for i in range(len(thresholds)):
@@ -231,11 +250,18 @@ def plot_score_vs_conf_thresholds(all_data, output_dir, datasets, normalize=True
             avg_score = round_fn(np.mean(scores_for_thresh))
             results_for_model.append(avg_score)
         overall_results.append((model, thresholds, results_for_model))
+        optimal_thresh_idx = np.argmax(results_for_model)
+        optimal_thresholds[model] = thresholds[optimal_thresh_idx]
             
     dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
     ylabel = 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else f'score with wrong penalty {wrong_penalty}'
-    score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name)
-    
+    score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name, thresholds_to_mark)
+    return optimal_thresholds # These may be used by other plots
+
+def train_and_test_score_plots(test_data, train_data, output_dir, datasets, normalize=True, wrong_penalty=1):
+    thresholds_to_mark = plot_score_vs_conf_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty)
+    plot_score_vs_conf_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=thresholds_to_mark)
+
 def main():
     # Setup
     if len(sys.argv) < 5:
@@ -243,8 +269,6 @@ def main():
         sys.exit(1)
 
     output_dir = sys.argv[1]
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
     incl_unparseable = (False if sys.argv[2].lower() == 'false' else
                         True if sys.argv[2].lower() == 'true' else None)
     if incl_unparseable is None:
@@ -258,19 +282,38 @@ def main():
     all_data = defaultdict(lambda: defaultdict(list))
     for file_path in file_paths:
         dataset, model = parse_file_name(os.path.basename(file_path))
-        labels, scores = parse_data(file_path, incl_unparseable)
-        old_labels, old_scores = all_data[dataset][model] if len(all_data[dataset][model]) > 0 else (np.array([]), np.array([]))
-        all_data[dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_scores, scores]))
+        labels, conf_levels = parse_data(file_path, incl_unparseable)
+        old_labels, old_conf_levels = all_data[dataset][model] if len(all_data[dataset][model]) > 0 else (np.array([]), np.array([]))
+        all_data[dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]))
+
+    # Split data into train and test. We don't have to shuffle, since question order is already randomized
+    train_data, test_data = defaultdict(dict), defaultdict(dict)
+    for dataset in all_data:
+        for model in all_data[dataset]:
+            labels, conf_levels = all_data[dataset][model]
+            n = len(labels)
+            train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2])
+            test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:])
             
     # Generating and saving plots
     all_aucs = dict()
     for dataset in all_data:
+        # Plots for all the data together
         all_aucs[dataset] = plot_roc_curves(all_data, output_dir, dataset, fpr_range=fpr_range)
         plot_score_vs_conf_thresholds(all_data, output_dir, [dataset], wrong_penalty=1)
         plot_score_vs_conf_thresholds(all_data, output_dir, [dataset], wrong_penalty=2)
-    auc_acc_plots(all_data, all_aucs, output_dir)
+
+        # Plots for train and test splits
+        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
+        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
+        
+    auc_acc_plots(all_data, all_aucs, output_dir) # We can do this now that we have all the aucs
+
+    # Same plots as before, but for all datasets together
     plot_score_vs_conf_thresholds(all_data, output_dir, all_data.keys(), wrong_penalty=1)
     plot_score_vs_conf_thresholds(all_data, output_dir, all_data.keys(), wrong_penalty=2)
-
+    train_and_test_score_plots(test_data, train_data, output_dir, all_data.keys(), wrong_penalty=1)
+    train_and_test_score_plots(test_data, train_data, output_dir, all_data.keys(), wrong_penalty=2)
+    
 if __name__ == "__main__":
     main()
