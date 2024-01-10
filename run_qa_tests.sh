@@ -35,7 +35,7 @@ get_batch_size() {
 	"Falcon-7b")
 	    batch_size=168
 	    ;;
-	"Yi-6b") # For some reason, this crashes for batch_size > 1
+	"Yi-6b"|"Yi-34b") # For some reason, this crashes for batch_size > 1
 	    batch_size=1
 	    ;;
         "Mistral"|"Zephyr"|"Solar")
