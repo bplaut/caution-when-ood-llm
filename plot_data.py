@@ -14,20 +14,25 @@ def parse_file_name(file_name):
 
 def parse_data(file_path, incl_unparseable):
     labels = []
-    scores = []
+    conf_levels = []
+    total_qs = 0
     try:
         with open(file_path, 'r') as f:
             for line in f:
                 parts = line.strip().split()
+                # skip header line
                 # skip Abstained answers, which don't affect the score or auc
                 # skip Unparseable lines if incl_unparseable is False
                 if parts[0] in ("Correct", "Wrong") or (incl_unparseable and parts[0] == "Unparseable"):
                     labels.append(1 if parts[0] == "Correct" else 0)
-                    scores.append(float(parts[1]))
+                    conf_levels.append(float(parts[1]))
+                if parts[0] in ("Correct", "Wrong", 'Abstained') or (incl_unparseable and parts[0] == "Unparseable"):
+                    # Abstentions don't affect the score, but we still want them for normalization
+                    total_qs += 1
     except IOError:
         print(f"Error opening file: {file_path}")
         sys.exit(1)
-    return labels, scores
+    return labels, conf_levels, total_qs
 
 def expand_model_name(name):
     return ('Mistral-7B' if name == 'Mistral' else
@@ -56,8 +61,8 @@ def model_size(name):
 def plot_roc_curves(all_data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     plt.figure()
     aucs = dict()
-    for model, (labels, scores) in all_data[dataset].items():
-        fpr, tpr, thresholds = roc_curve(labels, scores)
+    for model, (labels, conf_levels, _) in all_data[dataset].items():
+        fpr, tpr, thresholds = roc_curve(labels, conf_levels)
 
         # Filter the FPR and TPR based on the fpr_range
         valid_range = (fpr >= fpr_range[0]) & (fpr <= fpr_range[1])
@@ -86,11 +91,11 @@ def plot_roc_curves(all_data, output_dir, dataset, fpr_range=(0.0, 1.0)):
     print(f"ROC curve for {dataset} saved --> {output_path}")
     return aucs
     
-def compute_accuracy_per_confidence_bin(labels, scores, n_bins=10, min_conf=0):
+def compute_accuracy_per_confidence_bin(labels, conf_levels, n_bins=10, min_conf=0):
     bins = np.linspace(min_conf, 1, n_bins + 1)
     accuracies = []
     for i in range(len(bins) - 1): 
-        idx = (scores >= bins[i]) & (scores < bins[i + 1])
+        idx = (conf_levels >= bins[i]) & (conf_levels < bins[i + 1])
         bin_mid = (bins[i] + bins[i+1]) / 2
         if np.sum(idx) > 0:
             acc = np.mean(labels[idx] == 1)
@@ -119,8 +124,8 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', no
 
 def plot_accuracy_vs_confidence(data, output_dir, dataset):
     plt.figure()
-    for model, (labels, scores) in data.items():
-        accuracies = compute_accuracy_per_confidence_bin(labels, scores)
+    for model, (labels, conf_levels, _) in data.items():
+        accuracies = compute_accuracy_per_confidence_bin(labels, conf_levels)
         bins, accs = zip(*accuracies)
         accs = [a if a is not None else 0 for a in accs]  # Replace None with 0
         plt.plot(bins, accs, label=expand_model_name(model), marker='o')
@@ -170,7 +175,7 @@ def auc_acc_plots(all_data, all_aucs, output_dir):
                 model_aucs[model] = []
                 model_accs[model] = []    
             model_aucs[model].append(all_aucs[dataset][model])
-            (labels, _) = all_data[dataset][model]
+            (labels, _, _) = all_data[dataset][model]
             model_accs[model].append(np.mean(labels))
 
     model_sizes, avg_aucs, avg_accs, model_names = [], [], [], []
@@ -184,10 +189,10 @@ def auc_acc_plots(all_data, all_aucs, output_dir):
     # scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=True)
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', log_scale=False)
 
-def compute_score(labels, conf_levels, thresh, normalize, wrong_penalty=1):
+def compute_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty=1):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
-    total = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
-    return total / len(labels) if normalize else total
+    score = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
+    return score / total_qs if normalize else score
 
 def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dict(), yscale='linear'):
     plt.figure()
@@ -218,7 +223,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     
 def plot_score_vs_conf_thresholds(data, output_dir, datasets, normalize=True, wrong_penalty=1, thresholds_to_mark=dict()):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
-    max_conf = max([max([max(conf_levels) for _, (_, conf_levels) in data[dataset].items()])
+    max_conf = max([max([max(conf_levels) for _, (_,conf_levels,_) in data[dataset].items()])
                     for dataset in datasets])
     thresholds = np.linspace(0, max_conf, 200) # 200 data points per plot
     if abs(max_conf - 1) < 0.01: # We're dealing with probabilities: add more points near 1
@@ -229,11 +234,11 @@ def plot_score_vs_conf_thresholds(data, output_dir, datasets, normalize=True, wr
     # For each model and dataset, compute the score for each threshold
     results = defaultdict(lambda: defaultdict(list))        
     for dataset in datasets:
-        for model, (labels, conf_levels) in data[dataset].items():
+        for model, (labels, conf_levels, total_qs) in data[dataset].items():
             scores  = []
             scores_harsh = []
             for thresh in thresholds:
-                score = compute_score(labels, conf_levels, thresh, normalize, wrong_penalty)
+                score = compute_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty)
                 scores.append(score)
             results[model][dataset] = scores
             
@@ -282,18 +287,19 @@ def main():
     all_data = defaultdict(lambda: defaultdict(list))
     for file_path in file_paths:
         dataset, model = parse_file_name(os.path.basename(file_path))
-        labels, conf_levels = parse_data(file_path, incl_unparseable)
-        old_labels, old_conf_levels = all_data[dataset][model] if len(all_data[dataset][model]) > 0 else (np.array([]), np.array([]))
-        all_data[dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]))
+        labels, conf_levels, total_qs = parse_data(file_path, incl_unparseable)
+        old_labels, old_conf_levels, old_total_qs = all_data[dataset][model] if len(all_data[dataset][model]) > 0 else (np.array([]), np.array([]), 0)
+        all_data[dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
 
     # Split data into train and test. We don't have to shuffle, since question order is already randomized
     train_data, test_data = defaultdict(dict), defaultdict(dict)
     for dataset in all_data:
         for model in all_data[dataset]:
-            labels, conf_levels = all_data[dataset][model]
+            labels, conf_levels, total_qs = all_data[dataset][model]
+            # Unclear if dividing total_qs by 2 is the right thing to do here
             n = len(labels)
-            train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2])
-            test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:])
+            train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2], total_qs/2)
+            test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:], total_qs/2)
             
     # Generating and saving plots
     all_aucs = dict()
