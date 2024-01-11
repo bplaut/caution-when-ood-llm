@@ -85,19 +85,6 @@ def plot_roc_curves(all_data, output_dir, dataset):
     print(f"ROC curve for {dataset} saved --> {output_path}")
     return aucs
     
-def compute_accuracy_per_confidence_bin(labels, conf_levels, n_bins=10, min_conf=0):
-    bins = np.linspace(min_conf, 1, n_bins + 1)
-    accuracies = []
-    for i in range(len(bins) - 1): 
-        idx = (conf_levels >= bins[i]) & (conf_levels < bins[i + 1])
-        bin_mid = (bins[i] + bins[i+1]) / 2
-        if np.sum(idx) > 0:
-            acc = np.mean(labels[idx] == 1)
-            accuracies.append((bin_mid, acc))
-        else:
-            accuracies.append((bin_mid, None))
-    return accuracies
-
 def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', normalize=True, title_suffix=''):
     # No need to go too negative
     min_y_normed, min_y_unnormed = -0.15, -300
@@ -115,16 +102,6 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', no
     plt.savefig(output_path)
     plt.close()
     print(f"{ylabel} vs {xlabel} for {dataset} saved --> {output_path}")
-
-def plot_accuracy_vs_confidence(data, output_dir, dataset):
-    plt.figure()
-    for model, (labels, conf_levels, _) in data.items():
-        accuracies = compute_accuracy_per_confidence_bin(labels, conf_levels)
-        bins, accs = zip(*accuracies)
-        accs = [a if a is not None else 0 for a in accs]  # Replace None with 0
-        plt.plot(bins, accs, label=expand_model_name(model), marker='o')
-    plt.legend()
-    generic_finalize_plot(output_dir, 'conf', 'acc', dataset)
 
 def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel):
     plt.figure()
@@ -155,16 +132,12 @@ def auc_acc_plots(all_data, all_aucs, output_dir):
             (labels, _, _) = all_data[dataset][model]
             model_accs[model].append(np.mean(labels))
 
-    model_sizes, avg_aucs, avg_accs, model_names = [], [], [], []
+    avg_aucs, avg_accs, model_names = [], [], []
     for model in model_aucs:
-        model_sizes.append(model_size(model))
         avg_aucs.append(np.mean(model_aucs[model]))
         avg_accs.append(np.mean(model_accs[model]))
         model_names.append(model)
 
-    # Old plots of model size vs accuracy and AUC are currently unused
-    # scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc')
-    # scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc')
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc')
 
 def compute_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty=1):
@@ -177,7 +150,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plt.yscale(yscale)
 
     for (model, xs, ys) in data:
-        # Mark the provided threshold, or if none exists, the threshold with the highest score
+        # Mark the provided threshold if given, else mark the threshold with the best score
         if model in thresholds_to_mark:
             thresh_to_mark = thresholds_to_mark[model]
             thresh_idx = np.where(xs == thresh_to_mark)[0][0] # First zero idx is because np.where returns a tuple, second zero idx is because we only want the first index (although there should only be one)
@@ -239,7 +212,7 @@ def plot_score_vs_conf_thresholds(data, output_dir, datasets, normalize=True, wr
     dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
     ylabel = 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else f'score with wrong penalty {wrong_penalty}'
     score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name, thresholds_to_mark)
-    return optimal_thresholds # These may be used by other plots
+    return optimal_thresholds # These are used the train/test context
 
 def train_and_test_score_plots(test_data, train_data, output_dir, datasets, normalize=True, wrong_penalty=1):
     thresholds_to_mark = plot_score_vs_conf_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty)
