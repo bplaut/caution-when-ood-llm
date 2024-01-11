@@ -250,7 +250,6 @@ def main():
     if len(sys.argv) < 5:
         print("Usage: python plot_data.py <output_directory> <incl_unparseable> <dataset1,dataset2,...> <data_file1> [<data_file2> ...]")
         sys.exit(1)
-
     output_dir = sys.argv[1]
     incl_unparseable = (False if sys.argv[2].lower() == 'false' else
                         True if sys.argv[2].lower() == 'true' else None)
@@ -259,8 +258,10 @@ def main():
     file_paths = sys.argv[4:]
     print(f"Reading from {len(file_paths)} files...")
     datasets_to_analyze = sys.argv[3].split(',')
-    if any([dataset not in ('arc', 'hellaswag', 'mmlu', 'piqa', 'truthfulqa', 'winogrande') for dataset in datasets_to_analyze]):
-        raise Exception(f'Third argument must be a comma-separated list of datasets. Unsupported dataset: {dataset}')
+    if any([dataset not in ('arc', 'hellaswag', 'mmlu', 'piqa', 'truthfulqa', 'winogrande','all') for dataset in datasets_to_analyze]):
+        raise Exception(f'Third argument must be a comma-separated list of datasets or "all"')
+    if 'all' in datasets_to_analyze:
+        datasets_to_analyze = ['arc', 'hellaswag', 'mmlu', 'piqa', 'truthfulqa', 'winogrande']
 
     # Data aggregation
     all_data = defaultdict(lambda: defaultdict(list))
@@ -271,12 +272,11 @@ def main():
             old_labels, old_conf_levels, old_total_qs = all_data[dataset][model] if len(all_data[dataset][model]) > 0 else (np.array([]), np.array([]), 0)
             all_data[dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
 
-    # Split data into train and test. We don't have to shuffle, since question order is already randomized
+    # Split into train and test. We don't have to shuffle, since question order is already randomized
     train_data, test_data = defaultdict(dict), defaultdict(dict)
     for dataset in all_data:
         for model in all_data[dataset]:
             labels, conf_levels, total_qs = all_data[dataset][model]
-            # Unclear if dividing total_qs by 2 is the right thing to do here
             n = len(labels)
             train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2], total_qs/2)
             test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:], total_qs/2)
@@ -296,10 +296,11 @@ def main():
     auc_acc_plots(all_data, all_aucs, output_dir) # We can do this now that we have all the aucs
 
     # Same plots as before, but for all datasets together
-    plot_score_vs_conf_thresholds(all_data, output_dir, datasets_to_analyze, wrong_penalty=1)
-    plot_score_vs_conf_thresholds(all_data, output_dir, datasets_to_analyze, wrong_penalty=2)
-    train_and_test_score_plots(test_data, train_data, output_dir, datasets_to_analyze, wrong_penalty=1)
-    train_and_test_score_plots(test_data, train_data, output_dir, datasets_to_analyze, wrong_penalty=2)
+    datasets = list(all_data.keys())
+    plot_score_vs_conf_thresholds(all_data, output_dir, datasets, wrong_penalty=1)
+    plot_score_vs_conf_thresholds(all_data, output_dir, datasets, wrong_penalty=2)
+    train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1)
+    train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)
     
 if __name__ == "__main__":
     main()
