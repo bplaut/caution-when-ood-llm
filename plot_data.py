@@ -5,6 +5,7 @@ import sys
 import os
 from collections import defaultdict
 from adjustText import adjust_text
+from scipy.stats import linregress
 
 def parse_file_name(file_name):
     parts = file_name.split('_')
@@ -105,7 +106,7 @@ def compute_accuracy_per_confidence_bin(labels, conf_levels, n_bins=10, min_conf
             accuracies.append((bin_mid, None))
     return accuracies
 
-def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', normalize=True):
+def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', normalize=True, title_suffix=''):
     # No need to go too negative
     min_y_normed, min_y_unnormed = -0.15, -300
     curr_min_y = plt.ylim()[0]
@@ -114,7 +115,7 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', no
 
     plt.xlabel(expand_label(xlabel))
     plt.ylabel(expand_label(ylabel))
-    plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}: {dataset}')
+    plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}: {dataset}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     output_path = os.path.join(output_dir, f"{dataset.replace(' ','_')}_{ylabel}_vs_{xlabel}.png")
@@ -135,18 +136,18 @@ def plot_accuracy_vs_confidence(data, output_dir, dataset):
 
 def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel):
     plt.figure()
+    xs, ys = np.array(xs), np.array(ys)
     scatter = plt.scatter(xs, ys)
     texts = []
     for i in range(len(model_names)):
         texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))    
     adjust_text(texts)
 
-    # Fit and plot regression line appropriate to the scale
-    z = np.polyfit(xs, ys, 1)
-    p = np.poly1d(z)
-    plt.plot(xs, p(xs), "r-")
+    # Fit and plot linear regression line
+    slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
+    plt.plot(xs, intercept + slope * xs, 'r-')
 
-    generic_finalize_plot(output_dir, xlabel, ylabel)
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f' (r = {r_value:.2f})')
            
 def auc_acc_plots(all_data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
@@ -170,9 +171,9 @@ def auc_acc_plots(all_data, all_aucs, output_dir):
         model_names.append(model)
 
     # Old plots of model size vs accuracy and AUC are currently unused
-    # scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc', log_scale=True)
-    # scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=True)
-    scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', log_scale=False)
+    # scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc')
+    # scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc')
+    scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc')
 
 def compute_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty=1):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
