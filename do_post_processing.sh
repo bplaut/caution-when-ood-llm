@@ -34,10 +34,10 @@ echo -e "\nMaking figures for raw logits & yes abstain option excluding PIQA...\
 python plot_data.py figs/no_piqa/yes_abstain_raw_logits True arc,hellaswag,mmlu,truthfulqa,winogrande results/*yes_abst_raw_logits.txt
 
 echo -e "\nMaking figures for normed logits & no abstain option excluding PIQA and winogrande...\n"
-python plot_data.py figs/no_piqa_and_winogrande/no_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa,winogrande results/*no_abst_norm_logits.txt
+python plot_data.py figs/no_piqa_and_winogrande/no_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa results/*no_abst_norm_logits.txt
 echo -e "\nMaking figures for raw logits & no abstain option excluding PIQA and winogrande...\n"
-python plot_data.py figs/no_piqa_and_winogrande/no_abstain_raw_logits True arc,hellaswag,mmlu,truthfulqa,winogrande results/*no_abst_raw_logits.txt
+python plot_data.py figs/no_piqa_and_winogrande/no_abstain_raw_logits True arc,hellaswag,mmlu,truthfulqa results/*no_abst_raw_logits.txt
 echo -e "\nMaking figures for normed logits & yes abstain option excluding PIQA and winogrande...\n"
-python plot_data.py figs/no_piqa_and_winogrande/yes_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa,winogrande results/*yes_abst_norm_logits.txt
+python plot_data.py figs/no_piqa_and_winogrande/yes_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa results/*yes_abst_norm_logits.txt
 echo -e "\nMaking figures for raw logits & yes abstain option excluding PIQA and winogrande...\n"
-python plot_data.py figs/no_piqa_and_winogrande/yes_abstain_raw_logits True arc,hellaswag,mmlu,truthfulqa,winogrande results/*yes_abst_raw_logits.txt
+python plot_data.py figs/no_piqa_and_winogrande/yes_abstain_raw_logits True arc,hellaswag,mmlu,truthfulqa results/*yes_abst_raw_logits.txt
