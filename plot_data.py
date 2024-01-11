@@ -133,35 +133,18 @@ def plot_accuracy_vs_confidence(data, output_dir, dataset):
     plt.legend()
     generic_finalize_plot(output_dir, 'conf', 'acc', dataset)
 
-def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, log_scale=True):
+def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel):
     plt.figure()
-    # Set x-axis scale based on log_scale parameter
-    if log_scale:
-        plt.xscale('log')
-        x_for_fit = np.log(xs)  # log transform for fitting
-    else:
-        x_for_fit = xs
-
     scatter = plt.scatter(xs, ys)
-    
-    # Adjust x-ticks for log-scale
-    if log_scale:
-        max_x = max(xs)
-        tick_values = [x for x in range(10, int(max_x) + 10, 10)]
-        plt.xticks(tick_values, [f'{x}B' for x in tick_values])
-
     texts = []
     for i in range(len(model_names)):
         texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))    
     adjust_text(texts)
 
     # Fit and plot regression line appropriate to the scale
-    z = np.polyfit(x_for_fit, ys, 1)
+    z = np.polyfit(xs, ys, 1)
     p = np.poly1d(z)
-    if log_scale:
-        plt.plot(xs, p(np.log(xs)), "r-")
-    else:
-        plt.plot(xs, p(xs), "r-")
+    plt.plot(xs, p(xs), "r-")
 
     generic_finalize_plot(output_dir, xlabel, ylabel)
            
