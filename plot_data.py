@@ -60,34 +60,26 @@ def model_size(name):
     size_term = full_name.split('-')[-1]
     return 46.7 if name == 'Mixtral' else float(size_term[:-1])
 
-def plot_roc_curves(all_data, output_dir, dataset, fpr_range=(0.0, 1.0)):
+def plot_roc_curves(all_data, output_dir, dataset):
     plt.figure()
     aucs = dict()
     for model, (labels, conf_levels, _) in all_data[dataset].items():
-        fpr, tpr, thresholds = roc_curve(labels, conf_levels)
-
-        # Filter the FPR and TPR based on the fpr_range
-        valid_range = (fpr >= fpr_range[0]) & (fpr <= fpr_range[1])
-        fpr_filtered = fpr[valid_range]
-        tpr_filtered = tpr[valid_range]
-
-        # Calculate the partial AUROC
-        roc_auc = auc(fpr_filtered, tpr_filtered)
+        fpr, tpr, _ = roc_curve(labels, conf_levels)
+        roc_auc = auc(fpr, tpr)
         aucs[model] = roc_auc
-        plt.plot(fpr_filtered, tpr_filtered, lw=2, label=f'{expand_model_name(model)} (area = {roc_auc:.2f})')
+        plt.plot(fpr, tpr, lw=2, label=f'{expand_model_name(model)} (area = {roc_auc:.2f})')
 
     plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='--')
-    plt.xlim([fpr_range[0], fpr_range[1]])
-    plt.ylim([0.0, 1.0])
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title(f'Receiver Operating Characteristic - {dataset}')
     plt.legend(loc="lower right")
-    fpr_str = f"_fpr_{fpr_range[0]}_{fpr_range[1]}" if fpr_range != (0, 1) else ""
     # Make output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"roc_curve_{dataset}{fpr_str}.png")
+    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.png")
     plt.savefig(output_path)
     plt.close()
     print(f"ROC curve for {dataset} saved --> {output_path}")
@@ -255,8 +247,8 @@ def train_and_test_score_plots(test_data, train_data, output_dir, datasets, norm
 
 def main():
     # Setup
-    if len(sys.argv) < 5:
-        print("Usage: python plot_data.py <output_directory> <incl_unparseable> <fpr_range> <data_file1> [<data_file2> ...]")
+    if len(sys.argv) < 4:
+        print("Usage: python plot_data.py <output_directory> <incl_unparseable> <data_file1> [<data_file2> ...]")
         sys.exit(1)
 
     output_dir = sys.argv[1]
@@ -264,10 +256,8 @@ def main():
                         True if sys.argv[2].lower() == 'true' else None)
     if incl_unparseable is None:
         raise Exception('Second argument incl_unparseable must be a boolean (True or False)')    
-    file_paths = sys.argv[4:]
+    file_paths = sys.argv[3:]
     print(f"Reading from {len(file_paths)} files...")
-    fpr_range_str = sys.argv[3]
-    fpr_range = tuple(float(x) for x in fpr_range_str.split('-'))
 
     # Data aggregation
     all_data = defaultdict(lambda: defaultdict(list))
@@ -291,7 +281,7 @@ def main():
     all_aucs = dict()
     for dataset in all_data:
         # Plots for all the data together
-        all_aucs[dataset] = plot_roc_curves(all_data, output_dir, dataset, fpr_range=fpr_range)
+        all_aucs[dataset] = plot_roc_curves(all_data, output_dir, dataset)
         plot_score_vs_conf_thresholds(all_data, output_dir, [dataset], wrong_penalty=1)
         plot_score_vs_conf_thresholds(all_data, output_dir, [dataset], wrong_penalty=2)
 
