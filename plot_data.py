@@ -42,6 +42,7 @@ def expand_model_name(name):
             'Llama2-7B' if name == 'Llama-7b' else
             'Llama2-70B' if name == 'Llama-70b' else
             'Yi-6B' if name == 'Yi-6b' else
+            'Yi-34B' if name == 'Yi-34b' else
             'Falcon-7B' if name == 'Falcon-7b' else
             'Falcon-40B' if name == 'Falcon-40b' else name)
 
@@ -185,6 +186,7 @@ def auc_acc_plots(all_data, all_aucs, output_dir):
         avg_accs.append(np.mean(model_accs[model]))
         model_names.append(model)
 
+    # Old plots of model size vs accuracy and AUC are currently unused
     # scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc', log_scale=True)
     # scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', log_scale=True)
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', log_scale=False)
