@@ -90,8 +90,8 @@ Question:
 
 Response:\n
 """
-        # For some reason the final newline makes the Falcon models act really weird
-        return prompt if 'Falcon' not in self.args['model'] else prompt[:-1]
+        # For some reason the final newline makes Falcon-7b act really weird
+        return prompt if self.args['model'] != 'Falcon-7b' else prompt[:-1]
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
         # Find the max probability for the token which determines the answer
