@@ -212,7 +212,7 @@ def plot_score_vs_conf_thresholds(data, output_dir, datasets, normalize=True, wr
     dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
     ylabel = 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else f'score with wrong penalty {wrong_penalty}'
     score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name, thresholds_to_mark)
-    return optimal_thresholds # These are used the train/test context
+    return optimal_thresholds # We use this return value in the train/test context
 
 def train_and_test_score_plots(test_data, train_data, output_dir, datasets, normalize=True, wrong_penalty=1):
     thresholds_to_mark = plot_score_vs_conf_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty)

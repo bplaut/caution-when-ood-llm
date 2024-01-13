@@ -205,7 +205,8 @@ def main():
         all_grades += grades
         all_conf_levels_normed += conf_levels_normed
         all_conf_levels_raw += conf_levels_raw
-    test.write_output(all_grades, all_conf_levels_normed, all_conf_levels_raw)
+    if len(all_grades) > 0: # E.g. if the dataset only has 817 qs but you ask to run qs 1000-1500
+        test.write_output(all_grades, all_conf_levels_normed, all_conf_levels_raw)
 
 if __name__ == '__main__':
     main()
