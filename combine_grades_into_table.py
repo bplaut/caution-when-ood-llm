@@ -38,9 +38,9 @@ def write_to_table(output_filepath, all_grades):
         f.write('\\begin{document}\n')
         for dataset_name in sorted(all_grades.keys()):
             f.write(f'\\section*{{Dataset: {dataset_name}}}\n')
-            f.write('\\begin{tabular}{c|c|c|c|c|c|c|c|c}\n')
+            f.write('\\begin{tabular}{c|c|c|c|c|c|c|c|c|c}\n')
             f.write('\\hline\n')
-            f.write('Model name & Correct & Wrong & Abstained & C - W & $\\frac{\\text{C-W}}{\\text{Total}}$ & TPR & FPR & Total \\\\\n')
+            f.write('Model name & Correct & Wrong & Abst. & C - W & $\\frac{\\text{C-W}}{\\text{Total}}$ & Acc. & TPR & FPR & Total \\\\\n')
             f.write('\\hline\n')
             for row_name in sorted(all_grades[dataset_name].keys()):
                 correct = all_grades[dataset_name][row_name]['Correct']
@@ -53,9 +53,9 @@ def write_to_table(output_filepath, all_grades):
                 tpr = round(all_grades[dataset_name][row_name]['TP'] / all_grades[dataset_name][row_name]['P'], 3) if all_grades[dataset_name][row_name]['P'] > 0 else '-'
                 # bold rows for base models
                 if "base model" in row_name:
-                    f.write(f'\\textbf{{{row_name}}} & \\textbf{{{correct}}} & \\textbf{{{wrong}}} & \\textbf{{{abstained}}} & \\textbf{{{correct - wrong}}} & \\textbf{{{net_score}}}  & \\textbf{{{tpr}}} & \\textbf{{{fpr}}} & {correct + wrong + abstained} \\\\\n')
+                    f.write(f'\\textbf{{{row_name}}} & \\textbf{{{correct}}} & \\textbf{{{wrong}}} & \\textbf{{{abstained}}} & \\textbf{{{correct - wrong}}} & \\textbf{{{net_score}}} & \\textbf{{{accuracy}}}  & \\textbf{{{tpr}}} & \\textbf{{{fpr}}} & {correct + wrong + abstained} \\\\\n')
                 else:
-                    f.write(f'{row_name} & {correct} & {wrong} & {abstained} & {correct - wrong} & {net_score} & {tpr} & {fpr} & {correct + wrong + abstained} \\\\\n')
+                    f.write(f'{row_name} & {correct} & {wrong} & {abstained} & {correct - wrong} & {net_score} & {accuracy} & {tpr} & {fpr} & {correct + wrong + abstained} \\\\\n')
                 f.write('\\hline\n')
             f.write('\\end{tabular}\n')
             f.write('\\newpage\n')  # Optional: Start each group table on a new page                          
