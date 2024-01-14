@@ -140,7 +140,28 @@ def auc_acc_plots(all_data, all_aucs, output_dir):
 
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc')
 
-def compute_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty=1):
+def mcc_score(labels, conf_levels, thresh):
+    # MCC = (TP*TN - FP*FN) / sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+    # TP is when label is 1 and conf >= thresh
+    # TN is when label is 0 and conf < thresh
+    # FP is when label is 0 and conf >= thresh
+    # FN is when label is 1 and conf < thresh
+    TP, TN, FP, FN = 0, 0, 0, 0
+    for label, conf in zip(labels, conf_levels):
+        if conf < thresh:
+            if label == 0:
+                TN += 1
+            else:
+                FN += 1
+        else:
+            if label == 1:
+                TP += 1
+            else:
+                FP += 1
+    denom = np.sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+    return (TP*TN - FP*FN) / denom if denom != 0 else 0
+    
+def subtractive_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty=1):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
     score = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
     return score / total_qs if normalize else score
@@ -172,7 +193,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plt.legend(fontsize='small')
     generic_finalize_plot(output_dir, xlabel, ylabel, dataset)
     
-def plot_score_vs_conf_thresholds(data, output_dir, datasets, normalize=True, wrong_penalty=1, thresholds_to_mark=dict()):
+def plot_score_vs_thresholds(data, output_dir, datasets, normalize=True, wrong_penalty=1, thresholds_to_mark=dict(), score_type='subtractive'):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
     max_conf = max([max([max(conf_levels) for _, (_,conf_levels,_) in data[dataset].items()])
                     for dataset in datasets])
@@ -189,7 +210,12 @@ def plot_score_vs_conf_thresholds(data, output_dir, datasets, normalize=True, wr
             scores  = []
             scores_harsh = []
             for thresh in thresholds:
-                score = compute_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty)
+                if score_type == 'subtractive':
+                    score = subtractive_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty)
+                elif score_type == 'mcc':
+                    score = mcc_score(labels, conf_levels, thresh)
+                else:
+                    raise Exception(f'Unknown score type {score_type}')
                 scores.append(score)
             results[model][dataset] = scores
             
@@ -210,13 +236,13 @@ def plot_score_vs_conf_thresholds(data, output_dir, datasets, normalize=True, wr
         optimal_thresholds[model] = thresholds[optimal_thresh_idx]
             
     dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
-    ylabel = 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else f'score with wrong penalty {wrong_penalty}'
+    ylabel = 'MCC' if score_type == 'mcc' else 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else 'unknown'
     score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name, thresholds_to_mark)
     return optimal_thresholds # We use this return value in the train/test context
 
-def train_and_test_score_plots(test_data, train_data, output_dir, datasets, normalize=True, wrong_penalty=1):
-    thresholds_to_mark = plot_score_vs_conf_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty)
-    plot_score_vs_conf_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=thresholds_to_mark)
+def train_and_test_score_plots(test_data, train_data, output_dir, datasets, normalize=True, wrong_penalty=1, score_type='subtractive'):
+    thresholds_to_mark = plot_score_vs_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty, score_type=score_type)
+    plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=thresholds_to_mark, score_type=score_type)
 
 def main():
     # Setup
@@ -259,21 +285,26 @@ def main():
     for dataset in all_data:
         # Plots for all the data together
         all_aucs[dataset] = plot_roc_curves(all_data, output_dir, dataset)
-        plot_score_vs_conf_thresholds(all_data, output_dir, [dataset], wrong_penalty=1)
-        plot_score_vs_conf_thresholds(all_data, output_dir, [dataset], wrong_penalty=2)
+        # subtractive score (correct - wrong * wrong_penalty) is the default
+        plot_score_vs_thresholds(all_data, output_dir, [dataset], wrong_penalty=1)
+        plot_score_vs_thresholds(all_data, output_dir, [dataset], wrong_penalty=2)
+        plot_score_vs_thresholds(all_data, output_dir, [dataset], score_type='mcc')
 
         # Plots for train and test splits
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
+        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], score_type='mcc')
         
     auc_acc_plots(all_data, all_aucs, output_dir) # We can do this now that we have all the aucs
 
     # Same plots as before, but for all datasets together
     datasets = list(all_data.keys())
-    plot_score_vs_conf_thresholds(all_data, output_dir, datasets, wrong_penalty=1)
-    plot_score_vs_conf_thresholds(all_data, output_dir, datasets, wrong_penalty=2)
+    plot_score_vs_thresholds(all_data, output_dir, datasets, wrong_penalty=1)
+    plot_score_vs_thresholds(all_data, output_dir, datasets, wrong_penalty=2)
+    plot_score_vs_thresholds(all_data, output_dir, datasets, score_type='mcc')
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1)
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)
+    train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
     
 if __name__ == "__main__":
     main()
