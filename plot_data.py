@@ -57,8 +57,18 @@ def expand_label(label):
 
 def model_size(name):
     full_name = expand_model_name(name)
-    size_term = full_name.split('-')[-1]
-    return 46.7 if name == 'Mixtral' else float(size_term[:-1])
+    size_term = full_name.split('-')[1]
+    end_of_size_term = size_term.rfind('B')
+    return 46.7 if name == 'Mixtral' else float(size_term[:end_of_size_term])
+
+def make_and_sort_legend():
+    # Each name is of the form "<model_series>-<size>: <stuff>". Sort by model_series, then by size
+    handles, names = plt.gca().get_legend_handles_labels()
+    model_series = lambda name: name.split('-')[0]
+    zipped = zip(handles, names)
+    sorted_zipped = sorted(zipped, key=lambda x: (model_series(x[1]), model_size(x[1])))
+    sorted_handles, sorted_names = zip(*sorted_zipped)
+    plt.legend(handles=sorted_handles, labels=sorted_names, fontsize='small')
 
 def plot_roc_curves(all_data, output_dir, dataset):
     plt.figure()
@@ -69,13 +79,14 @@ def plot_roc_curves(all_data, output_dir, dataset):
         aucs[model] = roc_auc
         plt.plot(fpr, tpr, lw=2, label=f'{expand_model_name(model)} (area = {roc_auc:.2f})')
 
+    make_and_sort_legend()
+    plt.legend(loc='lower right')
     plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='--')
     plt.xlim([0, 1])
     plt.ylim([0, 1])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title(f'Receiver Operating Characteristic - {dataset}')
-    plt.legend(loc="lower right")
     # Make output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -190,7 +201,8 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     overall_max_x = max([max(xs) for _, xs, _ in data])
     plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='--')
 
-    plt.legend(fontsize='small')
+    make_and_sort_legend()
+    plt.legend(loc='upper left')
     generic_finalize_plot(output_dir, xlabel, ylabel, dataset)
     
 def plot_score_vs_thresholds(data, output_dir, datasets, normalize=True, wrong_penalty=1, thresholds_to_mark=dict(), score_type='subtractive'):
