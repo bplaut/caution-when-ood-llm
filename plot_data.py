@@ -285,7 +285,7 @@ def main():
     for dataset in all_data:
         # Plots for all the data together
         all_aucs[dataset] = plot_roc_curves(all_data, output_dir, dataset)
-        # subtractive score (correct - wrong * wrong_penalty) is the default
+        # score = (correct - wrong * wrong_penalty) when score_type isn't given
         plot_score_vs_thresholds(all_data, output_dir, [dataset], wrong_penalty=1)
         plot_score_vs_thresholds(all_data, output_dir, [dataset], wrong_penalty=2)
         plot_score_vs_thresholds(all_data, output_dir, [dataset], score_type='mcc')
