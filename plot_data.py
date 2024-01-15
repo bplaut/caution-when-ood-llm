@@ -9,7 +9,8 @@ from scipy.stats import linregress
 
 def parse_file_name(file_name):
     # filename looks like <dataset>_<model>-q<startq>to<endq>_<group>.txt. Assume endq ends with 0
-    group = file_name.split('0')[-1][1:-4] # remove initial underscore and ending .txt
+    second_half = file_name[file_name.find('to'):]
+    group = second_half[second_half.find('_')+1:-4] # remove initial underscore and .txt
     parts = file_name.split('_')
     dataset = parts[0]
     model = parts[1].split('-q')[0]
@@ -61,7 +62,7 @@ def model_size(name):
     full_name = expand_model_name(name)
     size_term = full_name.split('-')[1]
     end_of_size_term = size_term.rfind('B')
-    return 46.7 if name == 'Mixtral' else float(size_term[:end_of_size_term])
+    return 46.7 if 'Mixtral' in name else float(size_term[:end_of_size_term])
 
 def make_and_sort_legend():
     # Each name is of the form "<model_series>-<size>: <stuff>". Sort by model_series, then by size
@@ -152,6 +153,7 @@ def auc_acc_plots(all_data, all_aucs, output_dir):
         model_names.append(model)
 
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc')
+    return avg_aucs, avg_accs, model_names # We'll use these for the cross-group plots
 
 def mcc_score(labels, conf_levels, thresh):
     # MCC = (TP*TN - FP*FN) / sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
@@ -282,8 +284,6 @@ def plots_for_group(data, output_dir):
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], score_type='mcc')
-        
-    auc_acc_plots(data, all_aucs, output_dir) # We can do this now that we have all the aucs
 
     # Same plots as before, but for all datasets together
     datasets = list(data.keys())
@@ -294,7 +294,8 @@ def plots_for_group(data, output_dir):
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
 
-    
+    return auc_acc_plots(data, all_aucs, output_dir) # We'll use the return value for cross-group plots
+        
 def main():
     # Setup
     if len(sys.argv) < 5:
@@ -322,9 +323,27 @@ def main():
             old_labels, old_conf_levels, old_total_qs = all_data[group][dataset][model]
             all_data[group][dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
 
+    group_data = dict()
     for group in all_data:
         print(f"\nGenerating plots for {group}\n")
-        plots_for_group(all_data[group], os.path.join(output_dir, group))
+        group_data[group] = plots_for_group(all_data[group], os.path.join(output_dir, group))
 
+    # Cross-group plots
+    # Plot AUC vs accuracy, but with different colors for each group
+    plt.figure()
+    texts = []
+    for group in group_data:
+        (xs, ys, model_names) = group_data[group]
+        xs, ys = np.array(xs), np.array(ys)
+        plt.scatter(xs, ys, label=group)
+        slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
+        # plt.plot(xs, intercept + slope * xs, 'r-')
+        for i in range(len(model_names)):
+            texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
+            
+    adjust_text(texts)
+    plt.legend(loc='lower right')
+    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True)
+    
 if __name__ == "__main__":
     main()
