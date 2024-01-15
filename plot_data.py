@@ -99,7 +99,7 @@ def plot_roc_curves(all_data, output_dir, dataset):
     print(f"ROC curve for {dataset} saved --> {output_path}")
     return aucs
     
-def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', normalize=True, title_suffix=''):
+def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', normalize=True, title_suffix='', filename_suffix=''):
     # No need to go too negative
     min_y_normed, min_y_unnormed = -0.15, -300
     curr_min_y = plt.ylim()[0]
@@ -111,7 +111,7 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', no
     plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}: {dataset}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"{dataset.replace(' ','_')}_{ylabel}_vs_{xlabel}.png")
+    output_path = os.path.join(output_dir, f"{dataset.replace(' ','_')}_{ylabel}_vs_{xlabel}{filename_suffix}.png")
     
     plt.savefig(output_path)
     plt.close()
@@ -343,8 +343,8 @@ def main():
             
     adjust_text(texts)
     plt.legend(loc='lower right')
-    title_suffix = '_' + '-'.join(group_data.keys())
-    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True, title_suffix=title_suffix)
+    filename_suffix = '-' + '-'.join(group_data.keys())
+    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True, filename_suffix=filename_suffix)
     
 if __name__ == "__main__":
     main()

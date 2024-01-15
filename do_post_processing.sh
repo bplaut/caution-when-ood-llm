@@ -18,19 +18,21 @@ thresholds1=${2:-0}
 thresholds2=${3:-0}
 
 echo -e "Making tables...\n"
-python combine_grades_into_table.py tables/no_abstain_normed_logits.tex $thresholds1 True $dir/*no_abst_norm_logits.txt
-python combine_grades_into_table.py tables/no_abstain_raw_logits.tex $thresholds2 True $dir/*no_abst_raw_logits.txt
-python combine_grades_into_table.py tables/yes_abstain_normed_logits.tex $thresholds1 True $dir/*yes_abst_norm_logits.txt
-python combine_grades_into_table.py tables/yes_abstain_raw_logits.tex $thresholds2 True $dir/*yes_abst_raw_logits.txt
+output_dir=tables/$dir
+python combine_grades_into_table.py $output_dir/no_abstain_normed_logits.tex $thresholds1 True $dir/*no_abst_norm_logits.txt
+python combine_grades_into_table.py $output_dir/no_abstain_raw_logits.tex $thresholds2 True $dir/*no_abst_raw_logits.txt
+python combine_grades_into_table.py $output_dir/yes_abstain_normed_logits.tex $thresholds1 True $dir/*yes_abst_norm_logits.txt
+python combine_grades_into_table.py $output_dir/yes_abstain_raw_logits.tex $thresholds2 True $dir/*yes_abst_raw_logits.txt
 
+output_dir=figs/$dir
 echo -e "\nMaking main figures...\n"
-python plot_data.py figs/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*yes_abst*.txt
-python plot_data.py figs/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*no_abst*.txt
+python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*yes_abst*.txt
+python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*no_abst*.txt
 
 echo -e "\nMaking figures for PIQA...\n"
-python plot_data.py figs/piqa/no_abstain_normed_logits True piqa $dir/*no_abst*.txt
-python plot_data.py figs/piqa/yes_abstain_normed_logits True piqa $dir/*yes_abst*.txt
+python plot_data.py $output_dir/piqa/no_abstain_normed_logits True piqa $dir/*no_abst*.txt
+python plot_data.py $output_dir/piqa/yes_abstain_normed_logits True piqa $dir/*yes_abst*.txt
 
 echo -e "\nMaking figures excluding winogrande...\n"
-python plot_data.py figs/no_winogrande/no_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa $dir/*no_abst*.txt
-python plot_data.py figs/no_winogrande/yes_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa $dir/*yes_abst*.txt
+python plot_data.py $output_dir/no_winogrande/no_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa $dir/*no_abst*.txt
+python plot_data.py $output_dir/no_winogrande/yes_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa $dir/*yes_abst*.txt

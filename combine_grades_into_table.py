@@ -67,6 +67,10 @@ def main():
         raise Exception('Usage: python combine_grades_into_table.py [output_filepath] [comma-separated list of confidence thresholds] [include unparseable grades] [add least one grades file]')
 
     output_filepath = sys.argv[1]
+    # create output directory if it doesn't exist
+    output_dir = '/'.join(output_filepath.split('/')[:-1])
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     thresholds = [float(t) for t in sys.argv[2].split(',')]
     incl_unparseable = (False if sys.argv[3].lower() == 'false' else
                         True if sys.argv[3].lower() == 'true' else None)
