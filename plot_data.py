@@ -292,7 +292,7 @@ def plots_for_group(data, output_dir):
     # plot_score_vs_thresholds(data, output_dir, datasets, score_type='mcc')
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1)
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)
-    #train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
+    # train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
 
     return auc_acc_plots(data, all_aucs, output_dir) # We'll use the return value for cross-group plots
         
@@ -328,8 +328,8 @@ def main():
         print(f"\nGenerating plots for {group}\n")
         group_data[group] = plots_for_group(all_data[group], os.path.join(output_dir, group))
 
-    # Cross-group plots
     # Plot AUC vs accuracy, but with different colors for each group
+    print("\nGenerating cross-group plot\n")
     plt.figure()
     texts = []
     for group in group_data:
