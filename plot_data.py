@@ -8,10 +8,12 @@ from adjustText import adjust_text
 from scipy.stats import linregress
 
 def parse_file_name(file_name):
+    # filename looks like <dataset>_<model>-q<startq>to<endq>_<group>.txt. Assume endq ends with 0
+    group = file_name.split('0')[-1][1:-4] # remove initial underscore and ending .txt
     parts = file_name.split('_')
     dataset = parts[0]
     model = parts[1].split('-q')[0]
-    return dataset, model
+    return dataset, model, group
 
 def parse_data(file_path, incl_unparseable):
     labels = []
@@ -256,6 +258,43 @@ def train_and_test_score_plots(test_data, train_data, output_dir, datasets, norm
     thresholds_to_mark = plot_score_vs_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty, score_type=score_type)
     plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=thresholds_to_mark, score_type=score_type)
 
+def plots_for_group(data, output_dir):
+    # Split into train and test. We don't have to shuffle, since question order is already randomized
+    train_data, test_data = defaultdict(dict), defaultdict(dict)
+    for dataset in data:
+        for model in data[dataset]:
+            labels, conf_levels, total_qs = data[dataset][model]
+            n = len(labels)
+            train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2], total_qs/2)
+            test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:], total_qs/2)
+            
+    # Generating and saving plots
+    all_aucs = dict()
+    for dataset in data:
+        # Plots for all the data together
+        all_aucs[dataset] = plot_roc_curves(data, output_dir, dataset)
+        # score = (correct - wrong * wrong_penalty) when score_type isn't given
+        plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=1)
+        plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=2)
+        plot_score_vs_thresholds(data, output_dir, [dataset], score_type='mcc')
+
+        # Plots for train and test splits
+        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
+        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
+        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], score_type='mcc')
+        
+    auc_acc_plots(data, all_aucs, output_dir) # We can do this now that we have all the aucs
+
+    # Same plots as before, but for all datasets together
+    datasets = list(data.keys())
+    plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1)
+    plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=2)
+    plot_score_vs_thresholds(data, output_dir, datasets, score_type='mcc')
+    train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1)
+    train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)
+    train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
+
+    
 def main():
     # Setup
     if len(sys.argv) < 5:
@@ -274,49 +313,18 @@ def main():
     if 'all' in datasets_to_analyze:
         datasets_to_analyze = ['arc', 'hellaswag', 'mmlu', 'piqa', 'truthfulqa', 'winogrande']
 
-    # Data aggregation
-    all_data = defaultdict(lambda: defaultdict(list))
+    # Data aggregation. We want all_data[group][dataset][model] = (labels, conf_levels, total_qs)
+    all_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: ([], [], 0))))
     for file_path in file_paths:
-        dataset, model = parse_file_name(os.path.basename(file_path))
+        dataset, model, group = parse_file_name(os.path.basename(file_path))
         if dataset in datasets_to_analyze:
             labels, conf_levels, total_qs = parse_data(file_path, incl_unparseable)
-            old_labels, old_conf_levels, old_total_qs = all_data[dataset][model] if len(all_data[dataset][model]) > 0 else (np.array([]), np.array([]), 0)
-            all_data[dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
+            old_labels, old_conf_levels, old_total_qs = all_data[group][dataset][model]
+            all_data[group][dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
 
-    # Split into train and test. We don't have to shuffle, since question order is already randomized
-    train_data, test_data = defaultdict(dict), defaultdict(dict)
-    for dataset in all_data:
-        for model in all_data[dataset]:
-            labels, conf_levels, total_qs = all_data[dataset][model]
-            n = len(labels)
-            train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2], total_qs/2)
-            test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:], total_qs/2)
-            
-    # Generating and saving plots
-    all_aucs = dict()
-    for dataset in all_data:
-        # Plots for all the data together
-        all_aucs[dataset] = plot_roc_curves(all_data, output_dir, dataset)
-        # score = (correct - wrong * wrong_penalty) when score_type isn't given
-        plot_score_vs_thresholds(all_data, output_dir, [dataset], wrong_penalty=1)
-        plot_score_vs_thresholds(all_data, output_dir, [dataset], wrong_penalty=2)
-        plot_score_vs_thresholds(all_data, output_dir, [dataset], score_type='mcc')
+    for group in all_data:
+        print(f"\nGenerating plots for {group}\n")
+        plots_for_group(all_data[group], os.path.join(output_dir, group))
 
-        # Plots for train and test splits
-        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
-        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
-        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], score_type='mcc')
-        
-    auc_acc_plots(all_data, all_aucs, output_dir) # We can do this now that we have all the aucs
-
-    # Same plots as before, but for all datasets together
-    datasets = list(all_data.keys())
-    plot_score_vs_thresholds(all_data, output_dir, datasets, wrong_penalty=1)
-    plot_score_vs_thresholds(all_data, output_dir, datasets, wrong_penalty=2)
-    plot_score_vs_thresholds(all_data, output_dir, datasets, score_type='mcc')
-    train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1)
-    train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)
-    train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
-    
 if __name__ == "__main__":
     main()
