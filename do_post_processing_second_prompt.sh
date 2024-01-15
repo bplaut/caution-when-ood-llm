@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Check if two arguments are provided
-if [ $# -ne 2 ]; then
+# Check if no more than two arguments are provided
+if [ $# -gt 2 ]; then
     echo "Incorrect number of arguments provided. Usage: ./do_post_processing <[omma-separated list of probability thresholds] [comma-separated list of raw logit thresholds]"
     exit 1
 fi
