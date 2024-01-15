@@ -2,13 +2,13 @@
 
 # Check if two arguments are provided
 if [ $# -ne 2 ]; then
-    echo "Incorrect number of arguments provided. Usage: ./do_post_processing <comma-separated list of probability thresholds> <comma-separated list of raw logit thresholds>"
+    echo "Incorrect number of arguments provided. Usage: ./do_post_processing [comma-separated list of probability thresholds] [comma-separated list of raw logit thresholds]"
     exit 1
 fi
 
-# Assign the arguments to variables
-thresholds1=$1
-thresholds2=$2
+# Assign the arguments to variables. If no values are provided, default to 0
+thresholds1=${1:-0}
+thresholds2=${2:-0}
 
 echo -e "Making tables...\n"
 python combine_grades_into_table.py tables/no_abstain_normed_logits.tex $thresholds1 True results/*no_abst_norm_logits.txt
