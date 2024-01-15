@@ -278,21 +278,21 @@ def plots_for_group(data, output_dir):
         # score = (correct - wrong * wrong_penalty) when score_type isn't given
         plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=1)
         plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=2)
-        plot_score_vs_thresholds(data, output_dir, [dataset], score_type='mcc')
+        # plot_score_vs_thresholds(data, output_dir, [dataset], score_type='mcc')
 
         # Plots for train and test splits
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
-        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], score_type='mcc')
+        # train_and_test_score_plots(test_data, train_data, output_dir, [dataset], score_type='mcc')
 
     # Same plots as before, but for all datasets together
     datasets = list(data.keys())
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1)
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=2)
-    plot_score_vs_thresholds(data, output_dir, datasets, score_type='mcc')
+    # plot_score_vs_thresholds(data, output_dir, datasets, score_type='mcc')
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1)
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)
-    train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
+    #train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
 
     return auc_acc_plots(data, all_aucs, output_dir) # We'll use the return value for cross-group plots
         
