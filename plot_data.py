@@ -343,7 +343,8 @@ def main():
             
     adjust_text(texts)
     plt.legend(loc='lower right')
-    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True)
+    title_suffix = '_' + '-'.join(group_data.keys())
+    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True, title_suffix=title_suffix)
     
 if __name__ == "__main__":
     main()
