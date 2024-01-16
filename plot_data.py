@@ -55,8 +55,8 @@ def expand_label(label):
                 'Score' if label == 'score' else
                 'Score (harsh)' if label == 'harsh-score' else
                 'Model Size' if label == 'size' else
-                'Average AUC' if label == 'auc' else
-                'Average Accuracy' if label == 'acc' else label)    
+                'AUC' if label == 'auc' else
+                'Accuracy' if label == 'acc' else label)    
 
 def model_size(name):
     full_name = expand_model_name(name)
@@ -117,7 +117,7 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', no
     plt.close()
     print(f"{ylabel} vs {xlabel} for {dataset} saved --> {output_path}")
 
-def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel):
+def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all datasets'):
     plt.figure()
     xs, ys = np.array(xs), np.array(ys)
     scatter = plt.scatter(xs, ys)
@@ -130,9 +130,9 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel):
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
     plt.plot(xs, intercept + slope * xs, 'r-')
 
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f' (r = {r_value:.2f})')
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {dataset} (r = {r_value:.2f})', dataset=dataset)
            
-def auc_acc_plots(all_data, all_aucs, output_dir):
+def auc_acc_plots(data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
     # Create a scatter plot for each pair of metrics
     model_aucs, model_accs = dict(), dict()
@@ -143,7 +143,7 @@ def auc_acc_plots(all_data, all_aucs, output_dir):
                 model_aucs[model] = []
                 model_accs[model] = []    
             model_aucs[model].append(all_aucs[dataset][model])
-            (labels, _, _) = all_data[dataset][model]
+            (labels, _, _) = data[dataset][model]
             model_accs[model].append(np.mean(labels))
 
     avg_aucs, avg_accs, model_names = [], [], []
@@ -152,7 +152,8 @@ def auc_acc_plots(all_data, all_aucs, output_dir):
         avg_accs.append(np.mean(model_accs[model]))
         model_names.append(model)
 
-    scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc')
+    dataset_name = 'all datasets' if len(all_aucs) > 1 else list(all_aucs.keys())[0]
+    scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', dataset_name)
     return avg_aucs, avg_accs, model_names # We'll use these for the cross-group plots
 
 def mcc_score(labels, conf_levels, thresh):
@@ -273,7 +274,7 @@ def plots_for_group(data, output_dir):
     # Generating and saving plots
     all_aucs = dict()
     for dataset in data:
-        # Plots for all the data together
+        # Plots for this dataset
         all_aucs[dataset] = plot_roc_curves(data, output_dir, dataset)
         # score = (correct - wrong * wrong_penalty) when score_type isn't given
         plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=1)
@@ -284,6 +285,9 @@ def plots_for_group(data, output_dir):
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
         # train_and_test_score_plots(test_data, train_data, output_dir, [dataset], score_type='mcc')
+
+        auc_for_this_dataset = {dataset: all_aucs[dataset]}
+        auc_acc_plots(data, auc_for_this_dataset, output_dir)
 
     # Same plots as before, but for all datasets together
     datasets = list(data.keys())
