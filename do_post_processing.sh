@@ -26,8 +26,8 @@ python combine_grades_into_table.py $output_dir/yes_abstain_raw_logits.tex $thre
 
 output_dir=figs/$dir
 echo -e "\nMaking main figures...\n"
-python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*yes_abst*.txt
 python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*no_abst*.txt
+python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*yes_abst*.txt
 
 echo -e "\nMaking figures for PIQA...\n"
 python plot_data.py $output_dir/piqa/no_abstain_normed_logits True piqa $dir/*no_abst*.txt
