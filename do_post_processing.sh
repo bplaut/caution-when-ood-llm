@@ -30,9 +30,9 @@ python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,win
 python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*yes_abst*.txt
 
 echo -e "\nMaking figures for PIQA...\n"
-python plot_data.py $output_dir/piqa/no_abstain_normed_logits True piqa $dir/*no_abst*.txt
-python plot_data.py $output_dir/piqa/yes_abstain_normed_logits True piqa $dir/*yes_abst*.txt
+python plot_data.py $output_dir/piqa True piqa $dir/*no_abst*.txt
+python plot_data.py $output_dir/piqa True piqa $dir/*yes_abst*.txt
 
 echo -e "\nMaking figures excluding winogrande...\n"
-python plot_data.py $output_dir/no_winogrande/no_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa $dir/*no_abst*.txt
-python plot_data.py $output_dir/no_winogrande/yes_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa $dir/*yes_abst*.txt
+python plot_data.py $output_dir/no_winogrande True arc,hellaswag,mmlu,truthfulqa $dir/*no_abst*.txt
+python plot_data.py $output_dir/no_winogrande True arc,hellaswag,mmlu,truthfulqa $dir/*yes_abst*.txt
