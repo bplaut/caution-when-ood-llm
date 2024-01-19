@@ -207,7 +207,6 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='--')
 
     make_and_sort_legend()
-    plt.legend(loc='upper left')
     generic_finalize_plot(output_dir, xlabel, ylabel, dataset)
     
 def plot_score_vs_thresholds(data, output_dir, datasets, normalize=True, wrong_penalty=1, thresholds_to_mark=dict(), score_type='subtractive'):
