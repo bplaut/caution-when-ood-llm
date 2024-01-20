@@ -18,7 +18,7 @@ def parse_file_name(file_name):
 
 def parse_group_name(group):
     # Each group name has the form <yes/no>_abst_<raw/norm>_logits_<first/second>_prompt
-    parts = group1.split('_')
+    parts = group.split('_')
     return parts[0], parts[2], parts[4]
 
 def parse_data(file_path, incl_unparseable):
