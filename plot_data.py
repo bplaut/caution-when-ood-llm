@@ -382,7 +382,7 @@ def main():
                 data = {group1: group_data[group1], group2: group_data[group2]}
                 # Only do cross-group plots for certain combinations. Like it's not useful to compare yes abstain+raw logits+first prompt vs no abstain+normed logits+second prompt
                 if abst_type_1 == abst_type_2 and (logit_type_1 == logit_type_2 or prompt_type_1 == prompt_type_2):
-                    bottom_dir = f'{abst_type_1}_abst_{logit_type_1}_prompt' if logit_type_1 == logit_type_2 else f'{abst_type_1}_{prompt_type_1}'
+                    bottom_dir = f'{abst_type_1}_abst_{logit_type_1}_logits' if logit_type_1 == logit_type_2 else f'{abst_type_1}_abst_{prompt_type_1}_prompt'
                     cross_group_plots(data, os.path.join(output_dir, 'cross_group_plots', bottom_dir))
     
 if __name__ == "__main__":
