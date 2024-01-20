@@ -18,21 +18,31 @@ thresholds1=${2:-0}
 thresholds2=${3:-0}
 
 echo -e "Making tables...\n"
-output_dir=tables/$dir
-python combine_grades_into_table.py $output_dir/no_abstain_normed_logits.tex $thresholds1 True $dir/*no_abst_norm_logits.txt
-python combine_grades_into_table.py $output_dir/no_abstain_raw_logits.tex $thresholds2 True $dir/*no_abst_raw_logits.txt
-python combine_grades_into_table.py $output_dir/yes_abstain_normed_logits.tex $thresholds1 True $dir/*yes_abst_norm_logits.txt
-python combine_grades_into_table.py $output_dir/yes_abstain_raw_logits.tex $thresholds2 True $dir/*yes_abst_raw_logits.txt
+output_dir=tables
 
-output_dir=figs/$dir
-echo -e "\nMaking main figures...\n"
-python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*no_abst*.txt
-python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*yes_abst*.txt
+for abstain in "no_abst" "yes_abst"; do
+    for logit_type in "norm" "raw"; do
+        for prompt in "first_prompt" "second_prompt"; do
+            # Construct the file name part for table command
+            filename_part="${abstain}_${logit_type}_logits_${prompt}"
+            # Construct the threshold variable
+            if [ "$logit_type" = "norm" ]; then
+                thresholds=$thresholds1
+            else
+                thresholds=$thresholds2
+            fi
+            # Run the table command
+            python combine_grades_into_table.py $output_dir/${filename_part}.tex $thresholds True $dir/*${filename_part}.txt
+        done
+    done
+done
 
-echo -e "\nMaking figures for PIQA...\n"
-python plot_data.py $output_dir/piqa True piqa $dir/*no_abst*.txt
-python plot_data.py $output_dir/piqa True piqa $dir/*yes_abst*.txt
+output_dir=figs
+echo -e "\nMaking figures...\n"
 
-echo -e "\nMaking figures excluding winogrande...\n"
-python plot_data.py $output_dir/no_winogrande True arc,hellaswag,mmlu,truthfulqa $dir/*no_abst*.txt
-python plot_data.py $output_dir/no_winogrande True arc,hellaswag,mmlu,truthfulqa $dir/*yes_abst*.txt
+for abstain in "no_abst" "yes_abst"; do
+    for prompt in "first_prompt" "second_prompt"; do
+        python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*${abstain}*${prompt}.txt
+        python plot_data.py $output_dir/piqa True piqa $dir/*${abstain}*${prompt}.txt
+    done
+done
