@@ -16,6 +16,11 @@ def parse_file_name(file_name):
     model = parts[1].split('-q')[0]
     return dataset, model, group
 
+def parse_group_name(group):
+    # Each group name has the form <yes/no>_abst_<raw/norm>_logits_<first/second>_prompt
+    parts = group1.split('_')
+    return parts[0], parts[2], parts[4]
+
 def parse_data(file_path, incl_unparseable):
     labels = []
     conf_levels = []
@@ -130,7 +135,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
     plt.plot(xs, intercept + slope * xs, 'r-')
 
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {dataset} (r = {r_value:.2f})', dataset=dataset)
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': (r = {r_value:.2f})', dataset=dataset)
            
 def auc_acc_plots(data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
@@ -299,6 +304,40 @@ def plots_for_group(data, output_dir):
 
     return auc_acc_plots(data, all_aucs, output_dir) # We'll use the return value for cross-group plots
         
+def cross_group_plots(group_data, output_dir):
+    print(f"\nGENERATING CROSS GROUP PLOTS: {list(group_data.keys())}\n")
+    # First plot: AUC vs accuracy, but with different colors for each group
+    plt.figure()
+    texts = []
+    for group in group_data:
+        (xs, ys, model_names) = group_data[group]
+        xs, ys = np.array(xs), np.array(ys)
+        plt.scatter(xs, ys, label=group)
+        for i in range(len(model_names)):
+            texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
+    adjust_text(texts)
+    filename_suffix = '-' + '-'.join(group_data.keys())
+    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True, filename_suffix=filename_suffix)
+    
+    # Second plot: AUC vs accuracy, averaged across groups
+    model_data = {}
+    for group in group_data:
+        (xs, ys, model_names) = group_data[group]
+        for i, model_name in enumerate(model_names):
+            if model_name not in model_data:
+                model_data[model_name] = ([], [])
+            model_data[model_name][0].append(xs[i])
+            model_data[model_name][1].append(ys[i])
+
+    plt.figure()
+    final_xs, final_ys, model_names = [], [], []
+    for model_name, (xs, ys) in model_data.items():
+        final_xs.append(np.mean(xs))
+        final_ys.append(np.mean(ys))
+        model_names.append(model_name)
+
+    scatter_plot(final_xs, final_ys, output_dir, model_names, 'auc', 'acc', dataset='all datasets both prompts')
+    
 def main():
     # Setup
     if len(sys.argv) < 5:
@@ -326,28 +365,21 @@ def main():
             old_labels, old_conf_levels, old_total_qs = all_data[group][dataset][model]
             all_data[group][dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
 
+    # Single group plots
     group_data = dict()
     for group in all_data:
-        print(f"\nGenerating plots for {group}\n")
+        print(f"\nGENERATING PLOTS FOR {group}\n")
         group_data[group] = plots_for_group(all_data[group], os.path.join(output_dir, group))
 
-    # Plot AUC vs accuracy, but with different colors for each group
-    print("\nGenerating cross-group plot\n")
-    plt.figure()
-    texts = []
-    for group in group_data:
-        (xs, ys, model_names) = group_data[group]
-        xs, ys = np.array(xs), np.array(ys)
-        plt.scatter(xs, ys, label=group)
-        slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
-        # plt.plot(xs, intercept + slope * xs, 'r-')
-        for i in range(len(model_names)):
-            texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
-            
-    adjust_text(texts)
-    plt.legend(loc='lower right')
-    filename_suffix = '-' + '-'.join(group_data.keys())
-    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True, filename_suffix=filename_suffix)
+    # Cross-group plots
+    for group1 in group_data:
+        for group2 in group_data:
+            if group1 > group2: # greater because we only need to do each pair once
+                (abst_type_1, logit_type_1, prompt_type_1) = parse_group_name(group1)
+                (abst_type_2, logit_type_2, prompt_type_2) = parse_group_name(group2)
+                # Only do cross-group plots for certain combinations. Like it's not useful to compare yes abstain+raw logits+first prompt vs no abstain+normed logits+second prompt
+                if abst_type_1 == abst_type_2 and (logit_type_1 == logit_type_2 or prompt_type_1 == prompt_type_2):
+                    cross_group_plots({group1: group_data[group1], group2: group_data[group2]}, os.path.join(output_dir, f'{group1}-{group2}'))
     
 if __name__ == "__main__":
     main()

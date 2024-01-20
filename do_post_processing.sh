@@ -41,8 +41,6 @@ output_dir=figs
 echo -e "\nMaking figures...\n"
 
 for abstain in "no_abst" "yes_abst"; do
-    for prompt in "first_prompt" "second_prompt"; do
-        python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*${abstain}*${prompt}.txt
-        python plot_data.py $output_dir/piqa True piqa $dir/*${abstain}*${prompt}.txt
-    done
+    python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/piqa True piqa $dir/*${abstain}*.txt
 done
