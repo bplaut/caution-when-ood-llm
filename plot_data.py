@@ -317,6 +317,7 @@ def cross_group_plots(group_data, output_dir):
             texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
     adjust_text(texts)
     filename_suffix = '-' + '-'.join(group_data.keys())
+    plt.legend(loc='lower right')
     generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True, filename_suffix=filename_suffix)
     
     # Second plot: AUC vs accuracy, averaged across groups
@@ -336,7 +337,8 @@ def cross_group_plots(group_data, output_dir):
         final_ys.append(np.mean(ys))
         model_names.append(model_name)
 
-    scatter_plot(final_xs, final_ys, output_dir, model_names, 'auc', 'acc', dataset='all datasets both prompts')
+    bottom_dir = output_dir[output_dir.rfind('/')+1:]
+    scatter_plot(final_xs, final_ys, output_dir, model_names, 'auc', 'acc', dataset=f'{bottom_dir} averaged')
     
 def main():
     # Setup
@@ -377,9 +379,11 @@ def main():
             if group1 > group2: # greater because we only need to do each pair once
                 (abst_type_1, logit_type_1, prompt_type_1) = parse_group_name(group1)
                 (abst_type_2, logit_type_2, prompt_type_2) = parse_group_name(group2)
+                data = {group1: group_data[group1], group2: group_data[group2]}
                 # Only do cross-group plots for certain combinations. Like it's not useful to compare yes abstain+raw logits+first prompt vs no abstain+normed logits+second prompt
                 if abst_type_1 == abst_type_2 and (logit_type_1 == logit_type_2 or prompt_type_1 == prompt_type_2):
-                    cross_group_plots({group1: group_data[group1], group2: group_data[group2]}, os.path.join(output_dir, f'{group1}-{group2}'))
+                    bottom_dir = f'{abst_type_1}_abst_{logit_type_1}_prompt' if logit_type_1 == logit_type_2 else f'{abst_type_1}_{prompt_type_1}'
+                    cross_group_plots(data, os.path.join(output_dir, 'cross_group_plots', bottom_dir))
     
 if __name__ == "__main__":
     main()
