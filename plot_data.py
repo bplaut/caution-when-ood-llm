@@ -113,7 +113,8 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suff
     if xlabel == 'auc':
         # same here but 0.51 and 0.71
         curr_bottom, curr_top = plt.xlim()
-        plt.xlim([min(curr_bottom, 0.51), max(curr_top, 0.70)])
+        plt.xlim([0.5, max(curr_top, 0.71)])
+        print(f"X limits are {plt.xlim()}")
     if ylabel in ('score', 'harsh-score'):
         plt.ylim([-0.15,0.65])
 
