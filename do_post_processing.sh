@@ -43,4 +43,5 @@ echo -e "\nMaking figures...\n"
 for abstain in "no_abst" "yes_abst"; do
     python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*${abstain}*.txt
     python plot_data.py $output_dir/piqa True piqa $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/no_winogrande True arc,hellaswag,mmlu,truthfulqa $dir/*${abstain}*.txt
 done
