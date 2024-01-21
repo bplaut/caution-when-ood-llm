@@ -104,14 +104,20 @@ def plot_roc_curves(all_data, output_dir, dataset):
     print(f"ROC curve for {dataset} saved --> {output_path}")
     return aucs
     
-def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix=''):
+def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', texts=[]):
     # Consistent axes
     if ylabel == 'acc':
-        plt.ylim([0.28,0.71])
+        # bottom is min of current and 0.28, top is max of current and 0.72
+        curr_bottom, curr_top = plt.ylim()
+        plt.ylim([min(curr_bottom, 0.28), max(curr_top, 0.72)])
     if xlabel == 'auc':
-        plt.xlim([0.5,0.71])
+        # same here but 0.51 and 0.71
+        curr_bottom, curr_top = plt.xlim()
+        plt.xlim([min(curr_bottom, 0.51), max(curr_top, 0.70)])
     if ylabel in ('score', 'harsh-score'):
         plt.ylim([-0.15,0.65])
+
+    adjust_text(texts) # Must do this after setting ylim and xlim
 
     plt.xlabel(expand_label(xlabel))
     plt.ylabel(expand_label(ylabel))
@@ -130,14 +136,12 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     scatter = plt.scatter(xs, ys)
     texts = []
     for i in range(len(model_names)):
-        texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
-    adjust_text(texts)
+        texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
 
-    # Fit and plot linear regression line
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
     plt.plot(xs, intercept + slope * xs, 'r-')
 
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {dataset} (r = {r_value:.2f})', file_suffix=f'_{dataset}')
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {dataset} (r = {r_value:.2f})', file_suffix=f'_{dataset}', texts=texts)
            
 def auc_acc_plots(data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
@@ -312,10 +316,10 @@ def cross_group_plots(group_data, output_dir):
         plt.scatter(accs, aucs, label=group)
         for i in range(len(model_names)):
             texts.append(plt.text(accs[i], aucs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
-    adjust_text(texts)
+
     file_suffix = '-' + '-'.join(group_data.keys())
     plt.legend(loc='lower right')
-    generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix='_multi_group', title_suffix=': cross-group comparison')
+    generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix='_multi_group', title_suffix=': cross-group comparison', texts=texts)
     
     # Second plot: AUC vs accuracy, averaged across groups
     model_data = {}
