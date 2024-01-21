@@ -104,12 +104,14 @@ def plot_roc_curves(all_data, output_dir, dataset):
     print(f"ROC curve for {dataset} saved --> {output_path}")
     return aucs
     
-def generic_finalize_plot(output_dir, xlabel, ylabel, normalize=True, title_suffix='', file_suffix=''):
-    # No need to go too negative
-    min_y_normed, min_y_unnormed = -0.15, -300
-    curr_min_y = plt.ylim()[0]
-    new_min_y = max(curr_min_y, min_y_normed) if normalize else max(curr_min_y, min_y_unnormed)
-    plt.ylim(bottom = new_min_y)
+def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix=''):
+    # Consistent axes
+    if ylabel == 'acc':
+        plt.ylim([0.28,0.71])
+    if xlabel == 'auc':
+        plt.xlim([0.5,0.71])
+    if ylabel in ('score', 'harsh-score'):
+        plt.ylim([-0.15,0.65])
 
     plt.xlabel(expand_label(xlabel))
     plt.ylabel(expand_label(ylabel))
@@ -163,10 +165,6 @@ def auc_acc_plots(data, all_aucs, output_dir):
 
 def mcc_score(labels, conf_levels, thresh):
     # MCC = (TP*TN - FP*FN) / sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
-    # TP is when label is 1 and conf >= thresh
-    # TN is when label is 0 and conf < thresh
-    # FP is when label is 0 and conf >= thresh
-    # FN is when label is 1 and conf < thresh
     TP, TN, FP, FN = 0, 0, 0, 0
     for label, conf in zip(labels, conf_levels):
         if conf < thresh:
@@ -182,7 +180,7 @@ def mcc_score(labels, conf_levels, thresh):
     denom = np.sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
     return (TP*TN - FP*FN) / denom if denom != 0 else 0
     
-def subtractive_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty=1):
+def subtractive_score(labels, conf_levels, total_qs, thresh, normalize=True, wrong_penalty=1):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
     score = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
     return score / total_qs if normalize else score
@@ -214,7 +212,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     make_and_sort_legend()
     generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {dataset}', file_suffix = f'_{dataset}')
     
-def plot_score_vs_thresholds(data, output_dir, datasets, normalize=True, wrong_penalty=1, thresholds_to_mark=dict(), score_type='subtractive'):
+def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresholds_to_mark=dict(), score_type='subtractive'):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
     max_conf = max([max([max(conf_levels) for _, (_,conf_levels,_) in data[dataset].items()])
                     for dataset in datasets])
@@ -232,7 +230,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, normalize=True, wrong_p
             scores_harsh = []
             for thresh in thresholds:
                 if score_type == 'subtractive':
-                    score = subtractive_score(labels, conf_levels, total_qs, thresh, normalize, wrong_penalty)
+                    score = subtractive_score(labels, conf_levels, total_qs, thresh, wrong_penalty)
                 elif score_type == 'mcc':
                     score = mcc_score(labels, conf_levels, thresh)
                 else:
@@ -249,8 +247,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, normalize=True, wrong_p
             # Some models might not have results for all datasets (although eventually they should)
             scores_for_thresh = [results[model][dataset][i] for dataset in results[model]]
             precision = 3
-            round_fn = lambda x: round(x, precision) if normalize else x
-            avg_score = round_fn(np.mean(scores_for_thresh))
+            avg_score = round(np.mean(scores_for_thresh), precision)
             results_for_model.append(avg_score)
         overall_results.append((model, thresholds, results_for_model))
         optimal_thresh_idx = np.argmax(results_for_model)
@@ -261,7 +258,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, normalize=True, wrong_p
     score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name, thresholds_to_mark)
     return optimal_thresholds # We use this return value in the train/test context
 
-def train_and_test_score_plots(test_data, train_data, output_dir, datasets, normalize=True, wrong_penalty=1, score_type='subtractive'):
+def train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1, score_type='subtractive'):
     thresholds_to_mark = plot_score_vs_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty, score_type=score_type)
     plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=thresholds_to_mark, score_type=score_type)
 
@@ -318,7 +315,7 @@ def cross_group_plots(group_data, output_dir):
     adjust_text(texts)
     file_suffix = '-' + '-'.join(group_data.keys())
     plt.legend(loc='lower right')
-    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True, file_suffix='_multi_group', title_suffix=': cross-group comparison')
+    generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix='_multi_group', title_suffix=': cross-group comparison')
     
     # Second plot: AUC vs accuracy, averaged across groups
     model_data = {}
