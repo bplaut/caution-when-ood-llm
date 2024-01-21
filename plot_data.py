@@ -61,8 +61,8 @@ def expand_label(label):
                 'Score (harsh)' if label == 'harsh-score' else
                 'Model Size' if label == 'size' else
                 'AUC' if label == 'auc' else
-                'Accuracy' if label == 'acc' else label)    
-
+                'Accuracy' if label == 'acc' else label)
+    
 def model_size(name):
     full_name = expand_model_name(name)
     size_term = full_name.split('-')[1]
@@ -104,7 +104,7 @@ def plot_roc_curves(all_data, output_dir, dataset):
     print(f"ROC curve for {dataset} saved --> {output_path}")
     return aucs
     
-def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', normalize=True, title_suffix='', filename_suffix=''):
+def generic_finalize_plot(output_dir, xlabel, ylabel, normalize=True, title_suffix='', file_suffix=''):
     # No need to go too negative
     min_y_normed, min_y_unnormed = -0.15, -300
     curr_min_y = plt.ylim()[0]
@@ -113,14 +113,14 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, dataset='all datasets', no
 
     plt.xlabel(expand_label(xlabel))
     plt.ylabel(expand_label(ylabel))
-    plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}: {dataset}{title_suffix}')
+    plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"{dataset.replace(' ','_')}_{ylabel}_vs_{xlabel}{filename_suffix}.png")
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.png")
     
     plt.savefig(output_path)
     plt.close()
-    print(f"{ylabel} vs {xlabel} for {dataset} saved --> {output_path}")
+    print(f"{ylabel} vs {xlabel} for {title_suffix} saved --> {output_path}")
 
 def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all datasets'):
     plt.figure()
@@ -128,14 +128,14 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     scatter = plt.scatter(xs, ys)
     texts = []
     for i in range(len(model_names)):
-        texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))    
+        texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
     adjust_text(texts)
 
     # Fit and plot linear regression line
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
     plt.plot(xs, intercept + slope * xs, 'r-')
 
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': (r = {r_value:.2f})', dataset=dataset)
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {dataset} (r = {r_value:.2f})', file_suffix=f'_{dataset}')
            
 def auc_acc_plots(data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
@@ -212,7 +212,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='--')
 
     make_and_sort_legend()
-    generic_finalize_plot(output_dir, xlabel, ylabel, dataset)
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {dataset}', file_suffix = f'_{dataset}')
     
 def plot_score_vs_thresholds(data, output_dir, datasets, normalize=True, wrong_penalty=1, thresholds_to_mark=dict(), score_type='subtractive'):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
@@ -310,35 +310,36 @@ def cross_group_plots(group_data, output_dir):
     plt.figure()
     texts = []
     for group in group_data:
-        (xs, ys, model_names) = group_data[group]
-        xs, ys = np.array(xs), np.array(ys)
-        plt.scatter(xs, ys, label=group)
+        (accs, aucs, model_names) = group_data[group]
+        accs, aucs = np.array(accs), np.array(aucs)
+        plt.scatter(accs, aucs, label=group)
         for i in range(len(model_names)):
-            texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
+            texts.append(plt.text(accs[i], aucs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
     adjust_text(texts)
-    filename_suffix = '-' + '-'.join(group_data.keys())
+    file_suffix = '-' + '-'.join(group_data.keys())
     plt.legend(loc='lower right')
-    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True, filename_suffix=filename_suffix)
+    generic_finalize_plot(output_dir, 'auc', 'acc', normalize=True, file_suffix='_multi_group', title_suffix=': cross-group comparison')
     
     # Second plot: AUC vs accuracy, averaged across groups
     model_data = {}
     for group in group_data:
-        (xs, ys, model_names) = group_data[group]
+        (accs, aucs, model_names) = group_data[group]
         for i, model_name in enumerate(model_names):
             if model_name not in model_data:
                 model_data[model_name] = ([], [])
-            model_data[model_name][0].append(xs[i])
-            model_data[model_name][1].append(ys[i])
+            model_data[model_name][0].append(accs[i])
+            model_data[model_name][1].append(aucs[i])
 
     plt.figure()
-    final_xs, final_ys, model_names = [], [], []
-    for model_name, (xs, ys) in model_data.items():
-        final_xs.append(np.mean(xs))
-        final_ys.append(np.mean(ys))
+    avg_accs, avg_aucs, model_names = [], [], []
+    for model_name, (accs, aucs) in model_data.items():
+        avg_accs.append(np.mean(accs))
+        avg_aucs.append(np.mean(aucs))
         model_names.append(model_name)
 
     bottom_dir = output_dir[output_dir.rfind('/')+1:]
-    scatter_plot(final_xs, final_ys, output_dir, model_names, 'auc', 'acc', dataset=f'{bottom_dir} averaged')
+    plot_name = 'MSP' if bottom_dir == 'no_abst_norm_logits' else 'Max Logit' if bottom_dir == 'no_abst_raw_logits' else bottom_dir
+    scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'auc', 'acc', dataset=plot_name)
     
 def main():
     # Setup
