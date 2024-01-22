@@ -8,7 +8,7 @@ def copy_files(output_directory: str, filepaths: List[str]):
         os.makedirs(output_directory)
 
     for filepath in filepaths:
-        filepath = filepath + '.png'
+        filepath = filepath + '.pdf'
         print("Copying ", filepath)
         if os.path.isfile(filepath):
             # Copy file to output directory
