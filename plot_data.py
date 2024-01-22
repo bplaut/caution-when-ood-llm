@@ -19,7 +19,7 @@ def parse_file_name(file_name):
 def parse_group_name(group):
     # Each group name has the form <yes/no>_abst_<raw/norm>_logits_<first/second>_prompt
     parts = group.split('_')
-    return parts[0], parts[2], parts[4]
+    return parts[0] + '_' + parts[1], parts[2] + '_' + parts[3], parts[4] + '_' + parts[5]
 
 def parse_data(file_path, incl_unparseable):
     labels = []
@@ -111,10 +111,9 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suff
         curr_bottom, curr_top = plt.ylim()
         plt.ylim([min(curr_bottom, 0.28), max(curr_top, 0.72)])
     if xlabel == 'auc':
-        # same here but 0.51 and 0.71
+        # same here but 0.5 and 0.71, but we can fix min at 0.5 because that's the lowest AUC
         curr_bottom, curr_top = plt.xlim()
         plt.xlim([0.5, max(curr_top, 0.71)])
-        print(f"X limits are {plt.xlim()}")
     if ylabel in ('score', 'harsh-score'):
         plt.ylim([-0.15,0.65])
 
@@ -305,16 +304,35 @@ def plots_for_group(data, output_dir):
     # train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
 
     return auc_acc_plots(data, all_aucs, output_dir) # We'll use the return value for cross-group plots
-        
+
+def merge_groups(group_data):
+    # Merge to a single "group" based on the means across groups
+    new_data = defaultdict(lambda: ([], []))
+    for group in group_data:
+        (accs, aucs, model_names) = group_data[group]
+        for i, model_name in enumerate(model_names):
+            new_data[model_name][0].append(accs[i])
+            new_data[model_name][1].append(aucs[i])
+
+    plt.figure()
+    avg_accs, avg_aucs, model_names = [], [], []
+    for model_name, (accs, aucs) in new_data.items():
+        avg_accs.append(np.mean(accs))
+        avg_aucs.append(np.mean(aucs))
+        model_names.append(model_name)
+    return avg_accs, avg_aucs, model_names
+
 def cross_group_plots(group_data, output_dir):
     print(f"\nGENERATING CROSS GROUP PLOTS: {list(group_data.keys())}\n")
     # First plot: AUC vs accuracy, but with different colors for each group
     plt.figure()
     texts = []
-    for group in group_data:
+    colors = ['blue','blue','purple','gold','black','green']
+    markers = ['<','>','^','o','D','s']
+    for group in sorted(list(group_data.keys())): # Colors should be consistent across plots
         (accs, aucs, model_names) = group_data[group]
         accs, aucs = np.array(accs), np.array(aucs)
-        plt.scatter(accs, aucs, label=group)
+        plt.scatter(accs, aucs, label=group, color=colors.pop(0), marker=markers.pop(0))
         for i in range(len(model_names)):
             texts.append(plt.text(accs[i], aucs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
 
@@ -323,22 +341,7 @@ def cross_group_plots(group_data, output_dir):
     generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix='_multi_group', title_suffix=': cross-group comparison', texts=texts)
     
     # Second plot: AUC vs accuracy, averaged across groups
-    model_data = {}
-    for group in group_data:
-        (accs, aucs, model_names) = group_data[group]
-        for i, model_name in enumerate(model_names):
-            if model_name not in model_data:
-                model_data[model_name] = ([], [])
-            model_data[model_name][0].append(accs[i])
-            model_data[model_name][1].append(aucs[i])
-
-    plt.figure()
-    avg_accs, avg_aucs, model_names = [], [], []
-    for model_name, (accs, aucs) in model_data.items():
-        avg_accs.append(np.mean(accs))
-        avg_aucs.append(np.mean(aucs))
-        model_names.append(model_name)
-
+    avg_accs, avg_aucs, model_names = merge_groups(group_data)
     bottom_dir = output_dir[output_dir.rfind('/')+1:]
     plot_name = 'MSP' if bottom_dir == 'no_abst_norm_logits' else 'Max Logit' if bottom_dir == 'no_abst_raw_logits' else bottom_dir
     scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'auc', 'acc', dataset=plot_name)
@@ -385,8 +388,20 @@ def main():
                 data = {group1: group_data[group1], group2: group_data[group2]}
                 # Only do cross-group plots for certain combinations. Like it's not useful to compare yes abstain+raw logits+first prompt vs no abstain+normed logits+second prompt
                 if abst_type_1 == abst_type_2 and (logit_type_1 == logit_type_2 or prompt_type_1 == prompt_type_2):
-                    bottom_dir = f'{abst_type_1}_abst_{logit_type_1}_logits' if logit_type_1 == logit_type_2 else f'{abst_type_1}_abst_{prompt_type_1}_prompt'
+                    bottom_dir = f'{abst_type_1}_{logit_type_1}' if logit_type_1 == logit_type_2 else f'{abst_type_1}_{prompt_type_1}'
                     cross_group_plots(data, os.path.join(output_dir, 'cross_group_plots', bottom_dir))
+
+    # Finally, compare normed vs raw logits, averaged over the two prompts
+    merged_groups = dict()
+    group1 = 'no_abst_norm_logits_first_prompt'
+    group2 = 'no_abst_norm_logits_second_prompt'
+    new_group = 'no_abst_norm_logits'
+    merged_groups[new_group] = merge_groups({group1: group_data[group1], group2: group_data[group2]})
+    group3 = 'no_abst_raw_logits_first_prompt'
+    group4 = 'no_abst_raw_logits_second_prompt'
+    new_group = 'no_abst_raw_logits'
+    merged_groups[new_group] = merge_groups({group3: group_data[group3], group4: group_data[group4]})
+    cross_group_plots(merged_groups, os.path.join(output_dir, 'cross_group_plots', 'no_abst_all'))
     
 if __name__ == "__main__":
     main()
