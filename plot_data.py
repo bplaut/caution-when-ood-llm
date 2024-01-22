@@ -65,8 +65,8 @@ def expand_label(label):
                 'Accuracy' if label == 'acc' else label)
 
 def color_and_marker_for_category(category):
-    return (('teal', 's') if 'norm' in category else
-            ('deepskyblue', 'D') if 'raw' in category else ('#1f77b4', 'o'))
+    return (('mediumpurple', 's', 'darkorange') if 'norm' in category else
+            ('deepskyblue', 'D', 'lightcoral') if 'raw' in category else ('#1f77b4', 'o', 'red'))
     
 def model_size(name):
     full_name = expand_model_name(name)
@@ -139,16 +139,18 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     plt.figure()
     xs, ys = np.array(xs), np.array(ys)
     category = output_dir[output_dir.rfind('/')+1:]
-    color, marker = color_and_marker_for_category(category)
-    scatter = plt.scatter(xs, ys, c=color, marker=marker)
+    mark_color, marker, line_color = color_and_marker_for_category(category)
+    scatter = plt.scatter(xs, ys, c=mark_color, marker=marker)
     texts = []
+
     for i in range(len(model_names)):
         texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
 
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
-    plt.plot(xs, intercept + slope * xs, 'r-')
+    plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {dataset} (r = {r_value:.2f})', file_suffix=f'_{dataset}', texts=texts)
+    plot_name = 'MSP' if category == 'no_abst_norm_logits' else 'Max Logit' if category == 'no_abst_raw_logits' else category
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name}, {dataset} (r = {r_value:.2f})', file_suffix=f'_{dataset}_{plot_name}', texts=texts)
            
 def auc_acc_plots(data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
@@ -335,12 +337,15 @@ def cross_group_plots(group_data, output_dir):
     plt.figure()
     texts = []
     for group in sorted(list(group_data.keys())): # Colors should be consistent across plots
-        accs, aucs, model_names = group_data[group]
-        color, marker = color_and_marker_for_category(group)
-        accs, aucs = np.array(accs), np.array(aucs)
-        plt.scatter(accs, aucs, label=group, color=color, marker=marker)
+        aucs, accs, model_names = group_data[group]
+        mark_color, marker, line_color = color_and_marker_for_category(group)
+        aucs, accs = np.array(aucs), np.array(accs)
+        plt.scatter(aucs, accs, label=group, c=mark_color, marker=marker)
         for i in range(len(model_names)):
-            texts.append(plt.text(accs[i], aucs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
+            texts.append(plt.text(aucs[i], accs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
+        # line of best fit
+        slope, intercept, r_value, p_value, std_err = linregress(aucs, accs)
+        plt.plot(aucs, intercept + slope * aucs, color=line_color, linestyle='-')
 
     file_suffix = '-' + '-'.join(group_data.keys())
     plt.legend(loc='lower right')
@@ -348,9 +353,7 @@ def cross_group_plots(group_data, output_dir):
     
     # Second plot: AUC vs accuracy, averaged across groups
     avg_accs, avg_aucs, model_names = merge_groups(group_data)
-    category = output_dir[output_dir.rfind('/')+1:]
-    plot_name = 'MSP' if category == 'no_abst_norm_logits' else 'Max Logit' if category == 'no_abst_raw_logits' else category
-    scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'auc', 'acc', dataset=plot_name)
+    scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'auc', 'acc')
     
 def main():
     # Setup
@@ -392,7 +395,7 @@ def main():
                 (abst_type_1, logit_type_1, prompt_type_1) = parse_group_name(group1)
                 (abst_type_2, logit_type_2, prompt_type_2) = parse_group_name(group2)
                 data = {group1: group_data[group1], group2: group_data[group2]}
-                # Only do cross-group plots for certain combinations. Like it's not useful to compare yes abstain+raw logits+first prompt vs no abstain+normed logits+second prompt
+                # Only compare pairs of groups which differ by exactly 1 component
                 if abst_type_1 == abst_type_2 and (logit_type_1 == logit_type_2 or prompt_type_1 == prompt_type_2):
                     bottom_dir = f'{abst_type_1}_{logit_type_1}' if logit_type_1 == logit_type_2 else f'{abst_type_1}_{prompt_type_1}'
                     cross_group_plots(data, os.path.join(output_dir, 'cross_group_plots', bottom_dir))
