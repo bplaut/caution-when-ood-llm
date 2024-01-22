@@ -110,7 +110,7 @@ def plot_roc_curves(all_data, output_dir, dataset):
     # Make output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.png")
+    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.pdf")
     plt.savefig(output_path)
     plt.close()
     print(f"ROC curve for {dataset} saved --> {output_path}")
@@ -132,7 +132,7 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suff
     plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.png")
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.pdf")
     
     plt.savefig(output_path)
     plt.close()
@@ -147,7 +147,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     texts = []
 
     for i in range(len(model_names)):
-        texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
+        texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
 
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
     plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
@@ -180,24 +180,7 @@ def auc_acc_plots(data, all_aucs, output_dir):
     scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', dataset_name)
     return avg_aucs, avg_accs, model_names # We'll use these for the cross-group plots
 
-def mcc_score(labels, conf_levels, thresh):
-    # MCC = (TP*TN - FP*FN) / sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
-    TP, TN, FP, FN = 0, 0, 0, 0
-    for label, conf in zip(labels, conf_levels):
-        if conf < thresh:
-            if label == 0:
-                TN += 1
-            else:
-                FN += 1
-        else:
-            if label == 1:
-                TP += 1
-            else:
-                FP += 1
-    denom = np.sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
-    return (TP*TN - FP*FN) / denom if denom != 0 else 0
-    
-def subtractive_score(labels, conf_levels, total_qs, thresh, normalize=True, wrong_penalty=1):
+def compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty=1, normalize=True):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
     score = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
     return score / total_qs if normalize else score
@@ -232,7 +215,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
     
-def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresholds_to_mark=dict(), score_type='subtractive'):
+def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresholds_to_mark=dict()):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
     max_conf = max([max([max(conf_levels) for _, (_,conf_levels,_) in data[dataset].items()])
                     for dataset in datasets])
@@ -249,12 +232,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
             scores  = []
             scores_harsh = []
             for thresh in thresholds:
-                if score_type == 'subtractive':
-                    score = subtractive_score(labels, conf_levels, total_qs, thresh, wrong_penalty)
-                elif score_type == 'mcc':
-                    score = mcc_score(labels, conf_levels, thresh)
-                else:
-                    raise Exception(f'Unknown score type {score_type}')
+                score = compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty)
                 scores.append(score)
             results[model][dataset] = scores
             
@@ -274,13 +252,13 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
         optimal_thresholds[model] = thresholds[optimal_thresh_idx]
             
     dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
-    ylabel = 'MCC' if score_type == 'mcc' else 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else 'unknown'
+    ylabel = 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else f'Wrong penalty of {wrong_penalty}'
     score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name, thresholds_to_mark)
     return optimal_thresholds # We use this return value in the train/test context
 
-def train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1, score_type='subtractive'):
-    thresholds_to_mark = plot_score_vs_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty, score_type=score_type)
-    plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=thresholds_to_mark, score_type=score_type)
+def train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1):
+    thresholds_to_mark = plot_score_vs_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty)
+    plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=thresholds_to_mark)
 
 def plots_for_group(data, output_dir):
     # Split into train and test. We don't have to shuffle, since question order is already randomized
@@ -297,15 +275,13 @@ def plots_for_group(data, output_dir):
     for dataset in data:
         # Plots for this dataset
         all_aucs[dataset] = plot_roc_curves(data, output_dir, dataset)
-        # score = (correct - wrong * wrong_penalty) when score_type isn't given
+        # score = (correct - wrong * wrong_penalty)
         plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=1)
         plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=2)
-        # plot_score_vs_thresholds(data, output_dir, [dataset], score_type='mcc')
 
         # Plots for train and test splits
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
         train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
-        # train_and_test_score_plots(test_data, train_data, output_dir, [dataset], score_type='mcc')
 
         auc_for_this_dataset = {dataset: all_aucs[dataset]}
         auc_acc_plots(data, auc_for_this_dataset, output_dir)
@@ -314,10 +290,8 @@ def plots_for_group(data, output_dir):
     datasets = list(data.keys())
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1)
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=2)
-    # plot_score_vs_thresholds(data, output_dir, datasets, score_type='mcc')
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1)
     train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)
-    # train_and_test_score_plots(test_data, train_data, output_dir, datasets, score_type='mcc')
 
     return auc_acc_plots(data, all_aucs, output_dir) # We'll use the return value for cross-group plots
 
@@ -350,7 +324,7 @@ def cross_group_plots(group_data, output_dir):
         logit_type, prompt = group_label(group)
         plt.scatter(aucs, accs, label=logit_type+prompt, c=mark_color, marker=marker)
         for i in range(len(model_names)):
-            texts.append(plt.text(aucs[i], accs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
+            texts.append(plt.text(aucs[i], accs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
 
     file_suffix = '-' + '-'.join(group_data.keys())
     # Rather than including the full group name in the title, just include the logit type and "prompt comparison" if applicable
