@@ -18,7 +18,7 @@ def parse_file_name(file_name):
 
 def parse_group_name(group):
     # Each group name has the form <yes/no>_abst_<raw/norm>_logits_<first/second>_prompt
-    # A category might have only some of those three parts, e.g. no_abst_norm_logits
+    # Later on, we might create some merged groups, but we'll only call this fn on initial groups
     parts = group.split('_')
     return parts[0] + '_' + parts[1], parts[2] + '_' + parts[3], parts[4] + '_' + parts[5]
 
@@ -61,12 +61,19 @@ def expand_label(label):
                 'Score' if label == 'score' else
                 'Score (harsh)' if label == 'harsh-score' else
                 'Model Size' if label == 'size' else
-                'AUC' if label == 'auc' else
-                'Accuracy' if label == 'acc' else label)
+                'AUROC' if label == 'auc' else
+                'Q&A Accuracy' if label == 'acc' else label)
 
-def color_and_marker_for_category(category):
-    return (('mediumpurple', 's', 'darkorange') if 'norm' in category else
-            ('deepskyblue', 'D', 'lightcoral') if 'raw' in category else ('#1f77b4', 'o', 'red'))
+def plot_style_for_group(group):
+    return (('teal', 's', 'black') if 'first_prompt' in group else
+            ('gold', '^', 'black') if 'second_prompt' in group else
+            ('deepskyblue', 'o', 'tab:red') if 'norm' in group else
+            ('mediumpurple', 'D', 'tab:orange') if 'raw' in group else ('#1f77b4', 'o', 'red'))
+
+def group_label(group):
+    logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
+    prompt = ', first prompt' if group.endswith('first_prompt') else ', second prompt' if group.endswith('second_prompt') else ''
+    return logit_type, prompt
     
 def model_size(name):
     full_name = expand_model_name(name)
@@ -138,8 +145,8 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suff
 def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all datasets'):
     plt.figure()
     xs, ys = np.array(xs), np.array(ys)
-    category = output_dir[output_dir.rfind('/')+1:]
-    mark_color, marker, line_color = color_and_marker_for_category(category)
+    group = output_dir[output_dir.rfind('/')+1:]
+    mark_color, marker, line_color = plot_style_for_group(group)
     scatter = plt.scatter(xs, ys, c=mark_color, marker=marker)
     texts = []
 
@@ -149,8 +156,9 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
     plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
-    plot_name = 'MSP' if category == 'no_abst_norm_logits' else 'Max Logit' if category == 'no_abst_raw_logits' else category
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name}, {dataset} (r = {r_value:.2f})', file_suffix=f'_{dataset}_{plot_name}', texts=texts)
+    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
+    plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=f'_{dataset}_{plot_name}', texts=texts)
            
 def auc_acc_plots(data, all_aucs, output_dir):
     # Main three meta metrics are: model size, avg AUC, avg accuracy
@@ -338,18 +346,19 @@ def cross_group_plots(group_data, output_dir):
     texts = []
     for group in sorted(list(group_data.keys())): # Colors should be consistent across plots
         aucs, accs, model_names = group_data[group]
-        mark_color, marker, line_color = color_and_marker_for_category(group)
+        mark_color, marker, line_color = plot_style_for_group(group)
         aucs, accs = np.array(aucs), np.array(accs)
-        plt.scatter(aucs, accs, label=group, c=mark_color, marker=marker)
+        logit_type, prompt = group_label(group)
+        plt.scatter(aucs, accs, label=logit_type+prompt, c=mark_color, marker=marker)
         for i in range(len(model_names)):
             texts.append(plt.text(aucs[i], accs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
-        # line of best fit
-        slope, intercept, r_value, p_value, std_err = linregress(aucs, accs)
-        plt.plot(aucs, intercept + slope * aucs, color=line_color, linestyle='-')
 
     file_suffix = '-' + '-'.join(group_data.keys())
+    # Rather than including the full group name in the title, just include the logit type and "prompt comparison" if applicable
+    prompt_str = ', prompt comparison' if 'prompt' in file_suffix else ''
+    title_suffix = ': ' + ' and '.join([group_label(group)[0] for group in group_data]) + prompt_str
     plt.legend(loc='lower right')
-    generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix='_multi_group', title_suffix=': cross-group comparison', texts=texts)
+    generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix=file_suffix, title_suffix=title_suffix, texts=texts)
     
     # Second plot: AUC vs accuracy, averaged across groups
     avg_accs, avg_aucs, model_names = merge_groups(group_data)
