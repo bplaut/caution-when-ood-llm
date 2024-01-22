@@ -355,8 +355,11 @@ def cross_group_plots(group_data, output_dir):
 
     file_suffix = '-' + '-'.join(group_data.keys())
     # Rather than including the full group name in the title, just include the logit type and "prompt comparison" if applicable
-    prompt_str = ', prompt comparison' if 'prompt' in file_suffix else ''
-    title_suffix = ': ' + ' and '.join([group_label(group)[0] for group in group_data]) + prompt_str
+    if 'prompt' in file_suffix:
+        logit_type, _ = group_label(list(group_data.keys())[0])
+        title_suffix = ': ' + logit_type + ', prompt comparison'
+    else:
+        title_suffix = ': ' + ' and '.join([group_label(group)[0] for group in group_data])
     plt.legend(loc='lower right')
     generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix=file_suffix, title_suffix=title_suffix, texts=texts)
     
