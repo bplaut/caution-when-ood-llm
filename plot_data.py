@@ -18,6 +18,7 @@ def parse_file_name(file_name):
 
 def parse_group_name(group):
     # Each group name has the form <yes/no>_abst_<raw/norm>_logits_<first/second>_prompt
+    # A category might have only some of those three parts, e.g. no_abst_norm_logits
     parts = group.split('_')
     return parts[0] + '_' + parts[1], parts[2] + '_' + parts[3], parts[4] + '_' + parts[5]
 
@@ -62,6 +63,10 @@ def expand_label(label):
                 'Model Size' if label == 'size' else
                 'AUC' if label == 'auc' else
                 'Accuracy' if label == 'acc' else label)
+
+def color_and_marker_for_category(category):
+    return (('teal', 's') if 'norm' in category else
+            ('deepskyblue', 'D') if 'raw' in category else ('#1f77b4', 'o'))
     
 def model_size(name):
     full_name = expand_model_name(name)
@@ -133,7 +138,9 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suff
 def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all datasets'):
     plt.figure()
     xs, ys = np.array(xs), np.array(ys)
-    scatter = plt.scatter(xs, ys)
+    category = output_dir[output_dir.rfind('/')+1:]
+    color, marker = color_and_marker_for_category(category)
+    scatter = plt.scatter(xs, ys, c=color, marker=marker)
     texts = []
     for i in range(len(model_names)):
         texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
@@ -327,12 +334,11 @@ def cross_group_plots(group_data, output_dir):
     # First plot: AUC vs accuracy, but with different colors for each group
     plt.figure()
     texts = []
-    colors = ['blue','blue','purple','gold','black','green']
-    markers = ['<','>','^','o','D','s']
     for group in sorted(list(group_data.keys())): # Colors should be consistent across plots
-        (accs, aucs, model_names) = group_data[group]
+        accs, aucs, model_names = group_data[group]
+        color, marker = color_and_marker_for_category(group)
         accs, aucs = np.array(accs), np.array(aucs)
-        plt.scatter(accs, aucs, label=group, color=colors.pop(0), marker=markers.pop(0))
+        plt.scatter(accs, aucs, label=group, color=color, marker=marker)
         for i in range(len(model_names)):
             texts.append(plt.text(accs[i], aucs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
 
@@ -342,8 +348,8 @@ def cross_group_plots(group_data, output_dir):
     
     # Second plot: AUC vs accuracy, averaged across groups
     avg_accs, avg_aucs, model_names = merge_groups(group_data)
-    bottom_dir = output_dir[output_dir.rfind('/')+1:]
-    plot_name = 'MSP' if bottom_dir == 'no_abst_norm_logits' else 'Max Logit' if bottom_dir == 'no_abst_raw_logits' else bottom_dir
+    category = output_dir[output_dir.rfind('/')+1:]
+    plot_name = 'MSP' if category == 'no_abst_norm_logits' else 'Max Logit' if category == 'no_abst_raw_logits' else category
     scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'auc', 'acc', dataset=plot_name)
     
 def main():
@@ -392,16 +398,21 @@ def main():
                     cross_group_plots(data, os.path.join(output_dir, 'cross_group_plots', bottom_dir))
 
     # Finally, compare normed vs raw logits, averaged over the two prompts
-    merged_groups = dict()
-    group1 = 'no_abst_norm_logits_first_prompt'
-    group2 = 'no_abst_norm_logits_second_prompt'
-    new_group = 'no_abst_norm_logits'
-    merged_groups[new_group] = merge_groups({group1: group_data[group1], group2: group_data[group2]})
-    group3 = 'no_abst_raw_logits_first_prompt'
-    group4 = 'no_abst_raw_logits_second_prompt'
-    new_group = 'no_abst_raw_logits'
-    merged_groups[new_group] = merge_groups({group3: group_data[group3], group4: group_data[group4]})
-    cross_group_plots(merged_groups, os.path.join(output_dir, 'cross_group_plots', 'no_abst_all'))
-    
+    try:
+        merged_groups = dict()
+        group1 = 'no_abst_norm_logits_first_prompt'
+        group2 = 'no_abst_norm_logits_second_prompt'
+        new_group = 'no_abst_norm_logits'
+        merged_groups[new_group] = merge_groups({group1: group_data[group1],
+                                                 group2: group_data[group2]})
+        group3 = 'no_abst_raw_logits_first_prompt'
+        group4 = 'no_abst_raw_logits_second_prompt'
+        new_group = 'no_abst_raw_logits'
+        merged_groups[new_group] = merge_groups({group3: group_data[group3],
+                                                 group4: group_data[group4]})
+        cross_group_plots(merged_groups, os.path.join(output_dir, 'cross_group_plots', 'no_abst_all'))
+    except KeyError:
+        print("\nCouldn't find the right groups for the overall average plot, skipping.\n")
+
 if __name__ == "__main__":
     main()
