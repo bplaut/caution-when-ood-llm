@@ -119,13 +119,9 @@ def plot_roc_curves(all_data, output_dir, dataset):
 def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', texts=[]):
     # Consistent axes
     if ylabel == 'acc':
-        # bottom is min of current and 0.28, top is max of current and 0.72
-        curr_bottom, curr_top = plt.ylim()
-        plt.ylim([min(curr_bottom, 0.28), max(curr_top, 0.72)])
+        plt.ylim([0.28, 0.72])
     if xlabel == 'auc':
-        # same here but 0.5 and 0.71, but we can fix min at 0.5 because that's the lowest AUC
-        curr_bottom, curr_top = plt.xlim()
-        plt.xlim([0.5, max(curr_top, 0.71)])
+        plt.xlim([0.5, 0.71])
     if ylabel in ('score', 'harsh-score'):
         plt.ylim([-0.15,0.65])
 
@@ -209,7 +205,6 @@ def subtractive_score(labels, conf_levels, total_qs, thresh, normalize=True, wro
 def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dict(), yscale='linear'):
     plt.figure()
     plt.yscale(yscale)
-
     for (model, xs, ys) in data:
         # Mark the provided threshold if given, else mark the threshold with the best score
         if model in thresholds_to_mark:
@@ -230,8 +225,12 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     overall_max_x = max([max(xs) for _, xs, _ in data])
     plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='--')
 
-    make_and_sort_legend()
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {dataset}', file_suffix = f'_{dataset}')
+    # Don't include legend for score plots, we're gonna put the scores in a table in the paper
+    # make_and_sort_legend()
+    group = output_dir[output_dir.rfind('/')+1:]
+    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
+    plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
     
 def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresholds_to_mark=dict(), score_type='subtractive'):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
