@@ -190,6 +190,9 @@ def compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty=1, normal
 def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dict(), yscale='linear'):
     plt.figure()
     plt.yscale(yscale)
+    # define 10 unique linestyles, using custom patterns after the first 4
+    linestyles = ['-', '--', '-.', ':', (0, (1, 10)), (5, (10, 3)),(0, (5, 10)),(0, (5, 5)),(0, (5, 1)),(0, (3, 10, 1, 10)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1))]
+
     for (model, xs, ys) in data:
         # Mark the provided threshold if given, else mark the threshold with the best score
         if model in thresholds_to_mark:
@@ -203,7 +206,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
         # zorder determines which objects are on top
         plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # threshold of 0 is equivalent to the base model
-        plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2)
+        plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyles.pop(0))
 
     # Add dashed black line at y=0
     overall_min_x = min([min(xs) for _, xs, _ in data])
