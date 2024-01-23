@@ -191,7 +191,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plt.figure()
     plt.yscale(yscale)
     # define 10 unique linestyles, using custom patterns after the first 4
-    linestyles = ['-', '--', '-.', ':', (0, (1, 10)), (5, (10, 3)),(0, (5, 10)),(0, (5, 5)),(0, (5, 1)),(0, (3, 10, 1, 10)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1))]
+    linestyles = ['-', ':', (0, (3, 1, 1, 1, 1, 1)), (0, (0.5,0.5,0.5,0.5,2)),(0, (5, 10)),(0, (5, 1)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1)), (0, (0.5, 0.5)), (0,(1,1,1,3))]
 
     for (model, xs, ys) in data:
         # Mark the provided threshold if given, else mark the threshold with the best score
@@ -211,7 +211,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     # Add dashed black line at y=0
     overall_min_x = min([min(xs) for _, xs, _ in data])
     overall_max_x = max([max(xs) for _, xs, _ in data])
-    plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='--')
+    plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='-')
 
     make_and_sort_legend()
     group = output_dir[output_dir.rfind('/')+1:]
