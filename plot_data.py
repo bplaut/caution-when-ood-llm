@@ -122,8 +122,10 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suff
         plt.ylim([0.28, 0.72])
     if xlabel == 'auc':
         plt.xlim([0.5, 0.71])
-    if ylabel in ('score', 'harsh-score'):
+    if ylabel == 'score':
         plt.ylim([-0.15,0.65])
+    if ylabel == 'harsh-score':
+        plt.ylim([-0.15,0.25])
 
     adjust_text(texts) # Must do this after setting ylim and xlim
 
@@ -201,15 +203,14 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
         # zorder determines which objects are on top
         plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # threshold of 0 is equivalent to the base model
-        plt.plot(xs, ys, label=f"{expand_model_name(model)}: {base_score} to {score_to_mark}", zorder=2)
+        plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2)
 
     # Add dashed black line at y=0
     overall_min_x = min([min(xs) for _, xs, _ in data])
     overall_max_x = max([max(xs) for _, xs, _ in data])
     plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='--')
 
-    # Don't include legend for score plots, we're gonna put the scores in a table in the paper
-    # make_and_sort_legend()
+    make_and_sort_legend()
     group = output_dir[output_dir.rfind('/')+1:]
     plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
