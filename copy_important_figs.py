@@ -9,7 +9,7 @@ def copy_files(output_directory: str, filepaths: List[str]):
 
     for filepath in filepaths:
         print("Copying ", filepath)
-        extensions = ['.pdf', '.png']
+        extensions = ['.pdf', '.png', '.tex']
         for extension in extensions:
             full_path = filepath + extension
             if os.path.isfile(full_path):
@@ -36,5 +36,6 @@ for middle_dir in middle_dirs:
     # file_list += [f'figs/piqa/no{middle_dir}/roc_curve_piqa']
     file_list += [f'figs/main_figs/yes{middle_dir}/test/score_vs_conf_all_datasets']
     file_list += [f'figs/main_figs/yes{middle_dir}/test/harsh-score_vs_conf_all_datasets']
+file_list += ['figs/main_figs/auroc_table']
 copy_files(output_dir, file_list)
 print("Copied files to", output_dir)

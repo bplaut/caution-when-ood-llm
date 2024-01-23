@@ -71,10 +71,15 @@ def plot_style_for_group(group):
             ('mediumpurple', 'D', 'tab:orange') if 'raw' in group else ('#1f77b4', 'o', 'red'))
 
 def group_label(group):
-    logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
+    logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'MaxLogit' if group.startswith('no_abst_raw_logits') else group
     prompt = ', first prompt' if group.endswith('first_prompt') else ', second prompt' if group.endswith('second_prompt') else ''
     return logit_type, prompt
-    
+
+
+# Each model name is of the form "<model_series>-<size>B. Mixtral is a slight exception
+def model_series(name):
+    return name.split('-')[0]
+
 def model_size(name):
     full_name = expand_model_name(name)
     size_term = full_name.split('-')[1]
@@ -82,9 +87,7 @@ def model_size(name):
     return 46.7 if 'Mixtral' in name else float(size_term[:end_of_size_term])
 
 def make_and_sort_legend():
-    # Each name is of the form "<model_series>-<size>: <stuff>". Sort by model_series, then by size
     handles, names = plt.gca().get_legend_handles_labels()
-    model_series = lambda name: name.split('-')[0]
     zipped = zip(handles, names)
     sorted_zipped = sorted(zipped, key=lambda x: (model_series(x[1]), model_size(x[1])))
     sorted_handles, sorted_names = zip(*sorted_zipped)
@@ -110,7 +113,7 @@ def plot_roc_curves(all_data, output_dir, dataset):
     # Make output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.pdf")
+    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.png")
     plt.savefig(output_path)
     plt.close()
     print(f"ROC curve for {dataset} saved --> {output_path}")
@@ -134,7 +137,7 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suff
     plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.pdf")
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.png")
     
     plt.savefig(output_path)
     plt.close()
@@ -154,20 +157,15 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
     plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
-    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
+    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'MaxLogit' if group == 'no_abst_raw_logits' else group
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=f'_{dataset}_{plot_name}', texts=texts)
            
 def auc_acc_plots(data, all_aucs, output_dir):
-    # Main three meta metrics are: model size, avg AUC, avg accuracy
-    # Create a scatter plot for each pair of metrics
-    model_aucs, model_accs = dict(), dict()
+    model_aucs, model_accs = defaultdict(list), defaultdict(list)
     for dataset in all_aucs:
         # Same set of models in each dict, so we can just iterate over one dict
         for model in all_aucs[dataset]:
-            if model not in model_aucs:
-                model_aucs[model] = []
-                model_accs[model] = []    
             model_aucs[model].append(all_aucs[dataset][model])
             (labels, _, _) = data[dataset][model]
             model_accs[model].append(np.mean(labels))
@@ -193,6 +191,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     # define 10 unique linestyles, using custom patterns after the first 4
     linestyles = ['-', ':', (0, (3, 1, 1, 1, 1, 1)), (0, (0.5,0.5,0.5,0.5,2)),(0, (5, 10)),(0, (5, 1)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1)), (0, (0.5, 0.5)), (0,(1,1,1,3))]
 
+    result_thresholds, result_scores, base_scores = dict(), dict(), dict()
     for (model, xs, ys) in data:
         # Mark the provided threshold if given, else mark the threshold with the best score
         if model in thresholds_to_mark:
@@ -207,6 +206,9 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
         plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # threshold of 0 is equivalent to the base model
         plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyles.pop(0))
+        result_thresholds[model] = thresh_to_mark
+        base_scores[model] = base_score
+        result_scores[model] = score_to_mark
 
     # Add dashed black line at y=0
     overall_min_x = min([min(xs) for _, xs, _ in data])
@@ -215,9 +217,10 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
 
     make_and_sort_legend()
     group = output_dir[output_dir.rfind('/')+1:]
-    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
+    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'MaxLogit' if group == 'no_abst_raw_logits' else group
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
+    return result_thresholds, result_scores, base_scores
     
 def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresholds_to_mark=dict()):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
@@ -242,7 +245,6 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
             
     # Now for each model and threshold, average the scores across datasets
     overall_results = []
-    optimal_thresholds = dict()
     for model in results:
         results_for_model = []
         for i in range(len(thresholds)):
@@ -252,17 +254,54 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
             avg_score = round(np.mean(scores_for_thresh), precision)
             results_for_model.append(avg_score)
         overall_results.append((model, thresholds, results_for_model))
-        optimal_thresh_idx = np.argmax(results_for_model)
-        optimal_thresholds[model] = thresholds[optimal_thresh_idx]
             
     dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
     ylabel = 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else f'Wrong penalty of {wrong_penalty}'
-    score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name, thresholds_to_mark)
-    return optimal_thresholds # We use this return value in the train/test context
+    return score_plot(overall_results, output_dir, 'conf', ylabel, dataset_name, thresholds_to_mark)
 
 def train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1):
-    thresholds_to_mark = plot_score_vs_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty)
-    plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=thresholds_to_mark)
+    # Get optimal thresholds for train data, use those to compute scores for test data
+    (optimal_train_thresholds, _, _) = plot_score_vs_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty)
+    (_, test_scores, base_test_scores) = plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=optimal_train_thresholds)
+    return optimal_train_thresholds, test_scores, base_test_scores
+
+def make_auroc_table(msp_group_data, max_logit_group_data, output_dir):
+    model_results_msp = make_model_dict(*msp_group_data)
+    model_results_max_logit = make_model_dict(*max_logit_group_data)
+    rows = []
+    # Sort the rows by model series, then by model size
+    for model in sorted(model_results_msp.keys(), key=lambda x: (model_series(x), model_size(x))):
+        (auc_msp, acc_msp, _) = model_results_msp[model]
+        (auc_max_logit, acc_max_logit, _) = model_results_max_logit[model]
+        if abs(acc_msp - acc_max_logit) > 0.001:
+            raise Exception(f"Accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
+        precision = 3
+        rows.append([expand_model_name(model), round(acc_msp, precision), round(auc_msp, precision), round(auc_max_logit, precision)])
+    column_names = ['LLM', 'LLM Q\\&A Accuracy', 'MSP AUROC', 'MaxLogit AUROC']
+    make_results_table(column_names, rows, output_dir, caption='AUROC stuff', label='tab:auroc', filename='auroc_table.tex')
+
+def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex'):
+    filename = os.path.join(output_dir, filename)
+    # Create directory if it doesn't exist
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    with open(filename, 'w') as f:
+        f.write('\\documentclass{article}\n')
+        f.write('\\begin{document}\n')
+        f.write('\\renewcommand\\arraystretch{1.35}\n')
+        f.write('\\begin{table*}[tb]\n')
+        f.write('\\centering\n')
+        f.write('\\begin{tabular}{' + 'c|' * (len(column_names) - 1) + 'c}\n')
+        f.write(' & '.join(column_names) + '\\\\ \\hline\n')
+        for row in rows:
+            f.write(' & '.join([str(x) for x in row]) + '\\\\\n')
+        f.write('\\hline\n')
+        f.write('\\end{tabular}\n')
+        f.write(f'\\caption{{{caption}}}\n')
+        f.write('\\end{table*}\n')
+        f.write(f'\\label{{{label}}}\n')
+        f.write('\\end{document}\n')
+    print("Results table saved -->", filename)
 
 def plots_for_group(data, output_dir):
     # Split into train and test. We don't have to shuffle, since question order is already randomized
@@ -277,44 +316,74 @@ def plots_for_group(data, output_dir):
     # Generating and saving plots
     all_aucs = dict()
     for dataset in data:
-        # Plots for this dataset
+        # Single dataset plots. Commenting these out for now to speed things up, except for auc because we need that
         all_aucs[dataset] = plot_roc_curves(data, output_dir, dataset)
-        # score = (correct - wrong * wrong_penalty)
-        plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=1)
-        plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=2)
+        # plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=1)
+        # plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=2)
 
-        # Plots for train and test splits
-        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
-        train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
+        # train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
+        # train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
 
-        auc_for_this_dataset = {dataset: all_aucs[dataset]}
-        auc_acc_plots(data, auc_for_this_dataset, output_dir)
+        # auc_for_this_dataset = {dataset: all_aucs[dataset]}
+        # auc_acc_plots(data, auc_for_this_dataset, output_dir)
 
-    # Same plots as before, but for all datasets together
+    # Plots for all datasets together
     datasets = list(data.keys())
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1)
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=2)
-    train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1)
-    train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)
+    # Maps each wrong_penalty to (train_thresholds, test_scores, base_test_scores)
+    score_data = {1: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1), 2: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)} 
 
-    return auc_acc_plots(data, all_aucs, output_dir) # We'll use the return value for cross-group plots
+    aucs, accs, model_names = auc_acc_plots(data, all_aucs, output_dir)
+    return score_data, aucs, accs, model_names
 
 def merge_groups(group_data):
     # Merge to a single "group" based on the means across groups
-    new_data = defaultdict(lambda: ([], []))
+    all_auc_acc_data = defaultdict(lambda: ([], []))
+    all_score_data = defaultdict(lambda: (defaultdict(list), defaultdict(list), defaultdict(list)))
     for group in group_data:
-        (accs, aucs, model_names) = group_data[group]
+        (score_data, aucs, accs, model_names) = group_data[group]
         for i, model_name in enumerate(model_names):
-            new_data[model_name][0].append(accs[i])
-            new_data[model_name][1].append(aucs[i])
+            # Collect the auc and acc for this model in each group into a list
+            all_auc_acc_data[model_name][0].append(aucs[i])
+            all_auc_acc_data[model_name][1].append(accs[i])
+            
+        for wrong_penalty in score_data:
+            # Same idea here, except these are each dicts with model name as the key
+            (thresholds, our_scores, base_scores) = score_data[wrong_penalty]
+            for model in thresholds:
+                all_score_data[wrong_penalty][0][model].append(thresholds[model])
+                all_score_data[wrong_penalty][1][model].append(our_scores[model])
+                all_score_data[wrong_penalty][2][model].append(base_scores[model])
 
     plt.figure()
-    avg_accs, avg_aucs, model_names = [], [], []
-    for model_name, (accs, aucs) in new_data.items():
-        avg_accs.append(np.mean(accs))
+    avg_aucs, avg_accs, model_names = [], [], []
+    for model_name, (aucs, accs) in all_auc_acc_data.items():
         avg_aucs.append(np.mean(aucs))
+        avg_accs.append(np.mean(accs))
         model_names.append(model_name)
-    return avg_accs, avg_aucs, model_names
+
+    new_score_data = defaultdict(lambda: (dict(), dict(), dict()))
+    for wrong_penalty, (thresholds, our_scores, base_scores) in all_score_data.items():
+        for model in thresholds:
+            thresh_list, our_scores_list, base_scores_list = thresholds[model], our_scores[model], base_scores[model]
+            new_thresh, new_our_score, new_base_score = np.mean(thresh_list), np.mean(our_scores_list), np.mean(base_scores_list)
+            new_score_data[wrong_penalty][0][model] = new_thresh
+            new_score_data[wrong_penalty][1][model] = new_our_score
+            new_score_data[wrong_penalty][2][model] = new_base_score
+    return new_score_data, avg_aucs, avg_accs, model_names
+
+def make_model_dict(score_data, aucs, accs, model_names):
+    # Change the dict structure so that the model is the key
+    model_results = dict()
+    for i, model_name in enumerate(model_names):
+        model_score_data = dict()
+        for wrong_penalty in score_data:
+            thresholds, our_scores, base_scores = score_data[wrong_penalty]
+            thresh, our_score, base_score = thresholds[model_name], our_scores[model_name], base_scores[model_name]
+            model_score_data[wrong_penalty] = (thresh, our_score, base_score)
+        model_results[model_name] = (aucs[i], accs[i], model_score_data)
+    return model_results
 
 def cross_group_plots(group_data, output_dir):
     print(f"\nGENERATING CROSS GROUP PLOTS: {list(group_data.keys())}\n")
@@ -322,7 +391,7 @@ def cross_group_plots(group_data, output_dir):
     plt.figure()
     texts = []
     for group in sorted(list(group_data.keys())): # Colors should be consistent across plots
-        aucs, accs, model_names = group_data[group]
+        score_data, aucs, accs, model_names = group_data[group]
         mark_color, marker, line_color = plot_style_for_group(group)
         aucs, accs = np.array(aucs), np.array(accs)
         logit_type, prompt = group_label(group)
@@ -341,7 +410,7 @@ def cross_group_plots(group_data, output_dir):
     generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix=file_suffix, title_suffix=title_suffix, texts=texts)
     
     # Second plot: AUC vs accuracy, averaged across groups
-    avg_accs, avg_aucs, model_names = merge_groups(group_data)
+    score_data, avg_accs, avg_aucs, model_names = merge_groups(group_data)
     scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'auc', 'acc')
     
 def main():
@@ -391,18 +460,15 @@ def main():
 
     # Finally, compare normed vs raw logits, averaged over the two prompts
     try:
-        merged_groups = dict()
-        group1 = 'no_abst_norm_logits_first_prompt'
-        group2 = 'no_abst_norm_logits_second_prompt'
-        new_group = 'no_abst_norm_logits'
-        merged_groups[new_group] = merge_groups({group1: group_data[group1],
-                                                 group2: group_data[group2]})
-        group3 = 'no_abst_raw_logits_first_prompt'
-        group4 = 'no_abst_raw_logits_second_prompt'
-        new_group = 'no_abst_raw_logits'
-        merged_groups[new_group] = merge_groups({group3: group_data[group3],
-                                                 group4: group_data[group4]})
+        group1a = 'no_abst_norm_logits_first_prompt'
+        group1b = 'no_abst_norm_logits_second_prompt'
+        new_group1 = merge_groups({group1a: group_data[group1a], group1b: group_data[group1b]})
+        group2a = 'no_abst_raw_logits_first_prompt'
+        group2b = 'no_abst_raw_logits_second_prompt'
+        new_group2 = merge_groups({group2a: group_data[group2a], group2b: group_data[group2b]})
+        merged_groups = {'no_abst_norm_logits': new_group1, 'no_abst_raw_logits': new_group2}
         cross_group_plots(merged_groups, os.path.join(output_dir, 'cross_group_plots', 'no_abst_all'))
+        make_auroc_table(new_group1, new_group2, output_dir)
     except KeyError:
         print("\nCouldn't find the right groups for the overall average plot, skipping.\n")
 
