@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import roc_curve, auc, precision_recall_curve
+from sklearn.metrics import roc_curve, auc
 import sys
 import os
 from collections import defaultdict
@@ -250,7 +250,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
         for i in range(len(thresholds)):
             # Some models might not have results for all datasets (although eventually they should)
             scores_for_thresh = [results[model][dataset][i] for dataset in results[model]]
-            precision = 3
+            precision = 2
             avg_score = round(np.mean(scores_for_thresh), precision)
             results_for_model.append(avg_score)
         overall_results.append((model, thresholds, results_for_model))
@@ -275,9 +275,9 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir):
         (auc_max_logit, acc_max_logit, _) = model_results_max_logit[model]
         if abs(acc_msp - acc_max_logit) > 0.001:
             raise Exception(f"Accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
-        precision = 3
-        rows.append([expand_model_name(model), round(acc_msp, precision), round(auc_msp, precision), round(auc_max_logit, precision)])
-    column_names = ['LLM', 'LLM Q\\&A Accuracy', 'MSP AUROC', 'MaxLogit AUROC']
+        format_float = lambda x: round(100*x, 1)
+        rows.append([expand_model_name(model), format_float(acc_msp), format_float(auc_msp), format_float(auc_max_logit)])
+    column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'MaxLogit AUROC']
     make_results_table(column_names, rows, output_dir, caption='AUROC stuff', label='tab:auroc', filename='auroc_table.tex')
 
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex'):
@@ -286,8 +286,6 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(filename, 'w') as f:
-        f.write('\\documentclass{article}\n')
-        f.write('\\begin{document}\n')
         f.write('\\renewcommand\\arraystretch{1.35}\n')
         f.write('\\begin{table*}[tb]\n')
         f.write('\\centering\n')
@@ -300,7 +298,6 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
         f.write(f'\\caption{{{caption}}}\n')
         f.write('\\end{table*}\n')
         f.write(f'\\label{{{label}}}\n')
-        f.write('\\end{document}\n')
     print("Results table saved -->", filename)
 
 def plots_for_group(data, output_dir):
