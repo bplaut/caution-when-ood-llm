@@ -24,18 +24,19 @@ def copy_files(output_directory: str, filepaths: List[str]):
 
 output_dir = 'paper_figs'
 cross_group_dir = 'figs/main_figs/cross_group_plots'
-file_list = [cross_group_dir + '/no_abst_all/acc_vs_auc-no_abst_norm_logits-no_abst_raw_logits',
-             cross_group_dir + '/no_abst_norm_logits/acc_vs_auc_all_datasets_MSP',
-             cross_group_dir + '/no_abst_norm_logits/acc_vs_auc-no_abst_norm_logits_second_prompt-no_abst_norm_logits_first_prompt',
-             cross_group_dir + '/no_abst_raw_logits/acc_vs_auc_all_datasets_Max_Logit',
-             cross_group_dir + '/no_abst_raw_logits/acc_vs_auc-no_abst_raw_logits_second_prompt-no_abst_raw_logits_first_prompt',
+suffixes = ['/no_abst_all/acc_vs_auc-no_abst_norm_logits-no_abst_raw_logits',
+            '/no_abst_norm_logits/acc_vs_auc_all_datasets_MSP',
+            '/no_abst_norm_logits/acc_vs_auc-no_abst_norm_logits_second_prompt-no_abst_norm_logits_first_prompt',
+            '/no_abst_raw_logits/acc_vs_auc_all_datasets_Max_Logit',
+            '/no_abst_raw_logits/acc_vs_auc-no_abst_raw_logits_second_prompt-no_abst_raw_logits_first_prompt',
              ]
-datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande']
+file_list = [cross_group_dir + suffix for suffix in suffixes] + ['figs/main_figs/' + suffix for suffix in suffixes]
+datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande', 'piqa']
 middle_dirs = ['_abst_norm_logits_first_prompt', '_abst_norm_logits_second_prompt', '_abst_raw_logits_first_prompt', '_abst_raw_logits_second_prompt', '_abst_norm_logits', '_abst_raw_logits']
 for middle_dir in middle_dirs:
     file_list += [f'figs/main_figs/yes{middle_dir}/test/score_vs_conf_all_datasets']
     file_list += [f'figs/main_figs/yes{middle_dir}/test/harsh-score_vs_conf_all_datasets']
-file_list += ['figs/main_figs/auroc_table', cross_group_dir + '/no_abst_None/auroc_table']
-file_list += [f'figs/{dataset}/cross_group_plots/{dataset}_auroc_table' for dataset in datasets]
+file_list += [cross_group_dir + '/no_abst_None/auroc_table']
+file_list += [f'figs/{dataset}/cross_group_plots/no_abst_None/{dataset}_auroc_table' for dataset in datasets]
 copy_files(output_dir, file_list)
 print("Copied files to", output_dir)
