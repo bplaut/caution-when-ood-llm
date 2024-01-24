@@ -212,19 +212,19 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
         # zorder determines which objects are on top
         plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # threshold of 0 is equivalent to the base model
-        plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyles.pop(0))
+        plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyles.pop(0), linewidth=2)
         result_thresholds[model] = thresh_to_mark
         base_scores[model] = base_score
         result_scores[model] = score_to_mark
 
     # Add dashed black line at y=0
-    overall_min_x = min([min(xs) for _, xs, _ in data])
-    overall_max_x = max([max(xs) for _, xs, _ in data])
-    plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='-')
+    # overall_min_x = min([min(xs) for _, xs, _ in data])
+    # overall_max_x = max([max(xs) for _, xs, _ in data])
+    # plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='-')
 
     make_and_sort_legend()
-    group = output_dir[output_dir.rfind('/')+1:]
-    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
+    plt.legend(handlelength=3)
+    plot_name = 'MSP' if 'norm' in output_dir else 'Max Logit' if 'raw' in output_dir else 'unknown'
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
     return result_thresholds, result_scores, base_scores
@@ -257,8 +257,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
         for i in range(len(thresholds)):
             # Some models might not have results for all datasets (although eventually they should)
             scores_for_thresh = [results[model][dataset][i] for dataset in results[model]]
-            precision = 2
-            avg_score = round(np.mean(scores_for_thresh), precision)
+            avg_score = np.mean(scores_for_thresh)
             results_for_model.append(avg_score)
         overall_results.append((model, thresholds, results_for_model))
             
