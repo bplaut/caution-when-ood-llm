@@ -164,7 +164,8 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
 
     plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=f'_{dataset}_{plot_name}', texts=texts)
+    file_suffix = f"_{dataset}_{plot_name.replace(' ','_').replace(',','')}"
+    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=file_suffix, texts=texts)
            
 def auc_acc_plots(data, all_aucs, output_dir):
     model_aucs, model_accs = defaultdict(list), defaultdict(list)
@@ -270,7 +271,7 @@ def train_and_test_score_plots(test_data, train_data, output_dir, datasets, wron
     (_, test_scores, base_test_scores) = plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=optimal_train_thresholds)
     return optimal_train_thresholds, test_scores, base_test_scores
 
-def make_auroc_table(msp_group_data, max_logit_group_data, output_dir):
+def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
     model_results_max_logit = make_model_dict(*max_logit_group_data)
     rows = []
@@ -283,7 +284,8 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir):
         format_float = lambda x: round(100*x, 1)
         rows.append([expand_model_name(model), format_float(acc_msp), format_float(auc_msp), format_float(auc_max_logit)])
     column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
-    make_results_table(column_names, rows, output_dir, caption='AUROC stuff', label='tab:auroc', filename='auroc_table.tex')
+    dataset_for_caption = '' if dataset == '' else f' for {dataset}' 
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}', label=f'tab:{dataset}auroc', filename=f'{dataset}auroc_table.tex')
 
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex'):
     filename = os.path.join(output_dir, filename)
@@ -431,8 +433,8 @@ def main():
     file_paths = sys.argv[5:]
     print(f"Reading from {len(file_paths)} files...")
     datasets_to_analyze = sys.argv[4].split(',')
-    if any([dataset not in ('arc', 'hellaswag', 'mmlu', 'piqa', 'truthfulqa', 'winogrande','all') for dataset in datasets_to_analyze]):
-        raise Exception(f'Third argument must be a comma-separated list of datasets or "all"')
+    if any([dataset not in ('arc', 'hellaswag', 'mmlu', 'piqa', 'truthfulqa', 'winogrande') for dataset in datasets_to_analyze]):
+        raise Exception(f'Third argument must be a comma-separated list of datasets')
     if 'all' in datasets_to_analyze:
         datasets_to_analyze = ['arc', 'hellaswag', 'mmlu', 'piqa', 'truthfulqa', 'winogrande']
 
@@ -448,7 +450,7 @@ def main():
     # Single group plots
     group_data = dict()
     for group in all_data:
-        print(f"\nGENERATING PLOTS FOR {group}\n")
+        print(f"\nGENERATING PLOTS FOR {group} and {datasets_to_analyze}\n")
         group_data[group] = plots_for_group(all_data[group], os.path.join(output_dir, group))
 
     # Cross-group plots
@@ -464,10 +466,11 @@ def main():
                     curr_output_dir = os.path.join(output_dir, 'cross_group_plots', bottom_dir)
                     cross_group_plots(data, curr_output_dir)
                     # make_auroc_table takes MSP data as first arg, Max Logit data as second arg
+                    dataset_str = '' if len(datasets_to_analyze) > 1 else f'{datasets_to_analyze[0]}_'
                     if logit_type_1 == 'norm_logits' and logit_type_2 == 'raw_logits':
-                        make_auroc_table(group_data[group1], group_data[group2], curr_output_dir)
+                        make_auroc_table(group_data[group1], group_data[group2], curr_output_dir, dataset_str)
                     elif logit_type_1 == 'raw_logits' and logit_type_2 == 'norm_logits':
-                        make_auroc_table(group_data[group2], group_data[group1], curr_output_dir)
+                        make_auroc_table(group_data[group2], group_data[group1], curr_output_dir, dataset_str)
 
     # Finally, compare normed vs raw logits, averaged over the two prompts
     try:
