@@ -36,7 +36,7 @@ middle_dirs = ['_abst_norm_logits_first_prompt', '_abst_norm_logits_second_promp
 for middle_dir in middle_dirs:
     file_list += [f'figs/main_figs/yes{middle_dir}/test/score_vs_conf_all_datasets']
     file_list += [f'figs/main_figs/yes{middle_dir}/test/harsh-score_vs_conf_all_datasets']
-file_list += [cross_group_dir + '/no_abst_None/auroc_table']
+file_list += [cross_group_dir + '/no_abst_None/auroc_table', cross_group_dir + '/no_abst_None/acc_vs_auc-no_abst_raw_logits-no_abst_norm_logits']
 file_list += [f'figs/{dataset}/cross_group_plots/no_abst_None/{dataset}_auroc_table' for dataset in datasets]
 copy_files(output_dir, file_list)
 print("Copied files to", output_dir)

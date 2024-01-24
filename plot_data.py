@@ -285,8 +285,9 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         format_float = lambda x: round(100*x, 1)
         rows.append([expand_model_name(model), format_float(acc_msp), format_float(auc_msp), format_float(auc_max_logit)])
     column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
-    dataset_for_caption = '' if dataset == '' else f' for {dataset}' 
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}', label=f'tab:{dataset}auroc', filename=f'{dataset}auroc_table.tex')
+    dataset_for_caption = '' if dataset == '' else f' for {dataset}'
+    dataset_for_label = '' if dataset == '' else f'{dataset}_'
+    make_results_table(column_names, rows, output_dir, caption=f'{dataset}AUROC results', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
 
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex'):
     filename = os.path.join(output_dir, filename)
@@ -472,11 +473,11 @@ def main():
                     curr_output_dir = os.path.join(output_dir, 'cross_group_plots', bottom_dir)
                     cross_group_plots(data, curr_output_dir)
                     # make_auroc_table takes MSP data as first arg, Max Logit data as second arg
-                    dataset_str = '' if len(datasets_to_analyze) > 1 else f'{datasets_to_analyze[0]}_'
+                    dataset = '' if len(datasets_to_analyze) > 1 else datasets_to_analyze[0]
                     if logit_type_1 == 'norm_logits' and logit_type_2 == 'raw_logits':
-                        make_auroc_table(group_data[group1], group_data[group2], curr_output_dir, dataset_str)
+                        make_auroc_table(group_data[group1], group_data[group2], curr_output_dir, dataset)
                     elif logit_type_1 == 'raw_logits' and logit_type_2 == 'norm_logits':
-                        make_auroc_table(group_data[group2], group_data[group1], curr_output_dir, dataset_str)
+                        make_auroc_table(group_data[group2], group_data[group1], curr_output_dir, dataset)
 
     # Finally, compare normed vs raw logits, averaged over the two prompts
     try:
