@@ -118,7 +118,7 @@ def plot_roc_curves(all_data, output_dir, dataset):
     # Make output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.png")
+    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.pdf")
     plt.savefig(output_path)
     plt.close()
     print(f"ROC curve for {dataset} saved --> {output_path}")
@@ -142,7 +142,7 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suff
     plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.png")
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.pdf")
     
     plt.savefig(output_path)
     plt.close()
@@ -291,8 +291,8 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(filename, 'w') as f:
-        f.write('\\renewcommand\\arraystretch{1.35}\n')
-        f.write('\\begin{table*}[tb]\n')
+        f.write('\\renewcommand\\arraystretch{1.2}\n')
+        f.write('\\begin{table*}\n')
         f.write('\\centering\n')
         f.write('\\begin{tabular}{' + 'c|' * (len(column_names) - 1) + 'c}\n')
         f.write(' & '.join(column_names) + '\\\\ \\hline\n')
@@ -461,7 +461,13 @@ def main():
                 # Only compare pairs of groups which differ by exactly 1 component
                 if abst_type_1 == abst_type_2 and (logit_type_1 == logit_type_2 or prompt_type_1 == prompt_type_2):
                     bottom_dir = f'{abst_type_1}_{logit_type_1}' if logit_type_1 == logit_type_2 else f'{abst_type_1}_{prompt_type_1}'
-                    cross_group_plots(data, os.path.join(output_dir, 'cross_group_plots', bottom_dir))
+                    curr_output_dir = os.path.join(output_dir, 'cross_group_plots', bottom_dir)
+                    cross_group_plots(data, curr_output_dir)
+                    # make_auroc_table takes MSP data as first arg, Max Logit data as second arg
+                    if logit_type_1 == 'norm_logits' and logit_type_2 == 'raw_logits':
+                        make_auroc_table(group_data[group1], group_data[group2], curr_output_dir)
+                    elif logit_type_1 == 'raw_logits' and logit_type_2 == 'norm_logits':
+                        make_auroc_table(group_data[group2], group_data[group1], curr_output_dir)
 
     # Finally, compare normed vs raw logits, averaged over the two prompts
     try:
