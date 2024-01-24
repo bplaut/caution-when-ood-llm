@@ -7,20 +7,25 @@ from collections import defaultdict
 from adjustText import adjust_text
 from scipy.stats import linregress
 
-def parse_file_name(file_name):
+def parse_file_name(file_name, collapse_prompts=False):
     # filename looks like <dataset>_<model>-q<startq>to<endq>_<group>.txt. Assume endq ends with 0
     second_half = file_name[file_name.find('to'):]
-    group = second_half[second_half.find('_')+1:-4] # remove initial underscore and .txt
     parts = file_name.split('_')
     dataset = parts[0]
     model = parts[1].split('-q')[0]
+    group = second_half[second_half.find('_')+1:-4] # remove initial underscore and .txt
+    if collapse_prompts:
+        group = group.replace('_first_prompt','').replace('_second_prompt', '')
     return dataset, model, group
 
-def parse_group_name(group):
+def parse_group_name(group, collapse_prompts=False):
     # Each group name has the form <yes/no>_abst_<raw/norm>_logits_<first/second>_prompt
     # Later on, we might create some merged groups, but we'll only call this fn on initial groups
     parts = group.split('_')
-    return parts[0] + '_' + parts[1], parts[2] + '_' + parts[3], parts[4] + '_' + parts[5]
+    abst_type = parts[0] + '_' + parts[1]
+    logit_type = parts[2] + '_' + parts[3]
+    prompt_type = parts[4] + '_' + parts[5] if not collapse_prompts else None
+    return (abst_type, logit_type, prompt_type)
 
 def parse_data(file_path, incl_unparseable):
     labels = []
@@ -45,16 +50,16 @@ def parse_data(file_path, incl_unparseable):
     return labels, conf_levels, total_qs
 
 def expand_model_name(name):
-    return ('Mistral-7B' if name == 'Mistral' else
-            'Mixtral-8x7B' if name == 'Mixtral' else
-            'SOLAR-10.7B' if name == 'Solar' else
-            'Llama2-13B' if name == 'Llama-13b' else
-            'Llama2-7B' if name == 'Llama-7b' else
-            'Llama2-70B' if name == 'Llama-70b' else
-            'Yi-6B' if name == 'Yi-6b' else
-            'Yi-34B' if name == 'Yi-34b' else
-            'Falcon-7B' if name == 'Falcon-7b' else
-            'Falcon-40B' if name == 'Falcon-40b' else name)
+    return ('Mistral 7B' if name == 'Mistral' else
+            'Mixtral 8x7B' if name == 'Mixtral' else
+            'SOLAR 10.7B' if name == 'Solar' else
+            'Llama2 13B' if name == 'Llama-13b' else
+            'Llama2 7B' if name == 'Llama-7b' else
+            'Llama2 70B' if name == 'Llama-70b' else
+            'Yi 6B' if name == 'Yi-6b' else
+            'Yi 34B' if name == 'Yi-34b' else
+            'Falcon 7B' if name == 'Falcon-7b' else
+            'Falcon 40B' if name == 'Falcon-40b' else name)
 
 def expand_label(label):
         return ('Confidence Threshold' if label == 'conf' else
@@ -71,18 +76,18 @@ def plot_style_for_group(group):
             ('mediumpurple', 'D', 'tab:orange') if 'raw' in group else ('#1f77b4', 'o', 'red'))
 
 def group_label(group):
-    logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'MaxLogit' if group.startswith('no_abst_raw_logits') else group
+    logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
     prompt = ', first prompt' if group.endswith('first_prompt') else ', second prompt' if group.endswith('second_prompt') else ''
     return logit_type, prompt
 
 
-# Each model name is of the form "<model_series>-<size>B. Mixtral is a slight exception
+# Each model name is of the form "<model_series> <size>B. Mixtral is a slight exception
 def model_series(name):
-    return name.split('-')[0]
+    return expand_model_name(name).split(' ')[0]
 
 def model_size(name):
     full_name = expand_model_name(name)
-    size_term = full_name.split('-')[1]
+    size_term = full_name.split(' ')[1]
     end_of_size_term = size_term.rfind('B')
     return 46.7 if 'Mixtral' in name else float(size_term[:end_of_size_term])
 
@@ -157,7 +162,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
     plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
-    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'MaxLogit' if group == 'no_abst_raw_logits' else group
+    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=f'_{dataset}_{plot_name}', texts=texts)
            
@@ -217,7 +222,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
 
     make_and_sort_legend()
     group = output_dir[output_dir.rfind('/')+1:]
-    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'MaxLogit' if group == 'no_abst_raw_logits' else group
+    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
     return result_thresholds, result_scores, base_scores
@@ -277,7 +282,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir):
             raise Exception(f"Accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
         format_float = lambda x: round(100*x, 1)
         rows.append([expand_model_name(model), format_float(acc_msp), format_float(auc_msp), format_float(auc_max_logit)])
-    column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'MaxLogit AUROC']
+    column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
     make_results_table(column_names, rows, output_dir, caption='AUROC stuff', label='tab:auroc', filename='auroc_table.tex')
 
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex'):
@@ -412,17 +417,20 @@ def cross_group_plots(group_data, output_dir):
     
 def main():
     # Setup
-    if len(sys.argv) < 5:
-        print("Usage: python plot_data.py <output_directory> <incl_unparseable> <dataset1,dataset2,...> <data_file1> [<data_file2> ...]")
+    if len(sys.argv) < 6:
+        print("Usage: python plot_data.py <output_directory> <incl_unparseable> <collapse_prompts> <dataset1,dataset2,...> <data_file1> [<data_file2> ...]")
         sys.exit(1)
     output_dir = sys.argv[1]
-    incl_unparseable = (False if sys.argv[2].lower() == 'false' else
-                        True if sys.argv[2].lower() == 'true' else None)
+    incl_unparseable = (False if sys.argv[2].lower() == 'false' else True if sys.argv[2].lower() == 'true' else None) # On questions where the model produced an unparseable answer, do we include it and count it as wrong, or discard it?
+    collapse_prompts = (False if sys.argv[3].lower() == 'false' else True if sys.argv[3].lower() == 'true' else None) # Do we collapse the two prompts into a single group with 12k questions per dataset?
+    
     if incl_unparseable is None:
-        raise Exception('Second argument incl_unparseable must be a boolean (True or False)')
-    file_paths = sys.argv[4:]
+        raise Exception('Second argument incl_unparseable must be a boolean (True or False). Instead it was:', sys.argv[2])
+    if collapse_prompts is None:
+        raise Exception('Third argument collapse_prompts must be a boolean (True or False). Instead it was:', sys.argv[3])
+    file_paths = sys.argv[5:]
     print(f"Reading from {len(file_paths)} files...")
-    datasets_to_analyze = sys.argv[3].split(',')
+    datasets_to_analyze = sys.argv[4].split(',')
     if any([dataset not in ('arc', 'hellaswag', 'mmlu', 'piqa', 'truthfulqa', 'winogrande','all') for dataset in datasets_to_analyze]):
         raise Exception(f'Third argument must be a comma-separated list of datasets or "all"')
     if 'all' in datasets_to_analyze:
@@ -431,7 +439,7 @@ def main():
     # Data aggregation. We want all_data[group][dataset][model] = (labels, conf_levels, total_qs)
     all_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: ([], [], 0))))
     for file_path in file_paths:
-        dataset, model, group = parse_file_name(os.path.basename(file_path))
+        dataset, model, group = parse_file_name(os.path.basename(file_path), collapse_prompts)
         if dataset in datasets_to_analyze:
             labels, conf_levels, total_qs = parse_data(file_path, incl_unparseable)
             old_labels, old_conf_levels, old_total_qs = all_data[group][dataset][model]
@@ -447,8 +455,8 @@ def main():
     for group1 in group_data:
         for group2 in group_data:
             if group1 > group2: # greater because we only need to do each pair once
-                (abst_type_1, logit_type_1, prompt_type_1) = parse_group_name(group1)
-                (abst_type_2, logit_type_2, prompt_type_2) = parse_group_name(group2)
+                (abst_type_1, logit_type_1, prompt_type_1) = parse_group_name(group1, collapse_prompts)
+                (abst_type_2, logit_type_2, prompt_type_2) = parse_group_name(group2, collapse_prompts)
                 data = {group1: group_data[group1], group2: group_data[group2]}
                 # Only compare pairs of groups which differ by exactly 1 component
                 if abst_type_1 == abst_type_2 and (logit_type_1 == logit_type_2 or prompt_type_1 == prompt_type_2):

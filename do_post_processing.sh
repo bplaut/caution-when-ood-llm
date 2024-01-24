@@ -38,12 +38,18 @@ for abstain in "no_abst" "yes_abst"; do
 done
 
 output_dir=figs
+incl_unparseable=True
+collapse_prompts=True
 echo -e "\nMaking figures...\n"
 
 for abstain in "no_abst" "yes_abst"; do
-    python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*${abstain}*.txt
-    python plot_data.py $output_dir/piqa True piqa $dir/*${abstain}*.txt
-    python plot_data.py $output_dir/no_winogrande True arc,hellaswag,mmlu,truthfulqa $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/main_figs $incl_unparseable $collapse_prompts arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/piqa $incl_unparseable $collapse_prompts piqa $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/arc $incl_unparseable $collapse_prompts arc $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/hellaswag $incl_unparseable $collapse_prompts hellaswag $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/mmlu $incl_unparseable $collapse_prompts mmlu $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/truthfulqa $incl_unparseable $collapse_prompts truthfulqa $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/winogrande $incl_unparseable $collapse_prompts winogrande $dir/*${abstain}*.txt
 done
 
 echo -e "\nCopying important figures...\n"
