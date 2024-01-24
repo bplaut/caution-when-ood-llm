@@ -6,6 +6,7 @@ import os
 from collections import defaultdict
 from adjustText import adjust_text
 from scipy.stats import linregress
+import random
 
 def parse_file_name(file_name, collapse_prompts=False):
     # filename looks like <dataset>_<model>-q<startq>to<endq>_<group>.txt. Assume endq ends with 0
@@ -313,6 +314,11 @@ def plots_for_group(data, output_dir):
     for dataset in data:
         for model in data[dataset]:
             labels, conf_levels, total_qs = data[dataset][model]
+            # Shuffle labels and conf_levels together
+            random.seed(2549900867) # Everyone should have the same split
+            combined = list(zip(labels, conf_levels))
+            random.shuffle(combined)
+            labels, conf_levels = zip(*combined)
             n = len(labels)
             train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2], total_qs/2)
             test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:], total_qs/2)
