@@ -64,8 +64,8 @@ def expand_model_name(name):
 
 def expand_label(label):
         return ('Confidence Threshold' if label == 'conf' else
-                'Score' if label == 'score' else
-                'Score (harsh)' if label == 'harsh-score' else
+                'Score (Balanced)' if label == 'score' else
+                'Score (Conservative)' if label == 'harsh-score' else
                 'Model Size' if label == 'size' else
                 'AUROC' if label == 'auc' else
                 'Q&A Accuracy' if label == 'acc' else label)
@@ -223,7 +223,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     # plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='-')
 
     make_and_sort_legend()
-    plt.legend(handlelength=3)
+    plt.legend(handlelength=2.5)
     plot_name = 'MSP' if 'norm' in output_dir else 'Max Logit' if 'raw' in output_dir else 'unknown'
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
@@ -286,7 +286,28 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
     dataset_for_caption = '' if dataset == '' else f' for {dataset}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'{dataset}AUROC results', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
+
+def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
+    model_results_msp = make_model_dict(*msp_group_data)
+    model_results_max_logit = make_model_dict(*max_logit_group_data)
+    rows = []
+    # Sort the rows by model series, then by model size
+    for model in sorted(model_results_msp.keys(), key=lambda x: (model_series(x), model_size(x))):
+        (_, _, score_data_msp) = model_results_msp[model]
+        (_, _, score_data_max_logit) = model_results_max_logit[model]
+        rows.append([expand_model_name(model)])
+        for wrong_penalty in score_data_msp:
+            (_, score_msp, base_score_msp) = score_data_msp[wrong_penalty]
+            (_, score_max_logit, base_score_max_logit) = score_data_max_logit[wrong_penalty]
+            if abs(base_score_msp - base_score_max_logit) > 0.001:
+                raise Exception(f"Base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
+            format_float = lambda x: round(100*x, 1)
+            rows[-1].extend([format_float(base_score_msp), format_float(score_msp), format_float(score_max_logit)])
+    column_names = ['LLM', 'Base Score (bal.)', 'MSP Score', 'Max Logit Score', 'Base Score (cons.)', 'MSP Score', 'Max Logit Score']
+    dataset_for_caption = '' if dataset == '' else f' for {dataset}'
+    dataset_for_label = '' if dataset == '' else f'{dataset}_'
+    make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex')
 
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex'):
     filename = os.path.join(output_dir, filename)
@@ -323,21 +344,12 @@ def plots_for_group(data, output_dir):
             train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2], total_qs/2)
             test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:], total_qs/2)
             
-    # Generating and saving plots
+    # ROC plots (also collecting auc data)
     all_aucs = dict()
     for dataset in data:
-        # Single dataset plots. Commenting these out for now to speed things up, except for auc because we need that
         all_aucs[dataset] = plot_roc_curves(data, output_dir, dataset)
-        # plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=1)
-        # plot_score_vs_thresholds(data, output_dir, [dataset], wrong_penalty=2)
 
-        # train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=1)
-        # train_and_test_score_plots(test_data, train_data, output_dir, [dataset], wrong_penalty=2)
-
-        # auc_for_this_dataset = {dataset: all_aucs[dataset]}
-        # auc_acc_plots(data, auc_for_this_dataset, output_dir)
-
-    # Plots for all datasets together
+    # Main plots
     datasets = list(data.keys())
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1)
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=2)
@@ -469,14 +481,15 @@ def main():
                 # Only compare pairs of groups which differ by exactly 1 component
                 if abst_type_1 == abst_type_2 and (logit_type_1 == logit_type_2 or prompt_type_1 == prompt_type_2):
                     bottom_dir = f'{abst_type_1}_{logit_type_1}' if logit_type_1 == logit_type_2 else f'{abst_type_1}_{prompt_type_1}'
-                    curr_output_dir = os.path.join(output_dir, 'cross_group_plots', bottom_dir)
-                    cross_group_plots(data, curr_output_dir)
-                    # make_auroc_table takes MSP data as first arg, Max Logit data as second arg
-                    dataset = '' if len(datasets_to_analyze) > 1 else datasets_to_analyze[0]
-                    if logit_type_1 == 'norm_logits' and logit_type_2 == 'raw_logits':
-                        make_auroc_table(group_data[group1], group_data[group2], curr_output_dir, dataset)
-                    elif logit_type_1 == 'raw_logits' and logit_type_2 == 'norm_logits':
-                        make_auroc_table(group_data[group2], group_data[group1], curr_output_dir, dataset)
+                    new_output_dir = os.path.join(output_dir, 'cross_group_plots', bottom_dir)
+                    cross_group_plots(data, new_output_dir)
+                    # For tables, need MSP data as first arg, Max Logit data as second arg
+                    if logit_type_1 != logit_type_2:
+                        if logit_type_1 == 'raw_logits':
+                            (group1, group2) = (group2, group1)                        
+                        dset = '' if len(datasets_to_analyze) > 1 else datasets_to_analyze[0]
+                        make_auroc_table(group_data[group1], group_data[group2], new_output_dir, dset)
+                        make_score_table(group_data[group1], group_data[group2], new_output_dir, dset)
 
     # Finally, compare normed vs raw logits, averaged over the two prompts
     try:
@@ -489,6 +502,7 @@ def main():
         merged_groups = {'no_abst_norm_logits': new_group1, 'no_abst_raw_logits': new_group2}
         cross_group_plots(merged_groups, os.path.join(output_dir, 'cross_group_plots', 'no_abst_all'))
         make_auroc_table(new_group1, new_group2, output_dir)
+        make_score_table(new_group1, new_group2, output_dir)
     except KeyError:
         print("\nCouldn't find the right groups for the overall average plot, skipping.\n")
 
