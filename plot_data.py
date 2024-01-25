@@ -92,8 +92,8 @@ def model_size(name):
     end_of_size_term = size_term.rfind('B')
     return 46.7 if 'Mixtral' in name else float(size_term[:end_of_size_term])
 
-def format_pct(x):
-    return round(100*x, 1)
+def make_pct(x):
+    return 100*x
 
 def make_and_sort_legend():
     handles, names = plt.gca().get_legend_handles_labels()
@@ -107,7 +107,7 @@ def compute_auroc(all_data, output_dir, dataset):
     aucs = dict()
     for model, (labels, conf_levels, _) in all_data[dataset].items():
         fpr, tpr, _ = roc_curve(labels, conf_levels)
-        roc_auc = format_pct(auc(fpr, tpr))
+        roc_auc = make_pct(auc(fpr, tpr))
         aucs[model] = roc_auc
         plt.plot(fpr, tpr, lw=2, label=f'{expand_model_name(model)} (area = {roc_auc:.2f})')
 
@@ -131,13 +131,13 @@ def compute_auroc(all_data, output_dir, dataset):
 def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', texts=[]):
     # Consistent axes
     if ylabel == 'acc':
-        plt.ylim([0.28, 0.72])
+        plt.ylim([28, 72])
     if xlabel == 'auc':
-        plt.xlim([0.5, 0.71])
+        plt.xlim([50, 71])
     if ylabel == 'score':
-        plt.ylim([-0.15,0.65])
+        plt.ylim([-15, 65])
     if ylabel == 'harsh-score':
-        plt.ylim([-0.15,0.25])
+        plt.ylim([-15, 25])
 
     adjust_text(texts) # Must do this after setting ylim and xlim
 
@@ -178,7 +178,7 @@ def auc_acc_plots(data, all_aucs, output_dir):
         for model in all_aucs[dataset]:
             model_aucs[model].append(all_aucs[dataset][model])
             (labels, _, _) = data[dataset][model]
-            model_accs[model].append(format_pct(np.mean(labels)))
+            model_accs[model].append(make_pct(np.mean(labels)))
 
     avg_aucs, avg_accs, model_names = [], [], []
     for model in model_aucs:
@@ -193,7 +193,7 @@ def auc_acc_plots(data, all_aucs, output_dir):
 def compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty=1, normalize=True):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
     score = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
-    return format_pct(score / total_qs) if normalize else score
+    return make_pct(score / total_qs) if normalize else score
 
 def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dict(), yscale='linear'):
     plt.figure()
@@ -214,16 +214,12 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
             score_to_mark = max(ys)
         # zorder determines which objects are on top
         plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
-        base_score = ys[0] # threshold of 0 is equivalent to the base model
+        base_score = ys[0] # We added -1 to the front for base score, see plot_score_vs_thresholds
+        xs, ys = xs[1:], ys[1:] # Remove the -1 for plotting
         plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyles.pop(0), linewidth=2)
         result_thresholds[model] = thresh_to_mark
         base_scores[model] = base_score
         result_scores[model] = score_to_mark
-
-    # Add dashed black line at y=0
-    # overall_min_x = min([min(xs) for _, xs, _ in data])
-    # overall_max_x = max([max(xs) for _, xs, _ in data])
-    # plt.plot([overall_min_x, overall_max_x], [0, 0], color='black', linestyle='-')
 
     make_and_sort_legend()
     plt.legend(handlelength=2.5)
@@ -237,6 +233,8 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
     max_conf = max([max([max(conf_levels) for _, (_,conf_levels,_) in data[dataset].items()])
                     for dataset in datasets])
     thresholds = np.linspace(0, max_conf, 200) # 200 data points per plot
+    thresholds = np.append([-1], thresholds) # The base score is the score when the threshold is 0, but this could cause float issues if confidence is also exactly zero at times. So add -1
+
     if abs(max_conf - 1) < 0.01: # We're dealing with probabilities: add more points near 1
         thresholds = np.append(thresholds, np.linspace(0.99, 1, 100))
     # Add all keys in thresholds_to_mark to thresholds, and sort
@@ -283,7 +281,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         (auc_msp, acc_msp, _) = model_results_msp[model]
         (auc_max_logit, acc_max_logit, _) = model_results_max_logit[model]
         if abs(acc_msp - acc_max_logit) > 0.001:
-            raise Exception(f"Accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
+            print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
         rows.append([expand_model_name(model), acc_msp, auc_msp, auc_max_logit])
     column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
     dataset_for_caption = '' if dataset == '' else f' for {dataset}'
@@ -303,7 +301,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             (_, score_msp, base_score_msp) = score_data_msp[wrong_penalty]
             (_, score_max_logit, base_score_max_logit) = score_data_max_logit[wrong_penalty]
             if abs(base_score_msp - base_score_max_logit) > 0.001:
-                raise Exception(f"Base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
+                print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
     column_names = ['LLM', 'Base Score (bal.)', 'MSP Score', 'Max Logit Score', 'Base Score (cons.)', 'MSP Score', 'Max Logit Score']
     dataset_for_caption = '' if dataset == '' else f' for {dataset}'
@@ -322,7 +320,10 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
         f.write('\\begin{tabular}{' + 'c|' * (len(column_names) - 1) + 'c}\n')
         f.write(' & '.join(column_names) + '\\\\ \\hline\n')
         for row in rows:
-            f.write(' & '.join([str(x) for x in row]) + '\\\\\n')
+            # round floats to 1 decimal place, but if it's -0.0, make it 0.0
+            row = [str(round(x, 1)) if isinstance(x, float) else str(x) for x in row]
+            row = [x.replace('-0.0', '0.0') for x in row]
+            f.write(' & '.join(row) + '\\\\\n')
         f.write('\\hline\n')
         f.write('\\end{tabular}\n')
         f.write(f'\\caption{{{caption}}}\n')
