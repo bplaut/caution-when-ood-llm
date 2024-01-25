@@ -303,12 +303,13 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             if abs(base_score_msp - base_score_max_logit) > 0.01:
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
-    column_names = ['LLM', 'Base Score (bal.)', 'MSP Score', 'Max Logit Score', 'Base Score (cons.)', 'MSP Score', 'Max Logit Score']
+    column_names = ['LLM', 'Base Score', 'MSP Score', 'Max Logit Score', 'Base Score', 'MSP Score', 'Max Logit Score']
+    header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \\n'
     dataset_for_caption = '' if dataset == '' else f' for {dataset}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex')
 
-def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex'):
+def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
     # Create directory if it doesn't exist
     if not os.path.exists(output_dir):
@@ -318,6 +319,7 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
         f.write('\\begin{table*}\n')
         f.write('\\centering\n')
         f.write('\\begin{tabular}{' + 'c|' * (len(column_names) - 1) + 'c}\n')
+        f.write(header_row)
         f.write(' & '.join(column_names) + '\\\\ \\hline\n')
         for row in rows:
             # round floats to 1 decimal place, but if it's -0.0, make it 0.0
@@ -503,9 +505,10 @@ def main():
         group2b = 'no_abst_raw_logits_second_prompt'
         new_group2 = merge_groups({group2a: group_data[group2a], group2b: group_data[group2b]})
         merged_groups = {'no_abst_norm_logits': new_group1, 'no_abst_raw_logits': new_group2}
-        cross_group_plots(merged_groups, os.path.join(output_dir, 'cross_group_plots', 'no_abst_all'))
-        make_auroc_table(new_group1, new_group2, output_dir)
-        make_score_table(new_group1, new_group2, output_dir)
+        new_output_dir = os.path.join(output_dir, 'cross_group_plots', 'no_abst_all')
+        cross_group_plots(merged_groups, new_output_dir)
+        make_auroc_table(new_group1, new_group2, new_output_dir)
+        make_score_table(new_group1, new_group2, new_output_dir)
     except KeyError:
         print("\nCouldn't find the right groups for the overall average plot, skipping.\n")
 
