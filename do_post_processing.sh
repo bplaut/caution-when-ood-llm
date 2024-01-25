@@ -28,4 +28,4 @@ for abstain in "no_abst" "yes_abst"; do
 done
 
 echo -e "\nCopying important figures...\n"
-python copy_important_figs.py
+python copy_important_figs.py $output_dir paper_figs
