@@ -92,6 +92,9 @@ def model_size(name):
     end_of_size_term = size_term.rfind('B')
     return 46.7 if 'Mixtral' in name else float(size_term[:end_of_size_term])
 
+def format_pct(x):
+    return round(100*x, 1)
+
 def make_and_sort_legend():
     handles, names = plt.gca().get_legend_handles_labels()
     zipped = zip(handles, names)
@@ -99,12 +102,12 @@ def make_and_sort_legend():
     sorted_handles, sorted_names = zip(*sorted_zipped)
     plt.legend(handles=sorted_handles, labels=sorted_names, fontsize='small')
 
-def plot_roc_curves(all_data, output_dir, dataset):
+def compute_auroc(all_data, output_dir, dataset):
     plt.figure()
     aucs = dict()
     for model, (labels, conf_levels, _) in all_data[dataset].items():
         fpr, tpr, _ = roc_curve(labels, conf_levels)
-        roc_auc = auc(fpr, tpr)
+        roc_auc = format_pct(auc(fpr, tpr))
         aucs[model] = roc_auc
         plt.plot(fpr, tpr, lw=2, label=f'{expand_model_name(model)} (area = {roc_auc:.2f})')
 
@@ -175,7 +178,7 @@ def auc_acc_plots(data, all_aucs, output_dir):
         for model in all_aucs[dataset]:
             model_aucs[model].append(all_aucs[dataset][model])
             (labels, _, _) = data[dataset][model]
-            model_accs[model].append(np.mean(labels))
+            model_accs[model].append(format_pct(np.mean(labels)))
 
     avg_aucs, avg_accs, model_names = [], [], []
     for model in model_aucs:
@@ -190,7 +193,7 @@ def auc_acc_plots(data, all_aucs, output_dir):
 def compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty=1, normalize=True):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
     score = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
-    return score / total_qs if normalize else score
+    return format_pct(score / total_qs) if normalize else score
 
 def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dict(), yscale='linear'):
     plt.figure()
@@ -281,8 +284,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         (auc_max_logit, acc_max_logit, _) = model_results_max_logit[model]
         if abs(acc_msp - acc_max_logit) > 0.001:
             raise Exception(f"Accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
-        format_float = lambda x: round(100*x, 1)
-        rows.append([expand_model_name(model), format_float(acc_msp), format_float(auc_msp), format_float(auc_max_logit)])
+        rows.append([expand_model_name(model), acc_msp, auc_msp, auc_max_logit])
     column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
     dataset_for_caption = '' if dataset == '' else f' for {dataset}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
@@ -302,8 +304,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             (_, score_max_logit, base_score_max_logit) = score_data_max_logit[wrong_penalty]
             if abs(base_score_msp - base_score_max_logit) > 0.001:
                 raise Exception(f"Base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
-            format_float = lambda x: round(100*x, 1)
-            rows[-1].extend([format_float(base_score_msp), format_float(score_msp), format_float(score_max_logit)])
+            rows[-1].extend([base_score_msp, score_msp, score_max_logit])
     column_names = ['LLM', 'Base Score (bal.)', 'MSP Score', 'Max Logit Score', 'Base Score (cons.)', 'MSP Score', 'Max Logit Score']
     dataset_for_caption = '' if dataset == '' else f' for {dataset}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
@@ -347,7 +348,7 @@ def plots_for_group(data, output_dir):
     # ROC plots (also collecting auc data)
     all_aucs = dict()
     for dataset in data:
-        all_aucs[dataset] = plot_roc_curves(data, output_dir, dataset)
+        all_aucs[dataset] = compute_auroc(data, output_dir, dataset)
 
     # Main plots
     datasets = list(data.keys())
