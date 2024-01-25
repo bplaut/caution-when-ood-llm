@@ -487,11 +487,12 @@ def main():
                     cross_group_plots(data, new_output_dir)
                     # For tables, need MSP data as first arg, Max Logit data as second arg
                     if logit_type_1 != logit_type_2:
-                        if logit_type_1 == 'raw_logits':
-                            (group1, group2) = (group2, group1)                        
+                        msp_group = group_data[group1 if 'norm' in logit_type_1 else group2]
+                        max_logit_group = group_data[group1 if 'raw' in logit_type_1 else group2]
                         dset = '' if len(datasets_to_analyze) > 1 else datasets_to_analyze[0]
-                        make_auroc_table(group_data[group1], group_data[group2], new_output_dir, dset)
-                        make_score_table(group_data[group1], group_data[group2], new_output_dir, dset)
+                        make_auroc_table(msp_group, max_logit_group, new_output_dir, dataset=dset)
+                        make_score_table(msp_group, max_logit_group, new_output_dir, dataset=dset)
+                        
 
     # Finally, compare normed vs raw logits, averaged over the two prompts
     try:
