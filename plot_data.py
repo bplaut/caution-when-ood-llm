@@ -507,8 +507,9 @@ def main():
         merged_groups = {'no_abst_norm_logits': new_group1, 'no_abst_raw_logits': new_group2}
         new_output_dir = os.path.join(output_dir, 'cross_group_plots', 'no_abst_all')
         cross_group_plots(merged_groups, new_output_dir)
-        make_auroc_table(new_group1, new_group2, new_output_dir)
-        make_score_table(new_group1, new_group2, new_output_dir)
+        dset = '' if len(datasets_to_analyze) > 1 else datasets_to_analyze[0]
+        make_auroc_table(new_group1, new_group2, new_output_dir, dset)
+        make_score_table(new_group1, new_group2, new_output_dir, dset)
     except KeyError:
         print("\nCouldn't find the right groups for the overall average plot, skipping.\n")
 
