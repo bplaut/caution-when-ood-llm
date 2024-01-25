@@ -1,8 +1,7 @@
 import os
 import shutil
-from typing import List
 
-def copy_files(output_directory: str, filepaths: List[str]):
+def copy_files(output_directory, filepaths):
     # Check if output directory exists, if not, create it
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
@@ -31,7 +30,7 @@ suffixes = ['/no_abst_all/acc_vs_auc-no_abst_norm_logits-no_abst_raw_logits',
             '/no_abst_raw_logits/acc_vs_auc-no_abst_raw_logits_second_prompt-no_abst_raw_logits_first_prompt',
              ]
 file_list = [cross_group_dir + suffix for suffix in suffixes] + ['figs/main_figs/' + suffix for suffix in suffixes]
-datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande', 'piqa']
+datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande', 'piqa', 'no_winogrande']
 middle_dirs = ['_abst_norm_logits_first_prompt', '_abst_norm_logits_second_prompt', '_abst_raw_logits_first_prompt', '_abst_raw_logits_second_prompt', '_abst_norm_logits', '_abst_raw_logits']
 for middle_dir in middle_dirs:
     file_list += [f'figs/main_figs/yes{middle_dir}/test/score_vs_conf_all_datasets']

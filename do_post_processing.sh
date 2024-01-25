@@ -50,6 +50,7 @@ for abstain in "no_abst" "yes_abst"; do
     python plot_data.py $output_dir/mmlu $incl_unparseable $collapse_prompts mmlu $dir/*${abstain}*.txt
     python plot_data.py $output_dir/truthfulqa $incl_unparseable $collapse_prompts truthfulqa $dir/*${abstain}*.txt
     python plot_data.py $output_dir/winogrande $incl_unparseable $collapse_prompts winogrande $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/no_winogrande $incl_unparseable $collapse_prompts arc,hellaswag,mmlu,truthfulqa $dir/*${abstain}*.txt
 done
 
 echo -e "\nCopying important figures...\n"
