@@ -13,7 +13,7 @@ incl_unparseable=$3
 
 echo -e "collapse_prompts: $collapse_prompts, incl_unparseable: $incl_unparseable\n"
 
-output_dir="figs_${collapse_prompts}_${incl_unparseable}"
+output_dir="figs_collapse-prompts-${collapse_prompts}_incl-unparseable-${incl_unparseable}"
 echo -e "\nMaking figures...\n"
 
 for abstain in "no_abst" "yes_abst"; do
