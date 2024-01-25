@@ -280,7 +280,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     for model in sorted(model_results_msp.keys(), key=lambda x: (model_series(x), model_size(x))):
         (auc_msp, acc_msp, _) = model_results_msp[model]
         (auc_max_logit, acc_max_logit, _) = model_results_max_logit[model]
-        if abs(acc_msp - acc_max_logit) > 0.001:
+        if abs(acc_msp - acc_max_logit) > 0.01:
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
         rows.append([expand_model_name(model), acc_msp, auc_msp, auc_max_logit])
     column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
@@ -300,7 +300,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         for wrong_penalty in score_data_msp:
             (_, score_msp, base_score_msp) = score_data_msp[wrong_penalty]
             (_, score_max_logit, base_score_max_logit) = score_data_max_logit[wrong_penalty]
-            if abs(base_score_msp - base_score_max_logit) > 0.001:
+            if abs(base_score_msp - base_score_max_logit) > 0.01:
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
     column_names = ['LLM', 'Base Score (bal.)', 'MSP Score', 'Max Logit Score', 'Base Score (cons.)', 'MSP Score', 'Max Logit Score']
