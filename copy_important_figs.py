@@ -41,9 +41,10 @@ def main():
     for middle_dir in middle_dirs:
         file_list += [f'{input_dir}/main_figs/yes{middle_dir}/test/score_vs_conf_all_datasets']
         file_list += [f'{input_dir}/main_figs/yes{middle_dir}/test/harsh-score_vs_conf_all_datasets']
-    file_list += [cross_group_dir + '/no_abst_None/auroc_table', cross_group_dir + '/no_abst_None/acc_vs_auc-no_abst_raw_logits-no_abst_norm_logits', cross_group_dir + '/no_abst_None/score_table']
-    for table_type in ['auroc', 'score']:
-        file_list += [f'{input_dir}/{dataset}/cross_group_plots/no_abst_None/{dataset}_{table_type}_table' for dataset in datasets]
+    for overall_cross_group_dir in ['all', 'None']:
+        file_list += [cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auroc_table', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/acc_vs_auc-no_abst_raw_logits-no_abst_norm_logits', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/score_table']
+        for table_type in ['auroc', 'score']:
+            file_list += [f'{input_dir}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_{table_type}_table' for dataset in datasets]
     copy_files(output_dir, file_list)
 
 main()
