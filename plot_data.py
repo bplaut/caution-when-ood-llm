@@ -50,6 +50,14 @@ def parse_data(file_path, incl_unparseable):
         sys.exit(1)
     return labels, conf_levels, total_qs
 
+def format_dataset_name(dataset):
+    return ('ARC' if dataset == 'arc' else
+            'HellaSwag' if dataset == 'hellaswag' else
+            'MMLU' if dataset == 'mmlu' else
+            'PIQA' if dataset == 'piqa' else
+            'TruthfulQA' if dataset == 'truthfulqa' else
+            'WinoGrande' if dataset == 'winogrande' else dataset)
+
 def expand_model_name(name):
     return ('Mistral 7B' if name == 'Mistral' else
             'Mixtral 8x7B' if name == 'Mixtral' else
@@ -284,9 +292,9 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
         rows.append([expand_model_name(model), acc_msp, auc_msp, auc_max_logit])
     column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
-    dataset_for_caption = '' if dataset == '' else f' for {dataset}'
+    dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. All values are percentages between from 50\% (random classification) to 100\% (perfect classification).', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
@@ -305,9 +313,9 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
     column_names = ['LLM', 'Base Score', 'MSP', 'Max Logit', 'Base Score', 'MSP', 'Max Logit']
     header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \\n'
-    dataset_for_caption = '' if dataset == '' else f' for {dataset}'
+    dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header_row=header_row)
+    make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header_row=header_row)
 
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
