@@ -74,7 +74,7 @@ def expand_label(label):
         return ('Confidence Threshold' if label == 'conf' else
                 'Score (Balanced)' if label == 'score' else
                 'Score (Conservative)' if label == 'harsh-score' else
-                'Model Size' if label == 'size' else
+                'Model Size (billions of parameters)' if label == 'size' else
                 'AUROC' if label == 'auc' else
                 'Q&A Performance' if label == 'acc' else label)
 
@@ -151,12 +151,22 @@ def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', t
 
     plt.xlabel(expand_label(xlabel))
     plt.ylabel(expand_label(ylabel))
-    plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
+
+    # Remove some axes based on the way figs are organized in the paper
+    if 'raw' in output_dir:
+        plt.ylabel('')
+        plt.yticks([])
+    if ylabel == 'score':
+        plt.xlabel('')
+        plt.xticks([])
+    
+    # Commenting this out because ICML guidelines say no in-figure titles
+    # plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.pdf")
     
-    plt.savefig(output_path)
+    plt.savefig(output_path, bbox_inches='tight')
     plt.close()
     print(f"{ylabel} vs {xlabel} for {title_suffix} saved --> {output_path}")
 
@@ -298,7 +308,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. All values are percentages between 50\% (random classification) to 100\% (perfect classification).', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. All values are percentages between 50\% (random classification) and 100\% (perfect classification).', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
@@ -510,7 +520,6 @@ def main():
                         make_auroc_table(msp_group, max_logit_group, new_output_dir, dataset=dset)
                         make_score_table(msp_group, max_logit_group, new_output_dir, dataset=dset)
                         
-
     # Finally, compare normed vs raw logits, averaged over the two prompts
     try:
         group1a = 'no_abst_norm_logits_first_prompt'
