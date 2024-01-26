@@ -303,11 +303,11 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             if abs(base_score_msp - base_score_max_logit) > 0.01:
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
-    column_names = ['LLM', 'Base Score', 'MSP Score', 'Max Logit Score', 'Base Score', 'MSP Score', 'Max Logit Score']
+    column_names = ['LLM', 'Base Score', 'MSP', 'Max Logit', 'Base Score', 'MSP', 'Max Logit']
     header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \\n'
     dataset_for_caption = '' if dataset == '' else f' for {dataset}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex')
+    make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header_row=header_row)
 
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
