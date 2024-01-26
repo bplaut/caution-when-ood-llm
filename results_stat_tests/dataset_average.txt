@@ -1,0 +1,196 @@
+Results for dataset_average_test using prompt 1 and logits
+For dataset arc
+Data did not pass t-test assumptions
+P-value: 0.0029296875
+Statistic: 53.0
+DoF: -1
+Null rejected: True
+
+
+For dataset hellaswag
+Data did not pass t-test assumptions
+P-value: 0.0029296875
+Statistic: 53.0
+DoF: -1
+Null rejected: True
+
+
+For dataset mmlu
+Data did not pass t-test assumptions
+P-value: 0.0029296875
+Statistic: 53.0
+DoF: -1
+Null rejected: True
+
+
+For dataset piqa
+Data did not pass t-test assumptions
+P-value: 0.001953125
+Statistic: 54.0
+DoF: -1
+Null rejected: True
+
+
+For dataset truthfulqa
+Data did not pass t-test assumptions
+P-value: 0.0029296875
+Statistic: 53.0
+DoF: -1
+Null rejected: True
+
+
+For dataset winogrande
+Data did not pass t-test assumptions
+P-value: 0.0009765625
+Statistic: 55.0
+DoF: -1
+Null rejected: True
+
+
+Results for dataset_average_test using prompt 1 and probs
+For dataset arc
+Data did not pass t-test assumptions
+P-value: 0.0009765625
+Statistic: 55.0
+DoF: -1
+Null rejected: True
+
+
+For dataset hellaswag
+Data did not pass t-test assumptions
+P-value: 0.0009765625
+Statistic: 55.0
+DoF: -1
+Null rejected: True
+
+
+For dataset mmlu
+Data did not pass t-test assumptions
+P-value: 0.001953125
+Statistic: 54.0
+DoF: -1
+Null rejected: True
+
+
+For dataset piqa
+Data did not pass t-test assumptions
+P-value: 0.0009765625
+Statistic: 55.0
+DoF: -1
+Null rejected: True
+
+
+For dataset truthfulqa
+Data did not pass t-test assumptions
+P-value: 0.0009765625
+Statistic: 55.0
+DoF: -1
+Null rejected: True
+
+
+For dataset winogrande
+Data did not pass t-test assumptions
+P-value: 0.001953125
+Statistic: 54.0
+DoF: -1
+Null rejected: True
+
+
+Results for dataset_average_test using prompt 2 and logits
+For dataset arc
+Data did not pass t-test assumptions
+P-value: 0.001953125
+Statistic: 45.0
+DoF: -1
+Null rejected: True
+
+
+For dataset hellaswag
+Data did not pass t-test assumptions
+P-value: 0.00390625
+Statistic: 44.0
+DoF: -1
+Null rejected: True
+
+
+For dataset mmlu
+Data did not pass t-test assumptions
+P-value: 0.00390625
+Statistic: 44.0
+DoF: -1
+Null rejected: True
+
+
+For dataset piqa
+Data did not pass t-test assumptions
+P-value: 0.125
+Statistic: 6.0
+DoF: -1
+Null rejected: False
+
+
+For dataset truthfulqa
+Data did not pass t-test assumptions
+P-value: 0.00390625
+Statistic: 44.0
+DoF: -1
+Null rejected: True
+
+
+For dataset winogrande
+Data did not pass t-test assumptions
+P-value: 0.001953125
+Statistic: 45.0
+DoF: -1
+Null rejected: True
+
+
+Results for dataset_average_test using prompt 2 and probs
+For dataset arc
+Data did not pass t-test assumptions
+P-value: 0.001953125
+Statistic: 45.0
+DoF: -1
+Null rejected: True
+
+
+For dataset hellaswag
+Data did not pass t-test assumptions
+P-value: 0.00390625
+Statistic: 44.0
+DoF: -1
+Null rejected: True
+
+
+For dataset mmlu
+Data did not pass t-test assumptions
+P-value: 0.001953125
+Statistic: 45.0
+DoF: -1
+Null rejected: True
+
+
+For dataset piqa
+Data did not pass t-test assumptions
+P-value: 0.125
+Statistic: 6.0
+DoF: -1
+Null rejected: False
+
+
+For dataset truthfulqa
+Data did not pass t-test assumptions
+P-value: 0.00390625
+Statistic: 44.0
+DoF: -1
+Null rejected: True
+
+
+For dataset winogrande
+Data did not pass t-test assumptions
+P-value: 0.00390625
+Statistic: 44.0
+DoF: -1
+Null rejected: True
+
+

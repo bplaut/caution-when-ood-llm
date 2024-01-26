@@ -1,0 +1,1324 @@
+Results for all_combo_test using prompt 1 and logits
+For dataset arc and model Falcon-7b
+P-value: 0.37337358862672754
+Statistic: 2520493.5
+Null rejected: False
+
+
+For dataset arc and model Falcon-40b
+P-value: 0.06297492732802719
+Statistic: 2988615.0
+Null rejected: False
+
+
+For dataset arc and model Llama-7b
+P-value: 1.5140867768159615e-21
+Statistic: 3824220.5
+Null rejected: True
+
+
+For dataset arc and model Llama-13b
+P-value: 2.44820293900124e-72
+Statistic: 4241120.0
+Null rejected: True
+
+
+For dataset arc and model Llama-70b
+P-value: 3.24836091462955e-86
+Statistic: 3417339.5
+Null rejected: True
+
+
+For dataset arc and model Mistral
+P-value: 4.9351523456559304e-102
+Statistic: 3550949.0
+Null rejected: True
+
+
+For dataset arc and model Mixtral
+P-value: 6.768581495698829e-44
+Statistic: 2201111.0
+Null rejected: True
+
+
+For dataset arc and model Solar
+P-value: 4.195288192799231e-83
+Statistic: 2779445.0
+Null rejected: True
+
+
+For dataset arc and model Yi-6b
+P-value: 1.4605632661052593e-70
+Statistic: 3701875.5
+Null rejected: True
+
+
+For dataset arc and model Yi-34b
+P-value: 3.85767221571411e-84
+Statistic: 2690345.5
+Null rejected: True
+
+
+For dataset hellaswag and model Falcon-7b
+P-value: 0.5406080203098017
+Statistic: 13299345.5
+Null rejected: False
+
+
+For dataset hellaswag and model Falcon-40b
+P-value: 2.1040695922763907e-85
+Statistic: 20651563.5
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-7b
+P-value: 0.9706554701256871
+Statistic: 17693500.5
+Null rejected: False
+
+
+For dataset hellaswag and model Llama-13b
+P-value: 9.603832821948786e-44
+Statistic: 20392520.5
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-70b
+P-value: 2.0825431521432433e-156
+Statistic: 21194861.5
+Null rejected: True
+
+
+For dataset hellaswag and model Mistral
+P-value: 4.419224578706136e-119
+Statistic: 19489787.0
+Null rejected: True
+
+
+For dataset hellaswag and model Mixtral
+P-value: 7.80733845692358e-50
+Statistic: 17964646.5
+Null rejected: True
+
+
+For dataset hellaswag and model Solar
+P-value: 3.441414549420764e-91
+Statistic: 12884774.5
+Null rejected: True
+
+
+For dataset hellaswag and model Yi-6b
+P-value: 5.373579640393795e-158
+Statistic: 20532742.5
+Null rejected: True
+
+
+For dataset hellaswag and model Yi-34b
+P-value: 1.9534757392369686e-176
+Statistic: 18997493.0
+Null rejected: True
+
+
+For dataset mmlu and model Falcon-7b
+P-value: 0.8499091848819527
+Statistic: 13143046.5
+Null rejected: False
+
+
+For dataset mmlu and model Falcon-40b
+P-value: 4.7089486067560686e-08
+Statistic: 15374892.5
+Null rejected: True
+
+
+For dataset mmlu and model Llama-7b
+P-value: 1.7894354399195015e-26
+Statistic: 18843911.5
+Null rejected: True
+
+
+For dataset mmlu and model Llama-13b
+P-value: 1.5584792650163937e-131
+Statistic: 22450123.5
+Null rejected: True
+
+
+For dataset mmlu and model Llama-70b
+P-value: 1.7438704106169809e-174
+Statistic: 22828310.5
+Null rejected: True
+
+
+For dataset mmlu and model Mistral
+P-value: 4.755596260970987e-191
+Statistic: 21856911.0
+Null rejected: True
+
+
+For dataset mmlu and model Mixtral
+P-value: 7.076770287279624e-144
+Statistic: 20191067.5
+Null rejected: True
+
+
+For dataset mmlu and model Solar
+P-value: 1.6313168978390414e-270
+Statistic: 22922739.5
+Null rejected: True
+
+
+For dataset mmlu and model Yi-6b
+P-value: 5.931012132275475e-138
+Statistic: 22002487.0
+Null rejected: True
+
+
+For dataset mmlu and model Yi-34b
+P-value: 3.3476616678371377e-199
+Statistic: 22058817.0
+Null rejected: True
+
+
+For dataset piqa and model Falcon-7b
+P-value: 0.601888711202634
+Statistic: 15757183.5
+Null rejected: False
+
+
+For dataset piqa and model Falcon-40b
+P-value: 2.5955038508038103e-07
+Statistic: 13865654.0
+Null rejected: True
+
+
+For dataset piqa and model Llama-7b
+P-value: 4.925563706636755e-56
+Statistic: 18813485.5
+Null rejected: True
+
+
+For dataset piqa and model Llama-13b
+P-value: 4.065807821963655e-62
+Statistic: 17373839.5
+Null rejected: True
+
+
+For dataset piqa and model Llama-70b
+P-value: 6.751103061948725e-198
+Statistic: 15916035.0
+Null rejected: True
+
+
+For dataset piqa and model Mistral
+P-value: 5.253309078668014e-115
+Statistic: 14653846.5
+Null rejected: True
+
+
+For dataset piqa and model Mixtral
+P-value: 1.994483335173924e-10
+Statistic: 8324990.0
+Null rejected: True
+
+
+For dataset piqa and model Solar
+P-value: 2.034217243237368e-57
+Statistic: 8835149.5
+Null rejected: True
+
+
+For dataset piqa and model Yi-6b
+P-value: 2.0935789218964214e-144
+Statistic: 5634316.0
+Null rejected: True
+
+
+For dataset piqa and model Yi-34b
+P-value: 3.5329329446268614e-209
+Statistic: 11649437.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Falcon-7b
+P-value: 0.003323750805609741
+Statistic: 229552.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Falcon-40b
+P-value: 0.21029645654931506
+Statistic: 216985.0
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-7b
+P-value: 0.2299705160148554
+Statistic: 259103.5
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-13b
+P-value: 0.1530953806407913
+Statistic: 247959.5
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-70b
+P-value: 7.609123470767116e-32
+Statistic: 432162.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Mistral
+P-value: 5.247006635870513e-22
+Statistic: 385615.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Mixtral
+P-value: 1.510915411265836e-13
+Statistic: 343129.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Solar
+P-value: 1.4678812434948335e-08
+Statistic: 357172.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Yi-6b
+P-value: 1.2043283633914921e-14
+Statistic: 377324.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Yi-34b
+P-value: 3.972155129109081e-29
+Statistic: 438680.0
+Null rejected: True
+
+
+For dataset winogrande and model Falcon-7b
+P-value: 0.6932687545948275
+Statistic: 14780997.0
+Null rejected: False
+
+
+For dataset winogrande and model Falcon-40b
+P-value: 0.34244811686115384
+Statistic: 16892138.0
+Null rejected: False
+
+
+For dataset winogrande and model Llama-7b
+P-value: 0.31282366666045824
+Statistic: 17842310.5
+Null rejected: False
+
+
+For dataset winogrande and model Llama-13b
+P-value: 0.004007078591247795
+Statistic: 18151707.5
+Null rejected: True
+
+
+For dataset winogrande and model Llama-70b
+P-value: 0.13084579963129017
+Statistic: 17619056.5
+Null rejected: False
+
+
+For dataset winogrande and model Mistral
+P-value: 4.515497589252587e-08
+Statistic: 17257612.5
+Null rejected: True
+
+
+For dataset winogrande and model Mixtral
+P-value: 1.8916204138920206e-19
+Statistic: 17398279.0
+Null rejected: True
+
+
+For dataset winogrande and model Solar
+P-value: 1.2155122836443199e-21
+Statistic: 16176921.5
+Null rejected: True
+
+
+For dataset winogrande and model Yi-6b
+P-value: 3.922790273145976e-28
+Statistic: 16927035.5
+Null rejected: True
+
+
+For dataset winogrande and model Yi-34b
+P-value: 3.298818308673905e-68
+Statistic: 18492804.5
+Null rejected: True
+
+
+Results for all_combo_test using prompt 1 and probs
+For dataset arc and model Falcon-7b
+P-value: 0.7305616606957742
+Statistic: 2493125.5
+Null rejected: False
+
+
+For dataset arc and model Falcon-40b
+P-value: 1.0052907862255936e-23
+Statistic: 3594489.5
+Null rejected: True
+
+
+For dataset arc and model Llama-7b
+P-value: 2.3537145838016893e-52
+Statistic: 4128623.0
+Null rejected: True
+
+
+For dataset arc and model Llama-13b
+P-value: 2.661856145332448e-87
+Statistic: 4337942.0
+Null rejected: True
+
+
+For dataset arc and model Llama-70b
+P-value: 3.554347276164307e-190
+Statistic: 3869245.5
+Null rejected: True
+
+
+For dataset arc and model Mistral
+P-value: 8.030298182374978e-101
+Statistic: 3544916.0
+Null rejected: True
+
+
+For dataset arc and model Mixtral
+P-value: 5.1323242873131964e-45
+Statistic: 2205517.5
+Null rejected: True
+
+
+For dataset arc and model Solar
+P-value: 7.349058861363061e-25
+Statistic: 2409375.0
+Null rejected: True
+
+
+For dataset arc and model Yi-6b
+P-value: 3.380036177252571e-190
+Statistic: 4275398.0
+Null rejected: True
+
+
+For dataset arc and model Yi-34b
+P-value: 2.374384471247782e-131
+Statistic: 2890609.0
+Null rejected: True
+
+
+For dataset hellaswag and model Falcon-7b
+P-value: 0.48548464478023157
+Statistic: 13513539.5
+Null rejected: False
+
+
+For dataset hellaswag and model Falcon-40b
+P-value: 1.7470163552565854e-98
+Statistic: 20923432.5
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-7b
+P-value: 4.6242708740218405e-36
+Statistic: 20043133.5
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-13b
+P-value: 1.616394977772272e-83
+Statistic: 21425678.5
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-70b
+P-value: 1.859952142341354e-281
+Statistic: 22859912.5
+Null rejected: True
+
+
+For dataset hellaswag and model Mistral
+P-value: 4.9372907790603066e-129
+Statistic: 19654232.5
+Null rejected: True
+
+
+For dataset hellaswag and model Mixtral
+P-value: 2.9718552575275883e-48
+Statistic: 17912012.5
+Null rejected: True
+
+
+For dataset hellaswag and model Solar
+P-value: 1.25895477323139e-20
+Statistic: 11360957.0
+Null rejected: True
+
+
+For dataset hellaswag and model Yi-6b
+P-value: 3.3955206857180934e-267
+Statistic: 21962290.0
+Null rejected: True
+
+
+For dataset hellaswag and model Yi-34b
+P-value: 0.0
+Statistic: 21441658.0
+Null rejected: True
+
+
+For dataset mmlu and model Falcon-7b
+P-value: 0.5427102677674638
+Statistic: 13018091.5
+Null rejected: False
+
+
+For dataset mmlu and model Falcon-40b
+P-value: 1.0273382378168535e-45
+Statistic: 18847582.0
+Null rejected: True
+
+
+For dataset mmlu and model Llama-7b
+P-value: 4.927407517779812e-75
+Statistic: 20246358.5
+Null rejected: True
+
+
+For dataset mmlu and model Llama-13b
+P-value: 2.997157345361986e-164
+Statistic: 22998958.0
+Null rejected: True
+
+
+For dataset mmlu and model Llama-70b
+P-value: 0.0
+Statistic: 25092656.0
+Null rejected: True
+
+
+For dataset mmlu and model Mistral
+P-value: 3.4726753119655766e-191
+Statistic: 21858818.0
+Null rejected: True
+
+
+For dataset mmlu and model Mixtral
+P-value: 2.7785133768503412e-130
+Statistic: 19960233.5
+Null rejected: True
+
+
+For dataset mmlu and model Solar
+P-value: 3.424714162271798e-131
+Statistic: 20987608.0
+Null rejected: True
+
+
+For dataset mmlu and model Yi-6b
+P-value: 2.0437909871019583e-279
+Statistic: 23983596.5
+Null rejected: True
+
+
+For dataset mmlu and model Yi-34b
+P-value: 4.244413044877346e-246
+Statistic: 22674945.5
+Null rejected: True
+
+
+For dataset piqa and model Falcon-7b
+P-value: 0.4571517679207261
+Statistic: 15975555.0
+Null rejected: False
+
+
+For dataset piqa and model Falcon-40b
+P-value: 4.4527978282787995e-17
+Statistic: 14371885.0
+Null rejected: True
+
+
+For dataset piqa and model Llama-7b
+P-value: 1.918673088751009e-72
+Statistic: 19206221.0
+Null rejected: True
+
+
+For dataset piqa and model Llama-13b
+P-value: 2.0940461493686752e-95
+Statistic: 18071621.5
+Null rejected: True
+
+
+For dataset piqa and model Llama-70b
+P-value: 0.0
+Statistic: 17388002.5
+Null rejected: True
+
+
+For dataset piqa and model Mistral
+P-value: 1.1180852993007066e-76
+Statistic: 14044596.0
+Null rejected: True
+
+
+For dataset piqa and model Mixtral
+P-value: 0.00024471692965677465
+Statistic: 7995167.0
+Null rejected: True
+
+
+For dataset piqa and model Solar
+P-value: 4.362539259432589e-13
+Statistic: 7832744.5
+Null rejected: True
+
+
+For dataset piqa and model Yi-6b
+P-value: 5.742235403940316e-166
+Statistic: 5762226.5
+Null rejected: True
+
+
+For dataset piqa and model Yi-34b
+P-value: 6.600472490909426e-102
+Statistic: 10490640.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Falcon-7b
+P-value: 0.01626370699281791
+Statistic: 225580.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Falcon-40b
+P-value: 0.6561870364707725
+Statistic: 229616.0
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-7b
+P-value: 0.9965761467495019
+Statistic: 249347.5
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-13b
+P-value: 0.009391248062714297
+Statistic: 257141.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Llama-70b
+P-value: 1.1667801081641613e-47
+Statistic: 457917.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Mistral
+P-value: 1.4454136305935278e-31
+Statistic: 403682.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Mixtral
+P-value: 2.3196980822380478e-20
+Statistic: 358867.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Solar
+P-value: 0.07046656681667064
+Statistic: 322660.0
+Null rejected: False
+
+
+For dataset truthfulqa and model Yi-6b
+P-value: 1.916803168944806e-21
+Statistic: 393495.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Yi-34b
+P-value: 3.7479127912418704e-35
+Statistic: 449794.0
+Null rejected: True
+
+
+For dataset winogrande and model Falcon-7b
+P-value: 0.8005313607430533
+Statistic: 14757815.5
+Null rejected: False
+
+
+For dataset winogrande and model Falcon-40b
+P-value: 0.3332827857263686
+Statistic: 16895407.0
+Null rejected: False
+
+
+For dataset winogrande and model Llama-7b
+P-value: 0.8747227499188892
+Statistic: 17624064.0
+Null rejected: False
+
+
+For dataset winogrande and model Llama-13b
+P-value: 0.0014376537681154223
+Statistic: 18209501.0
+Null rejected: True
+
+
+For dataset winogrande and model Llama-70b
+P-value: 1.454093964575847e-10
+Statistic: 18524913.5
+Null rejected: True
+
+
+For dataset winogrande and model Mistral
+P-value: 4.438346808939473e-08
+Statistic: 17258153.0
+Null rejected: True
+
+
+For dataset winogrande and model Mixtral
+P-value: 1.7036316959686506e-11
+Statistic: 16988205.5
+Null rejected: True
+
+
+For dataset winogrande and model Solar
+P-value: 2.6839433074112756e-10
+Statistic: 15630971.5
+Null rejected: True
+
+
+For dataset winogrande and model Yi-6b
+P-value: 9.807752628744096e-32
+Statistic: 17048450.0
+Null rejected: True
+
+
+For dataset winogrande and model Yi-34b
+P-value: 1.3975716171375561e-109
+Statistic: 19330831.0
+Null rejected: True
+
+
+Results for all_combo_test using prompt 2 and logits
+For dataset arc and model Falcon-7b
+P-value: 0.9908665422156488
+Statistic: 628101.0
+Null rejected: False
+
+
+For dataset arc and model Falcon-40b
+P-value: 4.8148596226859047e-39
+Statistic: 1081724.5
+Null rejected: True
+
+
+For dataset arc and model Llama-7b
+P-value: 9.349704820724067e-34
+Statistic: 1067292.0
+Null rejected: True
+
+
+For dataset arc and model Llama-13b
+P-value: 3.6540817276024096e-33
+Statistic: 1041262.0
+Null rejected: True
+
+
+For dataset arc and model Llama-70b
+P-value: 3.061759516783073e-52
+Statistic: 902624.0
+Null rejected: True
+
+
+For dataset arc and model Mistral
+P-value: 3.9594153880402215e-40
+Statistic: 900951.5
+Null rejected: True
+
+
+
+For dataset arc and model Solar
+P-value: 2.0278515049035215e-45
+Statistic: 721712.5
+Null rejected: True
+
+
+For dataset arc and model Yi-6b
+P-value: 1.9864631812015624e-32
+Statistic: 951359.0
+Null rejected: True
+
+
+For dataset arc and model Yi-34b
+P-value: 1.2180279842577499e-51
+Statistic: 602780.0
+Null rejected: True
+
+
+For dataset hellaswag and model Falcon-7b
+P-value: 0.4071095984346056
+Statistic: 1463866.0
+Null rejected: False
+
+
+For dataset hellaswag and model Falcon-40b
+P-value: 2.7145717882201584e-22
+Statistic: 2340339.5
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-7b
+P-value: 4.5281232090515184e-29
+Statistic: 2296121.0
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-13b
+P-value: 2.619537730296144e-29
+Statistic: 2387664.5
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-70b
+P-value: 9.256146764418257e-51
+Statistic: 2359519.5
+Null rejected: True
+
+
+For dataset hellaswag and model Mistral
+P-value: 1.0886839070909687e-37
+Statistic: 3052776.5
+Null rejected: True
+
+
+
+For dataset hellaswag and model Solar
+P-value: 1.2196532501374608e-35
+Statistic: 1638627.0
+Null rejected: True
+
+
+For dataset hellaswag and model Yi-6b
+P-value: 6.417587857907637e-38
+Statistic: 3018947.5
+Null rejected: True
+
+
+For dataset hellaswag and model Yi-34b
+P-value: 1.4942555217614916e-50
+Statistic: 1840774.0
+Null rejected: True
+
+
+For dataset mmlu and model Falcon-7b
+P-value: 0.5995332406622205
+Statistic: 1504019.0
+Null rejected: False
+
+
+For dataset mmlu and model Falcon-40b
+P-value: 1.1995917164850746e-07
+Statistic: 1661081.5
+Null rejected: True
+
+
+For dataset mmlu and model Llama-7b
+P-value: 5.980665867683379e-43
+Statistic: 2433383.0
+Null rejected: True
+
+
+For dataset mmlu and model Llama-13b
+P-value: 5.84685178224825e-38
+Statistic: 2456600.5
+Null rejected: True
+
+
+For dataset mmlu and model Llama-70b
+P-value: 7.924203307918621e-61
+Statistic: 2549548.0
+Null rejected: True
+
+
+For dataset mmlu and model Mistral
+P-value: 2.685714792711993e-45
+Statistic: 2473944.5
+Null rejected: True
+
+
+
+For dataset mmlu and model Solar
+P-value: 3.449839575715763e-85
+Statistic: 2652139.5
+Null rejected: True
+
+
+For dataset mmlu and model Yi-6b
+P-value: 8.203557506533036e-45
+Statistic: 2511934.0
+Null rejected: True
+
+
+For dataset mmlu and model Yi-34b
+P-value: 5.781964378872772e-62
+Statistic: 2400767.5
+Null rejected: True
+
+
+
+
+
+
+
+For dataset piqa and model Mistral
+P-value: 3.0794291141776715e-07
+Statistic: 35016.5
+Null rejected: True
+
+
+
+
+For dataset piqa and model Yi-6b
+P-value: 3.7574858481494e-09
+Statistic: 26357.0
+Null rejected: True
+
+
+For dataset piqa and model Yi-34b
+P-value: 1.5461964061134247e-14
+Statistic: 19660.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Falcon-7b
+P-value: 0.0006519190060137087
+Statistic: 63876.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Falcon-40b
+P-value: 0.9541794479397396
+Statistic: 63259.0
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-7b
+P-value: 0.3832556391117209
+Statistic: 64022.0
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-13b
+P-value: 0.29116976078110857
+Statistic: 67201.0
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-70b
+P-value: 3.6409323693233036e-13
+Statistic: 105499.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Mistral
+P-value: 1.5740730023420762e-14
+Statistic: 108384.0
+Null rejected: True
+
+
+
+For dataset truthfulqa and model Solar
+P-value: 4.065781750902518e-12
+Statistic: 106450.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Yi-6b
+P-value: 9.405910279881716e-10
+Statistic: 103106.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Yi-34b
+P-value: 7.268108341346555e-14
+Statistic: 107948.5
+Null rejected: True
+
+
+For dataset winogrande and model Falcon-7b
+P-value: 0.9811155330370153
+Statistic: 1531813.5
+Null rejected: False
+
+
+For dataset winogrande and model Falcon-40b
+P-value: 0.2199580093692972
+Statistic: 1152673.0
+Null rejected: False
+
+
+For dataset winogrande and model Llama-7b
+P-value: 0.7807444172455293
+Statistic: 1527690.0
+Null rejected: False
+
+
+For dataset winogrande and model Llama-13b
+P-value: 0.7671233462593734
+Statistic: 1509420.5
+Null rejected: False
+
+
+For dataset winogrande and model Llama-70b
+P-value: 0.018202671562353785
+Statistic: 1592507.5
+Null rejected: True
+
+
+For dataset winogrande and model Mistral
+P-value: 0.0003688149909651464
+Statistic: 1615431.5
+Null rejected: True
+
+
+
+For dataset winogrande and model Solar
+P-value: 3.4708133849774365e-14
+Statistic: 1519284.0
+Null rejected: True
+
+
+For dataset winogrande and model Yi-6b
+P-value: 3.7697608749234936e-07
+Statistic: 1646234.5
+Null rejected: True
+
+
+For dataset winogrande and model Yi-34b
+P-value: 6.432936086970246e-18
+Statistic: 1627714.0
+Null rejected: True
+
+
+Results for all_combo_test using prompt 2 and probs
+For dataset arc and model Falcon-7b
+P-value: 0.6207087238232779
+Statistic: 636061.0
+Null rejected: False
+
+
+For dataset arc and model Falcon-40b
+P-value: 3.846221538084165e-64
+Statistic: 1154552.0
+Null rejected: True
+
+
+For dataset arc and model Llama-7b
+P-value: 2.0403464249804825e-36
+Statistic: 1076661.5
+Null rejected: True
+
+
+For dataset arc and model Llama-13b
+P-value: 6.435526208672092e-44
+Statistic: 1076952.5
+Null rejected: True
+
+
+For dataset arc and model Llama-70b
+P-value: 6.442611108883917e-105
+Statistic: 1012104.5
+Null rejected: True
+
+
+For dataset arc and model Mistral
+P-value: 4.193291035896596e-38
+Statistic: 894915.5
+Null rejected: True
+
+
+
+For dataset arc and model Solar
+P-value: 3.29526810188401e-13
+Statistic: 619804.0
+Null rejected: True
+
+
+For dataset arc and model Yi-6b
+P-value: 5.118952087354852e-88
+Statistic: 1094865.0
+Null rejected: True
+
+
+For dataset arc and model Yi-34b
+P-value: 2.3178544934619055e-22
+Statistic: 531627.0
+Null rejected: True
+
+
+For dataset hellaswag and model Falcon-7b
+P-value: 0.8226255410027337
+Statistic: 1482921.0
+Null rejected: False
+
+
+For dataset hellaswag and model Falcon-40b
+P-value: 1.5952921685110421e-43
+Statistic: 2490418.0
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-7b
+P-value: 1.1193449939342066e-38
+Statistic: 2360722.0
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-13b
+P-value: 8.843183575903249e-49
+Statistic: 2512353.5
+Null rejected: True
+
+
+For dataset hellaswag and model Llama-70b
+P-value: 2.846604239429113e-97
+Statistic: 2567336.5
+Null rejected: True
+
+
+For dataset hellaswag and model Mistral
+P-value: 3.2525289357806085e-40
+Statistic: 3071898.5
+Null rejected: True
+
+
+
+For dataset hellaswag and model Solar
+P-value: 9.727867838741004e-24
+Statistic: 1568529.0
+Null rejected: True
+
+
+For dataset hellaswag and model Yi-6b
+P-value: 9.311599792433309e-87
+Statistic: 3314392.0
+Null rejected: True
+
+
+For dataset hellaswag and model Yi-34b
+P-value: 6.666709990451046e-87
+Statistic: 1986912.0
+Null rejected: True
+
+
+For dataset mmlu and model Falcon-7b
+P-value: 0.23403504661275865
+Statistic: 1558623.0
+Null rejected: False
+
+
+For dataset mmlu and model Falcon-40b
+P-value: 1.5041742418220215e-46
+Statistic: 1928575.0
+Null rejected: True
+
+
+For dataset mmlu and model Llama-7b
+P-value: 1.6196434367301168e-52
+Statistic: 2487707.5
+Null rejected: True
+
+
+For dataset mmlu and model Llama-13b
+P-value: 3.003443090873201e-48
+Statistic: 2518991.5
+Null rejected: True
+
+
+For dataset mmlu and model Llama-70b
+P-value: 5.043779287892423e-121
+Statistic: 2800028.0
+Null rejected: True
+
+
+For dataset mmlu and model Mistral
+P-value: 9.578100696942924e-47
+Statistic: 2482349.5
+Null rejected: True
+
+
+
+For dataset mmlu and model Solar
+P-value: 1.519227513219179e-30
+Statistic: 2361381.0
+Null rejected: True
+
+
+For dataset mmlu and model Yi-6b
+P-value: 7.814741786415549e-96
+Statistic: 2757519.0
+Null rejected: True
+
+
+For dataset mmlu and model Yi-34b
+P-value: 1.165730812688045e-43
+Statistic: 2304749.0
+Null rejected: True
+
+
+
+
+
+
+
+For dataset piqa and model Mistral
+P-value: 0.00025904911813352506
+Statistic: 32804.5
+Null rejected: True
+
+
+
+
+For dataset piqa and model Yi-6b
+P-value: 4.3044581879491684e-14
+Statistic: 28422.0
+Null rejected: True
+
+
+For dataset piqa and model Yi-34b
+P-value: 0.0034680492038863236
+Statistic: 14907.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Falcon-7b
+P-value: 3.352557807604855e-08
+Statistic: 69633.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Falcon-40b
+P-value: 0.16990573602372083
+Statistic: 67329.0
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-7b
+P-value: 0.9748073959089324
+Statistic: 61417.5
+Null rejected: False
+
+
+For dataset truthfulqa and model Llama-13b
+P-value: 0.006512380838506183
+Statistic: 72049.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Llama-70b
+P-value: 1.5503119464672058e-25
+Statistic: 116029.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Mistral
+P-value: 5.60639385429401e-19
+Statistic: 112470.0
+Null rejected: True
+
+
+
+For dataset truthfulqa and model Solar
+P-value: 3.129625781073528e-06
+Statistic: 98804.5
+Null rejected: True
+
+
+For dataset truthfulqa and model Yi-6b
+P-value: 1.5945228639053148e-13
+Statistic: 107334.0
+Null rejected: True
+
+
+For dataset truthfulqa and model Yi-34b
+P-value: 6.033146877129698e-17
+Statistic: 110911.0
+Null rejected: True
+
+
+For dataset winogrande and model Falcon-7b
+P-value: 0.7291760292750354
+Statistic: 1520756.5
+Null rejected: False
+
+
+For dataset winogrande and model Falcon-40b
+P-value: 0.18364028488888406
+Statistic: 1155116.5
+Null rejected: False
+
+
+For dataset winogrande and model Llama-7b
+P-value: 0.512597441772453
+Statistic: 1538880.0
+Null rejected: False
+
+
+For dataset winogrande and model Llama-13b
+P-value: 0.69177727786116
+Statistic: 1512376.0
+Null rejected: False
+
+
+For dataset winogrande and model Llama-70b
+P-value: 1.378167518200542e-09
+Statistic: 1702550.0
+Null rejected: True
+
+
+For dataset winogrande and model Mistral
+P-value: 0.00010351590006428673
+Statistic: 1624938.5
+Null rejected: True
+
+
+
+For dataset winogrande and model Solar
+P-value: 3.8836646085155755e-06
+Statistic: 1437435.5
+Null rejected: True
+
+
+For dataset winogrande and model Yi-6b
+P-value: 3.0416305914153926e-11
+Statistic: 1692461.0
+Null rejected: True
+
+
+For dataset winogrande and model Yi-34b
+P-value: 1.936185421453395e-09
+Statistic: 1553253.5
+Null rejected: True
+
+
