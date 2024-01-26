@@ -2,7 +2,8 @@
 \begin{table*}
 \centering
 \begin{tabular}{c|c|c|c|c|c|c}
-LLM & Base Score & MSP Score & Max Logit Score & Base Score & MSP Score & Max Logit Score\\ \hline
+& \multicolumn{3}{c|}{Balanced Score} & \multicolumn{3}{c}{Conservative Score} \\ 
+LLM & Base LLM & MSP & Max Logit & Base Score & MSP & Max Logit\\ \hline
 Falcon 7B & -47.2 & 0.0 & 0.0 & -119.2 & -0.1 & 0.0\\
 Falcon 40B & -10.4 & 3.7 & 0.1 & -63.1 & 0.0 & -0.2\\
 Llama2 7B & -18.6 & 3.0 & -0.1 & -77.6 & 0.0 & 0.1\\
@@ -15,6 +16,6 @@ Yi 6B & -0.8 & 12.6 & 7.2 & -49.8 & 5.2 & 3.3\\
 Yi 34B & 28.6 & 31.2 & 30.2 & -5.8 & 13.4 & 10.1\\
 \hline
 \end{tabular}
-\caption{Score results for mmlu}
-\end{table*}
+\caption{Score results for MMLU. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.}
 \label{tab:mmlu_score}
+\end{table*}

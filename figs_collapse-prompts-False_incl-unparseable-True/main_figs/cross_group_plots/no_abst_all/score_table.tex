@@ -2,7 +2,8 @@
 \begin{table*}
 \centering
 \begin{tabular}{c|c|c|c|c|c|c}
-LLM & Base Score & MSP Score & Max Logit Score & Base Score & MSP Score & Max Logit Score\\ \hline
+& \multicolumn{3}{c|}{Balanced Score} & \multicolumn{3}{c}{Conservative Score} \\ 
+LLM & Base LLM & MSP & Max Logit & Base Score & MSP & Max Logit\\ \hline
 Falcon 7B & -41.7 & -0.1 & 0.0 & -112.5 & -0.2 & 0.0\\
 Falcon 40B & -12.2 & 2.8 & 0.9 & -68.3 & 0.0 & -0.1\\
 Llama2 7B & -19.0 & -0.1 & 0.1 & -78.4 & 0.0 & 0.0\\
@@ -15,6 +16,6 @@ Yi 6B & 3.8 & 14.1 & 10.6 & -44.3 & 4.8 & 1.8\\
 Yi 34B & 38.2 & 39.9 & 38.9 & 7.2 & 19.9 & 19.4\\
 \hline
 \end{tabular}
-\caption{Score results}
-\end{table*}
+\caption{Score results. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.}
 \label{tab:score}
+\end{table*}
