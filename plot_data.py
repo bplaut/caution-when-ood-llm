@@ -298,7 +298,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. All values are percentages between from 50\% (random classification) to 100\% (perfect classification).', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. All values are percentages between 50\% (random classification) to 100\% (perfect classification).', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
