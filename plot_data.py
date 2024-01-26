@@ -316,7 +316,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
     column_names = ['LLM', 'Base Score', 'MSP', 'Max Logit', 'Base Score', 'MSP', 'Max Logit']
-    header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \\n'
+    header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header_row=header_row)
