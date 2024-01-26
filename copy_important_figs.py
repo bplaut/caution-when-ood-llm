@@ -44,9 +44,9 @@ def main():
         file_list += [f'{input_dir}/main_figs/yes{middle_dir}/test/score_vs_conf_all_datasets']
         file_list += [f'{input_dir}/main_figs/yes{middle_dir}/test/harsh-score_vs_conf_all_datasets']
     for overall_cross_group_dir in ['all', 'None']:
-        file_list += [cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auroc_table', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auc_vs_acc-no_abst_raw_logits-no_abst_norm_logits', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/score_table']
-        for table_type in ['auroc', 'score']:
-            file_list += [f'{input_dir}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_{table_type}_table' for dataset in datasets]
+        file_list += [cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auroc_table', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auc_vs_acc-no_abst_raw_logits-no_abst_norm_logits']
+        file_list += [f'{input_dir}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_auroc_table' for dataset in datasets]
+        file_list += [f'{input_dir}/{dataset}/cross_group_plots/yes_abst_{overall_cross_group_dir}/{dataset}_score_table' for dataset in datasets]
     copy_files(output_dir, file_list)
 
 main()
