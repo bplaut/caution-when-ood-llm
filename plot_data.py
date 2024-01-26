@@ -195,7 +195,11 @@ def auc_acc_plots(data, all_aucs, output_dir):
         model_names.append(model)
 
     dataset_name = 'all datasets' if len(all_aucs) > 1 else list(all_aucs.keys())[0]
-    scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', dataset_name)
+    model_sizes = [model_size(model) for model in model_names]
+    scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'acc', 'auc', dataset_name)
+    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc', dataset_name)
+    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', dataset_name)
+    
     return avg_aucs, avg_accs, model_names # We'll use these for the cross-group plots
 
 def compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty=1, normalize=True):
