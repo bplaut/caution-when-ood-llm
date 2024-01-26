@@ -76,7 +76,7 @@ def expand_label(label):
                 'Score (Conservative)' if label == 'harsh-score' else
                 'Model Size' if label == 'size' else
                 'AUROC' if label == 'auc' else
-                'Q&A Accuracy' if label == 'acc' else label)
+                'Q&A Performance' if label == 'acc' else label)
 
 def plot_style_for_group(group):
     return (('teal', 's', 'black') if 'first_prompt' in group else
@@ -136,12 +136,12 @@ def compute_auroc(all_data, output_dir, dataset):
     print(f"ROC curve for {dataset} saved --> {output_path}")
     return aucs
     
-def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', texts=[]):
+def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', texts=[]):
     # Consistent axes
-    if ylabel == 'acc':
-        plt.ylim([28, 72])
-    if xlabel == 'auc':
-        plt.xlim([50, 71])
+    if xlabel == 'acc':
+        plt.xlim([28, 72])
+    if ylabel == 'auc':
+        plt.ylim([50, 71])
     if ylabel == 'score':
         plt.ylim([-15, 65])
     if ylabel == 'harsh-score':
@@ -177,7 +177,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     file_suffix = f"_{dataset}_{plot_name.replace(' ','_').replace(',','')}"
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=file_suffix, texts=texts)
+    finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=file_suffix, texts=texts)
            
 def auc_acc_plots(data, all_aucs, output_dir):
     model_aucs, model_accs = defaultdict(list), defaultdict(list)
@@ -237,7 +237,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plt.legend(handlelength=2.5)
     plot_name = 'MSP' if 'norm' in output_dir else 'Max Logit' if 'raw' in output_dir else 'unknown'
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
+    finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
     return result_thresholds, result_scores, base_scores
     
 def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresholds_to_mark=dict()):
@@ -315,7 +315,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             if abs(base_score_msp - base_score_max_logit) > 0.01:
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
-    column_names = ['LLM', 'Base Score', 'MSP', 'Max Logit', 'Base Score', 'MSP', 'Max Logit']
+    column_names = ['LLM', 'Base LLM', 'MSP', 'Max Logit', 'Base Score', 'MSP', 'Max Logit']
     header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
@@ -433,23 +433,26 @@ def cross_group_plots(group_data, output_dir):
         mark_color, marker, line_color = plot_style_for_group(group)
         aucs, accs = np.array(aucs), np.array(accs)
         logit_type, prompt = group_label(group)
-        plt.scatter(aucs, accs, label=logit_type+prompt, c=mark_color, marker=marker)
+        # accuracy is x-axis, auc is y-axis
+        plt.scatter(accs, aucs, label=logit_type+prompt, c=mark_color, marker=marker)
         for i in range(len(model_names)):
-            texts.append(plt.text(aucs[i], accs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
+            texts.append(plt.text(accs[i], aucs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
 
     file_suffix = '-' + '-'.join(group_data.keys())
-    # Rather than including the full group name in the title, just include the logit type and "prompt comparison" if applicable
     if 'prompt' in file_suffix:
         logit_type, _ = group_label(list(group_data.keys())[0])
         title_suffix = ': ' + logit_type + ', prompt comparison'
     else:
         title_suffix = ': ' + ' and '.join([group_label(group)[0] for group in group_data])
     plt.legend(loc='lower right')
-    generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix=file_suffix, title_suffix=title_suffix, texts=texts)
+    finalize_plot(output_dir, 'acc', 'auc', file_suffix=file_suffix, title_suffix=title_suffix, texts=texts)
     
     # Second plot: AUC vs accuracy, averaged across groups
-    score_data, avg_accs, avg_aucs, model_names = merge_groups(group_data)
-    scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'auc', 'acc')
+    score_data, avg_aucs, avg_accs, model_names = merge_groups(group_data)
+    model_sizes = [model_size(model) for model in model_names]
+    scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'acc', 'auc')
+    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc')
+    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc')
     
 def main():
     # Setup

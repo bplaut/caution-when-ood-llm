@@ -29,11 +29,13 @@ def main():
     output_dir = sys.argv[2]
 
     cross_group_dir = input_dir + '/main_figs/cross_group_plots'
-    suffixes = ['/no_abst_all/acc_vs_auc-no_abst_norm_logits-no_abst_raw_logits',
-                '/no_abst_norm_logits/acc_vs_auc_all_datasets_MSP',
-                '/no_abst_norm_logits/acc_vs_auc-no_abst_norm_logits_second_prompt-no_abst_norm_logits_first_prompt',
-                '/no_abst_raw_logits/acc_vs_auc_all_datasets_Max_Logit',
-                '/no_abst_raw_logits/acc_vs_auc-no_abst_raw_logits_second_prompt-no_abst_raw_logits_first_prompt',
+    suffixes = ['/no_abst_all/auc_vs_acc-no_abst_norm_logits-no_abst_raw_logits',
+                '/no_abst_norm_logits/auc_vs_size_all_datasets_MSP',
+                '/no_abst_raw_logits/auc_vs_size_all_datasets_Max_Logit',
+                '/no_abst_norm_logits/auc_vs_acc_all_datasets_MSP',
+                '/no_abst_norm_logits/auc_vs_acc-no_abst_norm_logits_second_prompt-no_abst_norm_logits_first_prompt',
+                '/no_abst_raw_logits/auc_vs_acc_all_datasets_Max_Logit',
+                '/no_abst_raw_logits/auc_vs_acc-no_abst_raw_logits_second_prompt-no_abst_raw_logits_first_prompt',
                  ]
     file_list = [cross_group_dir + suffix for suffix in suffixes] + [input_dir + '/main_figs/' + suffix for suffix in suffixes]
     datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande', 'piqa', 'no_winogrande']
@@ -42,7 +44,7 @@ def main():
         file_list += [f'{input_dir}/main_figs/yes{middle_dir}/test/score_vs_conf_all_datasets']
         file_list += [f'{input_dir}/main_figs/yes{middle_dir}/test/harsh-score_vs_conf_all_datasets']
     for overall_cross_group_dir in ['all', 'None']:
-        file_list += [cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auroc_table', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/acc_vs_auc-no_abst_raw_logits-no_abst_norm_logits', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/score_table']
+        file_list += [cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auroc_table', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auc_vs_acc-no_abst_raw_logits-no_abst_norm_logits', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/score_table']
         for table_type in ['auroc', 'score']:
             file_list += [f'{input_dir}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_{table_type}_table' for dataset in datasets]
     copy_files(output_dir, file_list)
