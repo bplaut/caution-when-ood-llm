@@ -341,8 +341,8 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
         f.write('\\hline\n')
         f.write('\\end{tabular}\n')
         f.write(f'\\caption{{{caption}}}\n')
-        f.write('\\end{table*}\n')
         f.write(f'\\label{{{label}}}\n')
+        f.write('\\end{table*}\n')
     print("Results table saved -->", filename)
 
 def plots_for_group(data, output_dir):
