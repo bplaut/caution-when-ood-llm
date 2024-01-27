@@ -51,7 +51,7 @@ def parse_data(file_path, incl_unparseable):
     return labels, conf_levels, total_qs
 
 def format_dataset_name(dataset):
-    return ('ARC' if dataset == 'arc' else
+    return ('ARC-Challenge' if dataset == 'arc' else
             'HellaSwag' if dataset == 'hellaswag' else
             'MMLU' if dataset == 'mmlu' else
             'PIQA' if dataset == 'piqa' else
@@ -304,12 +304,12 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         (auc_max_logit, acc_max_logit, _) = model_results_max_logit[model]
         if abs(acc_msp - acc_max_logit) > 0.01:
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
-        rows.append([expand_model_name(model), acc_msp, auc_msp, '', '', auc_max_logit, '', ''])
-    column_names = ['LLM', 'Q\\&A Performance', 'AUROC', 'max p-value', 'max p excl Wino', 'AUROC', 'max p-value', 'max p excl Wino']
-    header_row = '& & \\multicolumn{3}{c|}{MSP} & \\multicolumn{3}{c}{Max Logit} \\\\ \n'
+        rows.append([expand_model_name(model), acc_msp, auc_msp, '', auc_max_logit, ''])
+    column_names = ['LLM', 'Q\\&A Performance', 'AUROC', 'max p-value', 'AUROC', 'max p-value']
+    header_row = '& & \\multicolumn{2}{c|}{MSP} & \\multicolumn{2}{c}{Max Logit} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. All values are percentages, avergaed over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. All values are percentages, averaged over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
