@@ -230,18 +230,18 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
             thresh_to_mark = thresholds_to_mark[model]
             thresh_idx = np.where(xs == thresh_to_mark)[0][0] # First zero idx is because np.where returns a tuple, second zero idx is because we only want the first index (although there should only be one)
             score_to_mark = ys[thresh_idx]
+            plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
+            results_thresholds[model], result_scores[model] = thresh_to_mark, score_to_mark
         else:
-            thresh_to_mark_idx = np.argmax(ys)
-            thresh_to_mark = xs[thresh_to_mark_idx]
-            score_to_mark = max(ys)
+            best_thresh_idx = np.argmax(ys)
+            best_thresh = xs[thresh_to_mark_idx]
+            best_score = max(ys)
+            results_thresholds[model], result_scores[model] = best_thresh, best_score
         # zorder determines which objects are on top
-        plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # We added -1 to the front for base score, see plot_score_vs_thresholds
+        base_scores[model] = base_score
         xs, ys = xs[1:], ys[1:] # Remove the -1 for plotting
         plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyles.pop(0), linewidth=2)
-        result_thresholds[model] = thresh_to_mark
-        base_scores[model] = base_score
-        result_scores[model] = score_to_mark
 
     make_and_sort_legend()
     plt.legend(handlelength=2.5)
@@ -338,7 +338,6 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(filename, 'w') as f:
-        f.write('\\renewcommand\\arraystretch{1.2}\n')
         f.write('\\begin{table*}\n')
         f.write('\\centering\n')
         f.write('\\begin{tabular}{' + 'c|' * (len(column_names) - 1) + 'c}\n')
@@ -354,7 +353,7 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
         f.write(f'\\caption{{{caption}}}\n')
         f.write(f'\\label{{{label}}}\n')
         f.write('\\end{table*}\n')
-    print("Results table saved -->", filename)
+    print("Results able saved -->", filename)
 
 def plots_for_group(data, output_dir):
     # Split into train and test. We don't have to shuffle, since question order is already randomized
@@ -381,7 +380,7 @@ def plots_for_group(data, output_dir):
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1)
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=2)
     # Maps each wrong_penalty to (train_thresholds, test_scores, base_test_scores)
-    score_data = {1: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1), 2: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)} 
+    score_data = {1: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1), 2: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)}
 
     aucs, accs, model_names = auc_acc_plots(data, all_aucs, output_dir)
     return score_data, aucs, accs, model_names
