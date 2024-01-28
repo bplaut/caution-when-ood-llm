@@ -76,7 +76,6 @@ def expand_label(label):
                 'Score (Conservative)' if label == 'harsh-score' else
                 'Model Size (billions of parameters)' if label == 'size' else
                 'AUROC' if label == 'auc' else
-                'Number of questions' if label == 'count' else
                 'Q&A Performance' if label == 'acc' else label)
 
 def plot_style_for_group(group):
@@ -231,18 +230,18 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
             thresh_to_mark = thresholds_to_mark[model]
             thresh_idx = np.where(xs == thresh_to_mark)[0][0] # First zero idx is because np.where returns a tuple, second zero idx is because we only want the first index (although there should only be one)
             score_to_mark = ys[thresh_idx]
-            plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
-            result_thresholds[model], result_scores[model] = thresh_to_mark, score_to_mark
         else:
-            best_thresh_idx = np.argmax(ys)
-            best_thresh = xs[best_thresh_idx]
-            best_score = max(ys)
-            result_thresholds[model], result_scores[model] = best_thresh, best_score
+            thresh_to_mark_idx = np.argmax(ys)
+            thresh_to_mark = xs[thresh_to_mark_idx]
+            score_to_mark = max(ys)
         # zorder determines which objects are on top
+        plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # We added -1 to the front for base score, see plot_score_vs_thresholds
-        base_scores[model] = base_score
         xs, ys = xs[1:], ys[1:] # Remove the -1 for plotting
         plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyles.pop(0), linewidth=2)
+        result_thresholds[model] = thresh_to_mark
+        base_scores[model] = base_score
+        result_scores[model] = score_to_mark
 
     make_and_sort_legend()
     plt.legend(handlelength=2.5)
@@ -250,30 +249,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
     return result_thresholds, result_scores, base_scores
-
-def conf_level_distribution_plot(data, output_dir, dataset_descriptor='all datasets'):
-    # all datasets should have the same set of models, so just grab the first one
-    model_names = [data[list(data.keys())[0]].keys()]
-    conf_levels = defaultdict(list)
-    for dataset in data:
-        for model in data[dataset]:
-            conf_levels[model].extend(data[dataset][model][1])
-    max_conf = max([max(conf_levels[model]) for model in conf_levels])
-    thresholds = np.linspace(0, max_conf, 200) # 200 data points per plot
-
-    # Call score_plot where the "score" is the number of questions with conf level in that bucket
-    results = [] # (model, thresholds, conf_dist)
-    for model in conf_levels:
-        conf_dist = []
-        thresholds_for_plot = []
-        for i in range(len(thresholds)-1):
-            conf_dist.append(sum([1 if thresholds[i] <= conf < thresholds[i+1] else 0 for conf in conf_levels[model]]))
-            thresholds_for_plot.append((thresholds[i] + thresholds[i+1])/2)
-        results.append((model, thresholds_for_plot, conf_dist))
-
-    score_plot(results, output_dir, 'conf', 'count', dataset_descriptor)
-        
-
+    
 def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresholds_to_mark=dict()):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
     max_conf = max([max([max(conf_levels) for _, (_,conf_levels,_) in data[dataset].items()])
@@ -291,6 +267,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
     for dataset in datasets:
         for model, (labels, conf_levels, total_qs) in data[dataset].items():
             scores  = []
+            scores_harsh = []
             for thresh in thresholds:
                 score = compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty)
                 scores.append(score)
@@ -355,6 +332,24 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header_row=header_row)
 
+def percentile_conf_level(data, model, percentiles):
+    conf_levels = []
+    for dataset in data:
+        conf_levels.extend(data[dataset][model][1])
+    return np.percentile(conf_levels, percentiles)
+
+def make_percentile_conf_table(data, output_dir, dataset=''):
+    rows = []
+    percentiles = [10,25,50,75,90]
+    models = data[list(data.keys())[0]].keys() # All datasets have the same list of models
+    for model in sorted(models, key=lambda x: (model_series(x), model_size(x))):
+        confs = [str(round(x, 3)) for x in percentile_conf_level(data, model, percentiles)]
+        rows.append([expand_model_name(model)] + confs)
+        column_names = ['LLM'] + [f'{x}th percentile' for x in percentiles]
+    dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
+    dataset_for_label = '' if dataset == '' else f'{dataset}_'
+    make_results_table(column_names, rows, output_dir, caption=f'Percentile confidence levels{dataset_for_caption}.', label=f'tab:{dataset_for_label}percentile_conf', filename=f'{dataset_for_label}conf_distribution.tex')
+    
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
     # Create directory if it doesn't exist
@@ -404,8 +399,7 @@ def plots_for_group(data, output_dir):
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=2)
     # Maps each wrong_penalty to (train_thresholds, test_scores, base_test_scores)
     score_data = {1: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1), 2: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)}
-    # Distribution of confidence levels
-    conf_level_distribution_plot(data, output_dir)
+    make_percentile_conf_table(data, output_dir)
 
     aucs, accs, model_names = auc_acc_plots(data, all_aucs, output_dir)
     return score_data, aucs, accs, model_names

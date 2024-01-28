@@ -36,8 +36,8 @@ def main():
                 '/no_abst_norm_logits/auc_vs_acc-no_abst_norm_logits_second_prompt-no_abst_norm_logits_first_prompt',
                 '/no_abst_raw_logits/auc_vs_acc_all_datasets_Max_Logit',
                 '/no_abst_raw_logits/auc_vs_acc-no_abst_raw_logits_second_prompt-no_abst_raw_logits_first_prompt',
-                '/no_abst_norm_logits/count_vs_conf_all_datasets',
-                '/no_abst_raw_logits/count_vs_conf_all_datasets',
+                '/no_abst_norm_logits/conf_distribution',
+                '/no_abst_raw_logits/conf_distribution',
                  ]
     file_list = [cross_group_dir + suffix for suffix in suffixes] + [input_dir + '/main_figs/' + suffix for suffix in suffixes]
     datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande', 'piqa', 'no_winogrande']
