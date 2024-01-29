@@ -309,7 +309,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     header_row = '& & \\multicolumn{2}{c|}{MSP} & \\multicolumn{2}{c}{Max Logit} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. All values are percentages, averaged over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. AUROC and Q\&A values are percentages, averaged over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
