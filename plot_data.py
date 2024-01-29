@@ -340,15 +340,40 @@ def percentile_conf_level(data, model, percentiles):
 
 def make_percentile_conf_table(data, output_dir, dataset=''):
     rows = []
-    percentiles = [10,25,50,75,90]
+    percentiles = [10,50,90]
     models = data[list(data.keys())[0]].keys() # All datasets have the same list of models
     for model in sorted(models, key=lambda x: (model_series(x), model_size(x))):
         confs = [str(round(x, 3)) for x in percentile_conf_level(data, model, percentiles)]
         rows.append([expand_model_name(model)] + confs)
-        column_names = ['LLM'] + [f'{x}th percentile' for x in percentiles]
+    column_names = ['LLM'] + [f'{x}th' for x in percentiles]
+    header_row = '& \\multicolumn{3}{c}{Confidence level percentiles} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'Percentile confidence levels{dataset_for_caption}.', label=f'tab:{dataset_for_label}percentile_conf', filename=f'{dataset_for_label}conf_distribution.tex')
+    make_results_table(column_names, rows, output_dir, caption=f'Percentile confidence levels{dataset_for_caption}.', label=f'tab:{dataset_for_label}percentile_conf', filename=f'{dataset_for_label}conf_distribution.tex', header_row=header_row)
+
+def make_dataset_table(all_data, output_dir):
+    # one row per dataset, one column for avg acc, one for avg MSP auc, one for avg max logit auc
+    # all_data[group][dataset][model] = (labels, conf_levels, total_qs)
+    dataset_stats = defaultdict(lambda: ([], [], []))
+    for group in all_data:
+        for dataset in all_data[group]:
+            for model in all_data[group][dataset]:
+                labels, conf_levels, _ = all_data[group][dataset][model]
+                fpr, tpr, _ = roc_curve(labels, conf_levels)
+                auc_val = make_pct(auc(fpr, tpr))
+                acc_val = make_pct(np.mean(labels))
+                dataset_stats[dataset][0].append(acc_val)
+                if 'norm' in group:
+                    dataset_stats[dataset][1].append(auc_val)
+                elif 'raw' in group:
+                    dataset_stats[dataset][2].append(auc_val)
+
+    rows = []
+    for dataset in sorted(dataset_stats.keys()):
+        accs, msp_aucs, max_logit_aucs = dataset_stats[dataset]
+        rows.append([format_dataset_name(dataset), np.mean(accs), np.mean(msp_aucs), np.mean(max_logit_aucs)])
+    column_names = ['Dataset', 'Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
+    make_results_table(column_names, rows, output_dir, caption='Average Q\\&A performance and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename='dataset.tex')
     
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
@@ -512,6 +537,8 @@ def main():
             labels, conf_levels, total_qs = parse_data(file_path, incl_unparseable)
             old_labels, old_conf_levels, old_total_qs = all_data[group][dataset][model]
             all_data[group][dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
+
+    make_dataset_table(all_data, output_dir)
 
     # Single group plots
     group_data = dict()
