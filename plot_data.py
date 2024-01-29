@@ -86,7 +86,7 @@ def plot_style_for_group(group):
 
 def group_label(group):
     logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
-    prompt = ', first prompt' if group.endswith('first_prompt') else ', second prompt' if group.endswith('second_prompt') else ''
+    prompt = ', first phrasing' if group.endswith('first_prompt') else ', second phrasing' if group.endswith('second_prompt') else ''
     return logit_type, prompt
 
 
