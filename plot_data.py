@@ -305,7 +305,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         if abs(acc_msp - acc_max_logit) > 0.01:
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
         rows.append([expand_model_name(model), acc_msp, auc_msp, '', auc_max_logit, ''])
-    column_names = ['LLM', 'Q\\&A Performance', 'AUROC', 'max p-value', 'AUROC', 'max p-value']
+    column_names = ['LLM', 'Q\\&A Performance', 'AUROC', '$p < 10^{-5}$', 'AUROC', '$p < 10^{-5}$']
     header_row = '& & \\multicolumn{2}{c|}{MSP} & \\multicolumn{2}{c}{Max Logit} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
@@ -326,7 +326,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             if abs(base_score_msp - base_score_max_logit) > 0.01:
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
-    column_names = ['LLM', 'Base LLM', 'MSP', 'Max Logit', 'Base Score', 'MSP', 'Max Logit']
+    column_names = ['LLM', 'Base LLM', 'MSP', 'Max Logit', 'Base LLM', 'MSP', 'Max Logit']
     header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
