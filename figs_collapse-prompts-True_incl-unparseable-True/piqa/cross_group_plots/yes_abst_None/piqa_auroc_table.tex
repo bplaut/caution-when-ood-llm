@@ -1,20 +1,20 @@
-\renewcommand\arraystretch{1.2}
 \begin{table*}
 \centering
-\begin{tabular}{c|c|c|c}
-LLM & LLM Q\&A Performance & MSP AUROC & Max Logit AUROC\\ \hline
-Falcon 7B & 50.5 & 51.4 & 51.1\\
-Falcon 40B & 69.3 & 54.0 & 51.3\\
-Llama2 7B & 66.7 & 63.8 & 59.0\\
-Llama2 13B & 70.5 & 68.3 & 66.0\\
-Llama2 70B & 81.0 & 76.7 & 70.4\\
-Mistral 7B & 76.3 & 58.9 & 63.1\\
-Mixtral 8x7B & 88.4 & 53.8 & 57.3\\
-SOLAR 10.7B & 88.7 & 60.7 & 65.7\\
-Yi 6B & 90.0 & 73.7 & 71.6\\
-Yi 34B & 88.0 & 69.3 & 73.2\\
+\begin{tabular}{c|c|c|c|c|c}
+& & \multicolumn{2}{c|}{MSP} & \multicolumn{2}{c}{Max Logit} \\ 
+LLM & Q\&A Performance & AUROC & $p < 10^{-5}$ & AUROC & $p < 10^{-5}$\\ \hline
+Falcon 7B & 50.5 & 51.4 &  & 51.1 & \\
+Falcon 40B & 69.3 & 54.0 &  & 51.3 & \\
+Llama2 7B & 66.7 & 63.8 &  & 59.0 & \\
+Llama2 13B & 70.5 & 68.3 &  & 66.0 & \\
+Llama2 70B & 81.0 & 76.7 &  & 70.4 & \\
+Mistral 7B & 76.3 & 58.9 &  & 63.1 & \\
+Mixtral 8x7B & 88.4 & 53.8 &  & 57.3 & \\
+SOLAR 10.7B & 88.7 & 60.7 &  & 65.7 & \\
+Yi 6B & 90.0 & 73.7 &  & 71.6 & \\
+Yi 34B & 88.0 & 69.3 &  & 73.2 & \\
 \hline
 \end{tabular}
-\caption{AUROC results for PIQA. All values are percentages between 50\% (random classification) and 100\% (perfect classification).}
+\caption{AUROC results for PIQA. AUROC and Q\&A values are percentages, averaged over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.}
 \label{tab:piqa_auroc}
 \end{table*}

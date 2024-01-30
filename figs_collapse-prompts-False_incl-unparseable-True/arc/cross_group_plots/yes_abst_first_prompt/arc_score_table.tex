@@ -1,9 +1,8 @@
-\renewcommand\arraystretch{1.2}
 \begin{table*}
 \centering
 \begin{tabular}{c|c|c|c|c|c|c}
 & \multicolumn{3}{c|}{Balanced Score} & \multicolumn{3}{c}{Conservative Score} \\ 
-LLM & Base LLM & MSP & Max Logit & Base Score & MSP & Max Logit\\ \hline
+LLM & Base LLM & MSP & Max Logit & Base LLM & MSP & Max Logit\\ \hline
 Falcon 7B & -43.9 & -0.7 & -0.2 & -113.7 & -0.3 & -0.3\\
 Falcon 40B & 19.6 & 21.2 & 20.2 & -19.0 & 1.9 & 0.8\\
 Llama2 7B & -7.2 & 5.9 & 3.1 & -60.7 & -0.3 & 0.0\\
@@ -16,6 +15,6 @@ Yi 6B & 35.8 & 38.5 & 36.4 & 4.6 & 28.3 & 19.9\\
 Yi 34B & 64.2 & 65.0 & 64.2 & 46.9 & 55.1 & 50.5\\
 \hline
 \end{tabular}
-\caption{Score results for ARC. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.}
+\caption{Score results for ARC-Challenge. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.}
 \label{tab:arc_score}
 \end{table*}

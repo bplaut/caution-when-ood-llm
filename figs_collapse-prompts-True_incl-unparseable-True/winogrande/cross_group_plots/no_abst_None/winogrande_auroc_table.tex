@@ -1,20 +1,20 @@
-\renewcommand\arraystretch{1.2}
 \begin{table*}
 \centering
-\begin{tabular}{c|c|c|c}
-LLM & LLM Q\&A Performance & MSP AUROC & Max Logit AUROC\\ \hline
-Falcon 7B & 49.8 & 50.0 & 50.0\\
-Falcon 40B & 51.5 & 50.4 & 49.9\\
-Llama2 7B & 50.9 & 51.0 & 51.1\\
-Llama2 13B & 52.1 & 51.9 & 52.1\\
-Llama2 70B & 52.2 & 55.9 & 51.5\\
-Mistral 7B & 54.4 & 53.9 & 54.0\\
-Mixtral 8x7B & 63.2 & 53.7 & 54.6\\
-SOLAR 10.7B & 69.2 & 55.1 & 57.1\\
-Yi 6B & 58.1 & 56.6 & 54.3\\
-Yi 34B & 67.1 & 59.0 & 59.3\\
+\begin{tabular}{c|c|c|c|c|c}
+& & \multicolumn{2}{c|}{MSP} & \multicolumn{2}{c}{Max Logit} \\ 
+LLM & Q\&A Performance & AUROC & $p < 10^{-5}$ & AUROC & $p < 10^{-5}$\\ \hline
+Falcon 7B & 49.8 & 50.0 &  & 50.0 & \\
+Falcon 40B & 51.5 & 50.4 &  & 49.9 & \\
+Llama2 7B & 50.9 & 51.0 &  & 51.1 & \\
+Llama2 13B & 52.1 & 51.9 &  & 52.1 & \\
+Llama2 70B & 52.2 & 55.9 &  & 51.5 & \\
+Mistral 7B & 54.4 & 53.9 &  & 54.0 & \\
+Mixtral 8x7B & 63.2 & 53.7 &  & 54.6 & \\
+SOLAR 10.7B & 69.2 & 55.1 &  & 57.1 & \\
+Yi 6B & 58.1 & 56.6 &  & 54.3 & \\
+Yi 34B & 67.1 & 59.0 &  & 59.3 & \\
 \hline
 \end{tabular}
-\caption{AUROC results for WinoGrande. All values are percentages between 50\% (random classification) and 100\% (perfect classification).}
+\caption{AUROC results for WinoGrande. AUROC and Q\&A values are percentages, averaged over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.}
 \label{tab:winogrande_auroc}
 \end{table*}

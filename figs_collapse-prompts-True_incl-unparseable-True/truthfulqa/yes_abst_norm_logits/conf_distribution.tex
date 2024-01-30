@@ -1,17 +1,18 @@
 \begin{table*}
 \centering
-\begin{tabular}{c|c|c|c|c|c}
-LLM & 10th percentile & 25th percentile & 50th percentile & 75th percentile & 90th percentile\\ \hline
-Falcon 7B & 0.18 & 0.207 & 0.245 & 0.298 & 0.366\\
-Falcon 40B & 0.0 & 0.125 & 0.239 & 0.364 & 0.515\\
-Llama2 7B & 0.43 & 0.601 & 0.84 & 0.958 & 0.991\\
-Llama2 13B & 0.502 & 0.662 & 0.911 & 0.996 & 1.0\\
-Llama2 70B & 0.587 & 0.817 & 0.972 & 0.996 & 0.999\\
-Mistral 7B & 0.896 & 0.996 & 1.0 & 1.0 & 1.0\\
-Mixtral 8x7B & 0.99 & 1.0 & 1.0 & 1.0 & 1.0\\
-SOLAR 10.7B & 0.69 & 0.871 & 0.983 & 0.998 & 1.0\\
-Yi 6B & 0.35 & 0.467 & 0.657 & 0.832 & 0.928\\
-Yi 34B & 0.457 & 0.563 & 0.723 & 0.888 & 0.953\\
+\begin{tabular}{c|c|c|c}
+& \multicolumn{3}{c}{Confidence level percentiles} \\ 
+LLM & 10th & 50th & 90th\\ \hline
+Falcon 7B & 0.18 & 0.245 & 0.366\\
+Falcon 40B & 0.0 & 0.239 & 0.515\\
+Llama2 7B & 0.43 & 0.84 & 0.991\\
+Llama2 13B & 0.502 & 0.911 & 1.0\\
+Llama2 70B & 0.587 & 0.972 & 0.999\\
+Mistral 7B & 0.896 & 1.0 & 1.0\\
+Mixtral 8x7B & 0.99 & 1.0 & 1.0\\
+SOLAR 10.7B & 0.69 & 0.983 & 1.0\\
+Yi 6B & 0.35 & 0.657 & 0.928\\
+Yi 34B & 0.457 & 0.723 & 0.953\\
 \hline
 \end{tabular}
 \caption{Percentile confidence levels.}
