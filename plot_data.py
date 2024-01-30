@@ -343,7 +343,7 @@ def make_percentile_conf_table(data, output_dir, dataset=''):
     percentiles = [10,50,90]
     models = data[list(data.keys())[0]].keys() # All datasets have the same list of models
     for model in sorted(models, key=lambda x: (model_series(x), model_size(x))):
-        confs = [str(round(x, 3)) for x in percentile_conf_level(data, model, percentiles)]
+        confs = [make_pct(x) for x in percentile_conf_level(data, model, percentiles)]
         rows.append([expand_model_name(model)] + confs)
     column_names = ['LLM'] + [f'{x}th' for x in percentiles]
     header_row = '& \\multicolumn{3}{c}{Confidence level percentiles} \\\\ \n'
