@@ -1,20 +1,20 @@
-\renewcommand\arraystretch{1.2}
 \begin{table*}
 \centering
-\begin{tabular}{c|c|c|c}
-LLM & LLM Q\&A Performance & MSP AUROC & Max Logit AUROC\\ \hline
-Falcon 7B & 25.0 & 49.9 & 49.5\\
-Falcon 40B & 45.7 & 62.6 & 58.9\\
-Llama2 7B & 38.6 & 61.5 & 60.3\\
-Llama2 13B & 50.7 & 64.4 & 61.2\\
-Llama2 70B & 63.9 & 69.9 & 64.2\\
-Mistral 7B & 52.2 & 62.0 & 61.5\\
-Mixtral 8x7B & 67.4 & 59.9 & 61.8\\
-SOLAR 10.7B & 78.5 & 63.5 & 66.8\\
-Yi 6B & 41.2 & 66.7 & 60.6\\
-Yi 34B & 77.4 & 71.8 & 66.3\\
+\begin{tabular}{c|c|c|c|c|c}
+& & \multicolumn{2}{c|}{MSP} & \multicolumn{2}{c}{Max Logit} \\ 
+LLM & Q\&A Performance & AUROC & $p < 10^{-5}$ & AUROC & $p < 10^{-5}$\\ \hline
+Falcon 7B & 25.0 & 49.9 &  & 49.5 & \\
+Falcon 40B & 45.7 & 62.6 &  & 58.9 & \\
+Llama2 7B & 38.6 & 61.5 &  & 60.3 & \\
+Llama2 13B & 50.7 & 64.4 &  & 61.2 & \\
+Llama2 70B & 63.9 & 69.9 &  & 64.2 & \\
+Mistral 7B & 52.2 & 62.0 &  & 61.5 & \\
+Mixtral 8x7B & 67.4 & 59.9 &  & 61.8 & \\
+SOLAR 10.7B & 78.5 & 63.5 &  & 66.8 & \\
+Yi 6B & 41.2 & 66.7 &  & 60.6 & \\
+Yi 34B & 77.4 & 71.8 &  & 66.3 & \\
 \hline
 \end{tabular}
-\caption{AUROC results for hellaswag}
-\end{table*}
+\caption{AUROC results for HellaSwag. AUROC and Q\&A values are percentages, averaged over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.}
 \label{tab:hellaswag_auroc}
+\end{table*}

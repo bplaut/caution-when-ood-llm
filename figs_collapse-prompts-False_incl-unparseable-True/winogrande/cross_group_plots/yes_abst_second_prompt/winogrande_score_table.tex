@@ -1,8 +1,8 @@
-\renewcommand\arraystretch{1.2}
 \begin{table*}
 \centering
 \begin{tabular}{c|c|c|c|c|c|c}
-LLM & Base Score & MSP Score & Max Logit Score & Base Score & MSP Score & Max Logit Score\\ \hline
+& \multicolumn{3}{c|}{Balanced Score} & \multicolumn{3}{c}{Conservative Score} \\ 
+LLM & Base LLM & MSP & Max Logit & Base LLM & MSP & Max Logit\\ \hline
 Falcon 7B & 0.3 & 0.0 & 0.6 & -49.3 & 0.0 & 0.0\\
 Falcon 40B & 5.7 & 5.7 & 5.7 & -41.4 & 0.1 & 0.0\\
 Llama2 7B & 3.2 & 3.3 & 3.4 & -45.1 & 0.0 & 0.0\\
@@ -15,6 +15,6 @@ Yi 6B & 17.5 & 17.3 & 16.5 & -17.6 & 1.6 & -0.1\\
 Yi 34B & 35.6 & 35.3 & 35.6 & 3.5 & 5.1 & 11.8\\
 \hline
 \end{tabular}
-\caption{Score results for winogrande}
-\end{table*}
+\caption{Score results for WinoGrande. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.}
 \label{tab:winogrande_score}
+\end{table*}

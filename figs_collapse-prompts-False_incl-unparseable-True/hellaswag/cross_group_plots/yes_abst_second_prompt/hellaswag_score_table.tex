@@ -1,8 +1,8 @@
-\renewcommand\arraystretch{1.2}
 \begin{table*}
 \centering
 \begin{tabular}{c|c|c|c|c|c|c}
-LLM & Base Score & MSP Score & Max Logit Score & Base Score & MSP Score & Max Logit Score\\ \hline
+& \multicolumn{3}{c|}{Balanced Score} & \multicolumn{3}{c}{Conservative Score} \\ 
+LLM & Base LLM & MSP & Max Logit & Base LLM & MSP & Max Logit\\ \hline
 Falcon 7B & -49.5 & -0.2 & 0.0 & -124.1 & 0.0 & 0.0\\
 Falcon 40B & -12.4 & 3.8 & 2.1 & -68.0 & -0.3 & -0.1\\
 Llama2 7B & -18.4 & 3.7 & 1.9 & -77.6 & 0.0 & -0.3\\
@@ -15,6 +15,6 @@ Yi 6B & -25.6 & 3.9 & 1.4 & -84.4 & 0.9 & 0.3\\
 Yi 34B & 50.8 & 50.9 & 50.7 & 28.3 & 33.8 & 33.8\\
 \hline
 \end{tabular}
-\caption{Score results for hellaswag}
-\end{table*}
+\caption{Score results for HellaSwag. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.}
 \label{tab:hellaswag_score}
+\end{table*}

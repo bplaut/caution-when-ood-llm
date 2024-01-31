@@ -1,8 +1,8 @@
-\renewcommand\arraystretch{1.2}
 \begin{table*}
 \centering
 \begin{tabular}{c|c|c|c|c|c|c}
-LLM & Base Score & MSP Score & Max Logit Score & Base Score & MSP Score & Max Logit Score\\ \hline
+& \multicolumn{3}{c|}{Balanced Score} & \multicolumn{3}{c}{Conservative Score} \\ 
+LLM & Base LLM & MSP & Max Logit & Base LLM & MSP & Max Logit\\ \hline
 Falcon 7B & -60.0 & -0.5 & 0.0 & -140.0 & -1.0 & -0.2\\
 Falcon 40B & -40.4 & -2.0 & 0.0 & -110.6 & -4.4 & 0.0\\
 Llama2 7B & -50.2 & 0.0 & 0.0 & -125.3 & 0.0 & -0.2\\
@@ -15,6 +15,6 @@ Yi 6B & -12.5 & 5.6 & 4.7 & -68.8 & -0.2 & -1.5\\
 Yi 34B & 8.6 & 14.4 & 16.4 & -37.2 & 3.9 & 1.2\\
 \hline
 \end{tabular}
-\caption{Score results for truthfulqa}
-\end{table*}
+\caption{Score results for TruthfulQA. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.}
 \label{tab:truthfulqa_score}
+\end{table*}

@@ -1,10 +1,11 @@
-There are two main files:
+There are three main files:
 1. generate_text.py, which is a command-line interface to generate text via Hugging Face
-2. take_qa_test.py, which runs a multiple choice Q&A test using a Hugging Face dataset and generate_text.py.
-Both files support the same command line arguments (shown below), although some arguments are only relevant for one file. For example, --dataset is only used for take_qa_test.py.
+2. take_qa_test_first_prompt.py, which runs a multiple choice Q&A test using a Hugging Face dataset and generate_text.py.
+3. take_qa_test_second_prompt.py, which does the same thing, except, you guessed it...with a different prompt.
+All files support the same command line arguments (shown below), although some arguments are only relevant for one file. For example, --dataset is only used for take_qa_test.py.
 
 ```
-usage: generate_text.py/take_qa_test.py [-h] -m MODEL [-p PROMPTS] [-n MAX_NEW_TOKENS] [-k NUM_TOP_TOKENS] [-c] [-s]
+usage: generate_text.py/take_qa_test_<first/second>_prompt.py [-h] -m MODEL [-p PROMPTS] [-n MAX_NEW_TOKENS] [-k NUM_TOP_TOKENS] [-c] [-s]
                         [-r NUM_RESPONSES] [-i] [-d DATASET] [-q QUESTION_RANGE] [-b BATCH_SIZE]
                         [--abstain_option ABSTAIN_OPTION]
 

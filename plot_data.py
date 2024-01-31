@@ -54,6 +54,14 @@ def parse_data(file_path, incl_unparseable):
         sys.exit(1)
     return labels, conf_levels, total_qs
 
+def format_dataset_name(dataset):
+    return ('ARC-Challenge' if dataset == 'arc' else
+            'HellaSwag' if dataset == 'hellaswag' else
+            'MMLU' if dataset == 'mmlu' else
+            'PIQA' if dataset == 'piqa' else
+            'TruthfulQA' if dataset == 'truthfulqa' else
+            'WinoGrande' if dataset == 'winogrande' else dataset)
+
 def expand_model_name(name):
     return ('Mistral 7B' if name == 'Mistral' else
             'Mixtral 8x7B' if name == 'Mixtral' else
@@ -70,9 +78,9 @@ def expand_label(label):
         return ('Confidence Threshold' if label == 'conf' else
                 'Score (Balanced)' if label == 'score' else
                 'Score (Conservative)' if label == 'harsh-score' else
-                'Model Size' if label == 'size' else
+                'Model Size (billions of parameters)' if label == 'size' else
                 'AUROC' if label == 'auc' else
-                'Q&A Accuracy' if label == 'acc' else label)
+                'Q&A Performance' if label == 'acc' else label)
 
 def plot_style_for_group(group):
     return (('teal', 's', 'black') if 'first_prompt' in group else
@@ -82,7 +90,7 @@ def plot_style_for_group(group):
 
 def group_label(group):
     logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
-    prompt = ', first prompt' if group.endswith('first_prompt') else ', second prompt' if group.endswith('second_prompt') else ''
+    prompt = ', first phrasing' if group.endswith('first_prompt') else ', second phrasing' if group.endswith('second_prompt') else ''
     return logit_type, prompt
 
 
@@ -133,12 +141,12 @@ def compute_auroc(all_data, output_dir, dataset):
     print(f"ROC curve for {dataset} saved --> {output_path}")
     return aucs
     
-def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', texts=[]):
+def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', texts=[]):
     # Consistent axes
-    if ylabel == 'acc':
-        plt.ylim([28, 72])
-    if xlabel == 'auc':
-        plt.xlim([50, 71])
+    if xlabel == 'acc':
+        plt.xlim([28, 72])
+    if ylabel == 'auc':
+        plt.ylim([50, 71])
     if ylabel == 'score':
         plt.ylim([-15, 65])
     if ylabel == 'harsh-score':
@@ -148,12 +156,22 @@ def generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suff
 
     plt.xlabel(expand_label(xlabel))
     plt.ylabel(expand_label(ylabel))
-    plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
+
+    # Remove some axes based on the way figs are organized in the paper
+    if 'raw' in output_dir:
+        plt.ylabel('')
+        plt.yticks([])
+    if ylabel == 'score':
+        plt.xlabel('')
+        plt.xticks([])
+    
+    # Commenting this out because ICML guidelines say no in-figure titles
+    # plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.pdf")
     
-    plt.savefig(output_path)
+    plt.savefig(output_path, bbox_inches='tight')
     plt.close()
     print(f"{ylabel} vs {xlabel} for {title_suffix} saved --> {output_path}")
 
@@ -174,7 +192,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     file_suffix = f"_{dataset}_{plot_name.replace(' ','_').replace(',','')}"
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=file_suffix, texts=texts)
+    finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=file_suffix, texts=texts)
            
 def auc_acc_plots(data, all_aucs, output_dir):
     model_aucs, model_accs = defaultdict(list), defaultdict(list)
@@ -192,7 +210,11 @@ def auc_acc_plots(data, all_aucs, output_dir):
         model_names.append(model)
 
     dataset_name = 'all datasets' if len(all_aucs) > 1 else list(all_aucs.keys())[0]
-    scatter_plot(avg_aucs, avg_accs, output_dir, model_names, 'auc', 'acc', dataset_name)
+    model_sizes = [model_size(model) for model in model_names]
+    scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'acc', 'auc', dataset_name)
+    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc', dataset_name)
+    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc', dataset_name)
+    
     return avg_aucs, avg_accs, model_names # We'll use these for the cross-group plots
 
 <<<<<<< HEAD
@@ -233,7 +255,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plt.legend(handlelength=2.5)
     plot_name = 'MSP' if 'norm' in output_dir else 'Max Logit' if 'raw' in output_dir else 'unknown'
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
-    generic_finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
+    finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
     return result_thresholds, result_scores, base_scores
     
 def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresholds_to_mark=dict()):
@@ -290,11 +312,12 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         (auc_max_logit, acc_max_logit, _) = model_results_max_logit[model]
         if abs(acc_msp - acc_max_logit) > 0.01:
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
-        rows.append([expand_model_name(model), acc_msp, auc_msp, auc_max_logit])
-    column_names = ['LLM', 'LLM Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
-    dataset_for_caption = '' if dataset == '' else f' for {dataset}'
+        rows.append([expand_model_name(model), acc_msp, auc_msp, '', auc_max_logit, ''])
+    column_names = ['LLM', 'Q\\&A Performance', 'AUROC', '$p < 10^{-5}$', 'AUROC', '$p < 10^{-5}$']
+    header_row = '& & \\multicolumn{2}{c|}{MSP} & \\multicolumn{2}{c}{Max Logit} \\\\ \n'
+    dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex')
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. AUROC and Q\&A values are percentages, averaged over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
@@ -311,19 +334,61 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             if abs(base_score_msp - base_score_max_logit) > 0.01:
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
-    column_names = ['LLM', 'Base Score', 'MSP Score', 'Max Logit Score', 'Base Score', 'MSP Score', 'Max Logit Score']
-    header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \\n'
-    dataset_for_caption = '' if dataset == '' else f' for {dataset}'
+    column_names = ['LLM', 'Base LLM', 'MSP', 'Max Logit', 'Base LLM', 'MSP', 'Max Logit']
+    header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
+    dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex')
+    make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header_row=header_row)
 
+def percentile_conf_level(data, model, percentiles):
+    conf_levels = []
+    for dataset in data:
+        conf_levels.extend(data[dataset][model][1])
+    return np.percentile(conf_levels, percentiles)
+
+def make_percentile_conf_table(data, output_dir, dataset=''):
+    rows = []
+    percentiles = [10,50,90]
+    models = data[list(data.keys())[0]].keys() # All datasets have the same list of models
+    for model in sorted(models, key=lambda x: (model_series(x), model_size(x))):
+        confs = [make_pct(x) for x in percentile_conf_level(data, model, percentiles)]
+        rows.append([expand_model_name(model)] + confs)
+    column_names = ['LLM'] + [f'{x}th' for x in percentiles]
+    header_row = '& \\multicolumn{3}{c}{Confidence level percentiles} \\\\ \n'
+    dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
+    dataset_for_label = '' if dataset == '' else f'{dataset}_'
+    make_results_table(column_names, rows, output_dir, caption=f'Percentile confidence levels{dataset_for_caption}.', label=f'tab:{dataset_for_label}percentile_conf', filename=f'{dataset_for_label}conf_distribution.tex', header_row=header_row)
+
+def make_dataset_table(all_data, output_dir):
+    # one row per dataset, one column for avg acc, one for avg MSP auc, one for avg max logit auc
+    # all_data[group][dataset][model] = (labels, conf_levels, total_qs)
+    dataset_stats = defaultdict(lambda: ([], [], []))
+    for group in all_data:
+        for dataset in all_data[group]:
+            for model in all_data[group][dataset]:
+                labels, conf_levels, _ = all_data[group][dataset][model]
+                fpr, tpr, _ = roc_curve(labels, conf_levels)
+                auc_val = make_pct(auc(fpr, tpr))
+                acc_val = make_pct(np.mean(labels))
+                dataset_stats[dataset][0].append(acc_val)
+                if 'norm' in group:
+                    dataset_stats[dataset][1].append(auc_val)
+                elif 'raw' in group:
+                    dataset_stats[dataset][2].append(auc_val)
+
+    rows = []
+    for dataset in sorted(dataset_stats.keys()):
+        accs, msp_aucs, max_logit_aucs = dataset_stats[dataset]
+        rows.append([format_dataset_name(dataset), np.mean(accs), np.mean(msp_aucs), np.mean(max_logit_aucs)])
+    column_names = ['Dataset', 'Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
+    make_results_table(column_names, rows, output_dir, caption='Average Q\\&A performance and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename='dataset.tex')
+    
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
     # Create directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(filename, 'w') as f:
-        f.write('\\renewcommand\\arraystretch{1.2}\n')
         f.write('\\begin{table*}\n')
         f.write('\\centering\n')
         f.write('\\begin{tabular}{' + 'c|' * (len(column_names) - 1) + 'c}\n')
@@ -337,9 +402,9 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
         f.write('\\hline\n')
         f.write('\\end{tabular}\n')
         f.write(f'\\caption{{{caption}}}\n')
-        f.write('\\end{table*}\n')
         f.write(f'\\label{{{label}}}\n')
-    print("Results table saved -->", filename)
+        f.write('\\end{table*}\n')
+    print("Results able saved -->", filename)
 
 def plots_for_group(data, output_dir):
     # Split into train and test. We don't have to shuffle, since question order is already randomized
@@ -366,7 +431,8 @@ def plots_for_group(data, output_dir):
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1)
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=2)
     # Maps each wrong_penalty to (train_thresholds, test_scores, base_test_scores)
-    score_data = {1: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1), 2: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)} 
+    score_data = {1: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1), 2: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)}
+    make_percentile_conf_table(data, output_dir)
 
     aucs, accs, model_names = auc_acc_plots(data, all_aucs, output_dir)
     return score_data, aucs, accs, model_names
@@ -429,23 +495,26 @@ def cross_group_plots(group_data, output_dir):
         mark_color, marker, line_color = plot_style_for_group(group)
         aucs, accs = np.array(aucs), np.array(accs)
         logit_type, prompt = group_label(group)
-        plt.scatter(aucs, accs, label=logit_type+prompt, c=mark_color, marker=marker)
+        # accuracy is x-axis, auc is y-axis
+        plt.scatter(accs, aucs, label=logit_type+prompt, c=mark_color, marker=marker)
         for i in range(len(model_names)):
-            texts.append(plt.text(aucs[i], accs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
+            texts.append(plt.text(accs[i], aucs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
 
     file_suffix = '-' + '-'.join(group_data.keys())
-    # Rather than including the full group name in the title, just include the logit type and "prompt comparison" if applicable
     if 'prompt' in file_suffix:
         logit_type, _ = group_label(list(group_data.keys())[0])
         title_suffix = ': ' + logit_type + ', prompt comparison'
     else:
         title_suffix = ': ' + ' and '.join([group_label(group)[0] for group in group_data])
     plt.legend(loc='lower right')
-    generic_finalize_plot(output_dir, 'auc', 'acc', file_suffix=file_suffix, title_suffix=title_suffix, texts=texts)
+    finalize_plot(output_dir, 'acc', 'auc', file_suffix=file_suffix, title_suffix=title_suffix, texts=texts)
     
     # Second plot: AUC vs accuracy, averaged across groups
-    score_data, avg_accs, avg_aucs, model_names = merge_groups(group_data)
-    scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'auc', 'acc')
+    score_data, avg_aucs, avg_accs, model_names = merge_groups(group_data)
+    model_sizes = [model_size(model) for model in model_names]
+    scatter_plot(avg_accs, avg_aucs, output_dir, model_names, 'acc', 'auc')
+    scatter_plot(model_sizes, avg_aucs, output_dir, model_names, 'size', 'auc')
+    scatter_plot(model_sizes, avg_accs, output_dir, model_names, 'size', 'acc')
     
 def main():
     # Setup
@@ -477,6 +546,8 @@ def main():
             old_labels, old_conf_levels, old_total_qs = all_data[group][dataset][model]
             all_data[group][dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
 
+    make_dataset_table(all_data, output_dir)
+
     # Single group plots
     group_data = dict()
     for group in all_data:
@@ -503,7 +574,6 @@ def main():
                         make_auroc_table(msp_group, max_logit_group, new_output_dir, dataset=dset)
                         make_score_table(msp_group, max_logit_group, new_output_dir, dataset=dset)
                         
-
     # Finally, compare normed vs raw logits, averaged over the two prompts
     try:
         group1a = 'no_abst_norm_logits_first_prompt'
@@ -515,8 +585,9 @@ def main():
         merged_groups = {'no_abst_norm_logits': new_group1, 'no_abst_raw_logits': new_group2}
         new_output_dir = os.path.join(output_dir, 'cross_group_plots', 'no_abst_all')
         cross_group_plots(merged_groups, new_output_dir)
-        make_auroc_table(new_group1, new_group2, new_output_dir)
-        make_score_table(new_group1, new_group2, new_output_dir)
+        dset = '' if len(datasets_to_analyze) > 1 else datasets_to_analyze[0]
+        make_auroc_table(new_group1, new_group2, new_output_dir, dset)
+        make_score_table(new_group1, new_group2, new_output_dir, dset)
     except KeyError:
         print("\nCouldn't find the right groups for the overall average plot, skipping.\n")
 
