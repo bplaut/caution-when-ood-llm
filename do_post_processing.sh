@@ -1,38 +1,31 @@
 #!/bin/bash
 
-# Check if no more than three arguments are provided
-if [ $# -gt 3 ]; then
-    echo "Incorrect number of arguments provided. Usage: ./do_post_processing <directory> [comma-separated list of probability thresholds] [comma-separated list of raw logit thresholds]"
+# Check if exactly three arguments are provided
+if [ $# -ne 3 ]; then
+    echo "Incorrect number of arguments provided. Usage: ./do_post_processing <directory> <collapse_prompts> <incl_unparseable>"
     exit 1
 fi
 
-# Check if at least one argument is provided (the directory)
-if [ $# -lt 1 ]; then
-    echo "No directory specified. Usage: ./do_post_processing <directory> [comma-separated list of probability thresholds] [comma-separated list of raw logit thresholds]"
-    exit 1
-fi
-
-# Assign the arguments to variables. If no values are provided for thresholds, default to 0
+# Assign the arguments to variables
 dir=$1
-thresholds1=${2:-0}
-thresholds2=${3:-0}
+collapse_prompts=$2
+incl_unparseable=$3
 
-echo -e "Making tables...\n"
-output_dir=tables/$dir
-python combine_grades_into_table.py $output_dir/no_abstain_normed_logits.tex $thresholds1 True $dir/*no_abst_norm_logits.txt
-python combine_grades_into_table.py $output_dir/no_abstain_raw_logits.tex $thresholds2 True $dir/*no_abst_raw_logits.txt
-python combine_grades_into_table.py $output_dir/yes_abstain_normed_logits.tex $thresholds1 True $dir/*yes_abst_norm_logits.txt
-python combine_grades_into_table.py $output_dir/yes_abstain_raw_logits.tex $thresholds2 True $dir/*yes_abst_raw_logits.txt
+echo -e "collapse_prompts: $collapse_prompts, incl_unparseable: $incl_unparseable\n"
 
-output_dir=figs/$dir
-echo -e "\nMaking main figures...\n"
-python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*yes_abst*.txt
-python plot_data.py $output_dir/main_figs True arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*no_abst*.txt
+output_dir="figs_collapse-prompts-${collapse_prompts}_incl-unparseable-${incl_unparseable}"
+echo -e "\nMaking figures...\n"
 
-echo -e "\nMaking figures for PIQA...\n"
-python plot_data.py $output_dir/piqa/no_abstain_normed_logits True piqa $dir/*no_abst*.txt
-python plot_data.py $output_dir/piqa/yes_abstain_normed_logits True piqa $dir/*yes_abst*.txt
+for abstain in "no_abst" "yes_abst"; do
+    python plot_data.py $output_dir/main_figs $incl_unparseable $collapse_prompts arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/piqa $incl_unparseable $collapse_prompts piqa $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/arc $incl_unparseable $collapse_prompts arc $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/hellaswag $incl_unparseable $collapse_prompts hellaswag $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/mmlu $incl_unparseable $collapse_prompts mmlu $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/truthfulqa $incl_unparseable $collapse_prompts truthfulqa $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/winogrande $incl_unparseable $collapse_prompts winogrande $dir/*${abstain}*.txt
+    python plot_data.py $output_dir/no_winogrande $incl_unparseable $collapse_prompts arc,hellaswag,mmlu,truthfulqa $dir/*${abstain}*.txt
+done
 
-echo -e "\nMaking figures excluding winogrande...\n"
-python plot_data.py $output_dir/no_winogrande/no_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa $dir/*no_abst*.txt
-python plot_data.py $output_dir/no_winogrande/yes_abstain_normed_logits True arc,hellaswag,mmlu,truthfulqa $dir/*yes_abst*.txt
+echo -e "\nCopying important figures...\n"
+python copy_important_figs.py $output_dir paper_figs

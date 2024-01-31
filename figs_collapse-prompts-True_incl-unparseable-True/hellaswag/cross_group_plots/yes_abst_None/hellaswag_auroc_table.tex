@@ -1,0 +1,20 @@
+\renewcommand\arraystretch{1.2}
+\begin{table*}
+\centering
+\begin{tabular}{c|c|c|c}
+LLM & LLM Q\&A Performance & MSP AUROC & Max Logit AUROC\\ \hline
+Falcon 7B & 25.1 & 50.7 & 49.8\\
+Falcon 40B & 41.5 & 57.6 & 56.4\\
+Llama2 7B & 42.8 & 59.0 & 54.4\\
+Llama2 13B & 46.9 & 64.2 & 61.8\\
+Llama2 70B & 64.4 & 70.0 & 65.1\\
+Mistral 7B & 56.7 & 63.0 & 62.6\\
+Mixtral 8x7B & 69.6 & 60.1 & 60.2\\
+SOLAR 10.7B & 81.2 & 55.9 & 66.6\\
+Yi 6B & 36.3 & 69.0 & 64.0\\
+Yi 34B & 74.5 & 73.0 & 66.5\\
+\hline
+\end{tabular}
+\caption{AUROC results for hellaswag}
+\end{table*}
+\label{tab:hellaswag_auroc}
