@@ -187,6 +187,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
         texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
 
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
+    print("slope, r_value, p_value for", xlabel, ylabel, "is", slope, r_value, p_value)
     plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
     plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
