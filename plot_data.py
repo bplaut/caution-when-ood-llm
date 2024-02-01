@@ -76,7 +76,7 @@ def expand_label(label):
                 'Score (Conservative)' if label == 'harsh-score' else
                 'Model Size (billions of parameters)' if label == 'size' else
                 'AUROC' if label == 'auc' else
-                'Q&A Performance' if label == 'acc' else label)
+                'Q&A Accuracy' if label == 'acc' else label)
 
 def plot_style_for_group(group):
     return (('teal', 's', 'black') if 'first_prompt' in group else
@@ -306,11 +306,11 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         if abs(acc_msp - acc_max_logit) > 0.01:
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
         rows.append([expand_model_name(model), acc_msp, auc_msp, '', auc_max_logit, ''])
-    column_names = ['LLM', 'Q\\&A Performance', 'AUROC', '$p < 10^{-5}$', 'AUROC', '$p < 10^{-5}$']
+    column_names = ['LLM', 'Q\\&A Accuracy', 'AUROC', '$p < 10^{-5}$', 'AUROC', '$p < 10^{-5}$']
     header_row = '& & \\multicolumn{2}{c|}{MSP} & \\multicolumn{2}{c}{Max Logit} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. AUROC and Q\&A values are percentages, averaged over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. AUROC and Q\&A values are percentages, averaged over the two prompts.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
@@ -373,8 +373,8 @@ def make_dataset_table(all_data, output_dir):
     for dataset in sorted(dataset_stats.keys()):
         accs, msp_aucs, max_logit_aucs = dataset_stats[dataset]
         rows.append([format_dataset_name(dataset), np.mean(accs), np.mean(msp_aucs), np.mean(max_logit_aucs)])
-    column_names = ['Dataset', 'Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
-    make_results_table(column_names, rows, output_dir, caption='Average Q\\&A performance and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename='dataset.tex')
+    column_names = ['Dataset', 'Q\\&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
+    make_results_table(column_names, rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename='dataset.tex')
     
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
