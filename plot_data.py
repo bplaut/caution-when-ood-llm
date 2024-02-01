@@ -6,10 +6,6 @@ import os
 from collections import defaultdict
 from adjustText import adjust_text
 from scipy.stats import linregress
-<<<<<<< HEAD
-from utils import *
-
-=======
 import random
 
 def parse_file_name(file_name, collapse_prompts=False):
@@ -103,7 +99,6 @@ def model_size(name):
     size_term = full_name.split(' ')[1]
     end_of_size_term = size_term.rfind('B')
     return 46.7 if 'Mixtral' in name else float(size_term[:end_of_size_term])
->>>>>>> 7191e26049e494c55b90b40aff427fa6a6748ecc
 
 def make_pct(x):
     return 100*x
@@ -187,7 +182,6 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
         texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
 
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
-    print("slope, r_value, p_value for", xlabel, ylabel, "is", slope, r_value, p_value)
     plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
     plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
@@ -218,14 +212,11 @@ def auc_acc_plots(data, all_aucs, output_dir):
     
     return avg_aucs, avg_accs, model_names # We'll use these for the cross-group plots
 
-<<<<<<< HEAD
-=======
 def compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty=1, normalize=True):
     # Score = num correct - num wrong, with abstaining when confidence < threshold
     score = sum([0 if conf < thresh else (1 if label == 1 else -wrong_penalty) for label, conf in zip(labels, conf_levels)])
     return make_pct(score / total_qs) if normalize else score
 
->>>>>>> 7191e26049e494c55b90b40aff427fa6a6748ecc
 def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dict(), yscale='linear'):
     plt.figure()
     plt.yscale(yscale)
