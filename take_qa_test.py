@@ -61,10 +61,11 @@ class Test(object):
         dataset_str = self.args['dataset'].split("/")[-1]
         abstain_str = "_yes_abst" if self.args['abstain_option'] else "_no_abst"
         logit_strs = ["_norm_logits", "_raw_logits"]
+        prompt_str = "_first_prompt" if self.args['prompt_phrasing'] == 0 else "_second_prompt"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
         for (logit_str, conf_levels) in zip(logit_strs, [conf_levels_normed, conf_levels_raw]):
-            output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}.txt"
+            output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}.txt"
             print('\nWriting results to', output_filepath)
             with open(output_filepath, 'w') as f:
                 f.write("grade confidence_level\n")
@@ -82,7 +83,8 @@ class Test(object):
         return question + '\n' + '\n'.join(formatted_choices)
 
     def make_prompt(self, question_string):
-        prompt = f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
+        if self.args['prompt_phrasing'] == 0:
+            prompt = f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
 
 Question:
 
@@ -90,8 +92,17 @@ Question:
 
 Response:\n
 """
-        # For some reason the final newline makes Falcon-7b act really weird
-        return prompt if self.args['model'] != 'Falcon-7b' else prompt[:-1]
+            # For some reason the final newline makes Falcon-7b act really weird
+            return prompt if self.args['model'] != 'Falcon-7b' else prompt[:-1]
+        elif self.args['prompt_phrasing'] == 1:
+            return f"""You will be asked a multiple-choice question. Respond with the letter which corresponds to the correct answer, followed by a period. There is no need to provide an explanation, so your response should be very short. Now here is the question:
+
+{question_string}
+
+Answer:
+"""
+        else:
+            raise Exception(f"Unknown phrasing option: {self.args['prompt_phrasing']}. Must be 0 or 1.")
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
         # Find the max probability for the token which determines the answer

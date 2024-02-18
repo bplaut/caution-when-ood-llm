@@ -140,6 +140,7 @@ def parse_args():
     parser.add_argument('-q', '--question_range', type=str, help='When running a Q&A test, what range of questions should we test? Format is "-q startq-endq", 0 indexed. For example, "-q 0-100".', default=None)
     parser.add_argument('-b', '--batch_size', type=int, help='Maximum number of prompts to batch together. Only used for experiments', default=1)
     parser.add_argument('--abstain_option', type=str_to_bool, help='When running a Q&A test, should we add an option that says "I don\'t know"?', default=False)
+    parser.add_argument('-g', '--prompt_phrasing', type=int, help='When running a Q&A test, which of the two prompt phrasings should we use? 0 or 1', default=0)
     return dict(vars(parser.parse_args())) # dictionaries are easier to manipulate sometimes
 
 def str_to_bool(s):
