@@ -52,11 +52,13 @@ python plot_data.py <output_directory> <incl_unparseable> <collapse_prompts> <da
 ```
 If incl_unparseable=True, unparseable responses are counted as wrong. Otherwise, we exclude them. If collapse_prompts=True, we group the data from the two prompt phrasings together. We set collapse_prompts=False for the AUROC analysis (because it's nonlinear), but set collapse_prompt=True for the score plots (because those are linear).
 
-There is also statistical_tests.py, which has the following usage:
+There is also statistical_tests.py, which computes the p-values and has the following usage:
 ```
 statistical_tests.py [-h] --option OPTION [--incl_unparseable]
 ```
 The OPTION parameter determines which tests are run; see the file itself for more details.
+
+Lastly, results_analysis.ipynb groups the p-values to create the tables in the paper.
 
 # Batching scripts
 
@@ -77,7 +79,7 @@ For example,
 ```
 ./do_post_processing results False True
 ```
-Currently, statistical_tests.py is not called by the scripts and must be run separately.
+Currently, statistical_tests.py and results_analysis.ipynb are not called by the scripts and must be run separately.
 
 # Resource requirements
 We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 70B) taking up 129 GB. With our setup, it took about 2 weeks to run all of the experiments from start to finish: ten models X five datasets X 6000 questions X two prompt phrasings X {no abstain option, yes abstain option}.
