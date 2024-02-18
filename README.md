@@ -1,3 +1,6 @@
+Before attempting to run this code, make sure you have text generation with Hugging Face set up: https://huggingface.co/docs/transformers/llm_tutorial
+
+# Generating text and running Q&A tests
 There are two main Python files:
 1. generate_text.py, which uses the Hugging Face interface to generate text with an LLM. This file can be called directly by command-line, but for our experiments it is only called by take_qa_test.py.
 2. take_qa_test.py, which runs a multiple choice Q&A test using a Hugging Face dataset and generate_text.py.
@@ -41,6 +44,8 @@ options:
   -g PROMPT_PHRASING, --prompt_phrasing PROMPT_PHRASING
                         When running a Q&A test, which of the two prompt phrasings should we use? 0 or 1
 ```
+
+# Post-processing Q&A results
 There are also some files for post-processing. The first is plot_data.py, which has the following usage:
 ```
 python plot_data.py <output_directory> <incl_unparseable> <collapse_prompts> <dataset1,dataset2,...> <data_file1> [<data_file2> ...]
@@ -52,6 +57,8 @@ There is also statistical_tests.py, which has the following usage:
 statistical_tests.py [-h] --option OPTION [--incl_unparseable]
 ```
 The OPTION parameter determines which tests are run; see the file itself for more details.
+
+# Batching scripts
 
 Finally, it is tedious to call these python files individually for all the combinations of experiments and plots we want to run. For this reason, we have the following two scripts:
 1. run_qa_tests.sh, which calls take_qa_test.py (which in turn calls generate_text.py). Usage:
@@ -71,3 +78,6 @@ For example,
 ./do_post_processing results False True
 ```
 Currently, statistical_tests.py is not called by the scripts and must be run separately.
+
+# Resource requirements
+We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 70B) taking up 129 GB. With our setup, it took about 2 weeks to run all of the experiments from start to finish (ten models X five datasets X 6000 questions X two prompt phrasings X yes or no abstain option).
