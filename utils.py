@@ -34,16 +34,18 @@ def parse_data(file_path, incl_unparseable):
     return labels, conf_levels, total_qs
 
 def expand_model_name(name):
-    return ('Mistral 7B' if name == 'Mistral' else
-            'Mixtral 8x7B' if name == 'Mixtral' else
-            'SOLAR 10.7B' if name == 'Solar' else
-            'Llama2 13B' if name == 'Llama-13b' else
-            'Llama2 7B' if name == 'Llama-7b' else
-            'Llama2 70B' if name == 'Llama-70b' else
-            'Yi 6B' if name == 'Yi-6b' else
-            'Yi 34B' if name == 'Yi-34b' else
-            'Falcon 7B' if name == 'Falcon-7b' else
-            'Falcon 40B' if name == 'Falcon-40b' else name)
+    base = name.split('-raw')[0]
+    base_expanded = ('Mistral 7B' if base == 'Mistral' else
+                     'Mixtral 8x7B' if base == 'Mixtral' else
+                     'SOLAR 10.7B' if base == 'Solar' else
+                     'Llama2 13B' if base == 'Llama-13b' else
+                     'Llama2 7B' if base == 'Llama-7b' else
+                     'Llama2 70B' if base == 'Llama-70b' else
+                     'Yi 6B' if base == 'Yi-6b' else
+                     'Yi 34B' if base == 'Yi-34b' else
+                     'Falcon 7B' if base == 'Falcon-7b' else
+                     'Falcon 40B' if base == 'Falcon-40b' else base)
+    return base_expanded + ' Raw' if name.endswith('-raw') else base_expanded
 
 def expand_label(label):
         return ('Confidence Threshold' if label == 'conf' else
