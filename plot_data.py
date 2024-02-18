@@ -303,7 +303,7 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
         f.write(f'\\caption{{{caption}}}\n')
         f.write(f'\\label{{{label}}}\n')
         f.write('\\end{table*}\n')
-    print("Results able saved -->", filename)
+    print("Results table saved -->", filename)
 
 def plots_for_group(data, output_dir):
     # Split into train and test. We don't have to shuffle, since question order is already randomized
