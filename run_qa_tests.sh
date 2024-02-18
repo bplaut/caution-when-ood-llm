@@ -20,6 +20,9 @@ get_batch_size() {
     local dataset_name="$2"
     local batch_size
 
+    # remove -raw from the model name if it exists
+    model_name="${model_name/-raw/}"
+
     case "$model_name" in
         "Llama-70b")
             batch_size=16
