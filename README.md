@@ -58,8 +58,16 @@ Finally, it is tedious to call these python files individually for all the combi
 ```
 ./run_qa_tests.sh 'model1,model2' 'dataset1,dataset2' 'question_range1,question_range2' prompt_phrasing abstain_option
 ```
+For example,
+```
+./run_qa_tests.sh 'Mistral,Llama-13b,Llama-70b' 'arc,truthfulqa' '0-500,500-1000' 1 False
+```
 2. do_post_processing.sh, which calls plot_data.py and copy_important_figs.py. Usage:
 ```
 ./do_post_processing <directory> <collapse_prompts> <incl_unparseable>
+```
+For example,
+```
+./do_post_processing results False True
 ```
 Currently, statistical_tests.py is not called by the scripts and must be run separately.
