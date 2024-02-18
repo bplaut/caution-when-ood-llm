@@ -33,6 +33,8 @@ class Generator(object):
             raise Exception("Unrecognized model name. Check model_name_map")
         else:
             model_name = model_name_map[args['model']]
+        if 'raw' in args['model']:
+            args['completion_mode'] = True
         self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", load_in_4bit=True)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side="left")
         self.tokenizer.pad_token = self.tokenizer.eos_token
