@@ -57,7 +57,7 @@ class Test(object):
         dataset_str = self.args['dataset'].split("/")[-1]
         abstain_str = "_yes_abst" if self.args['abstain_option'] else "_no_abst"
         logit_strs = ["_norm_logits", "_raw_logits"]
-        prompt_str = "_first_prompt" if self.args['prompt_phrasing'] == 0 else "_second_prompt"
+        prompt_str = "_first_prompt" if self.args['prompt_phrasing'] == 0 else "_second_prompt" if self.args['prompt_phrasing'] == 1 else "_unknown_prompt"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
         for (logit_str, conf_levels) in zip(logit_strs, [conf_levels_normed, conf_levels_raw]):
