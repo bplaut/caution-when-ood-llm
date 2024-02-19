@@ -65,8 +65,8 @@ def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', t
     if ylabel == 'score':
         plt.xlabel('')
         plt.xticks([])
-    
-    # Commenting this out because ICML guidelines say no in-figure titles
+
+    # Don't include titles for formatting in paper
     # plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
