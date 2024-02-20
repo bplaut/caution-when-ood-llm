@@ -3,7 +3,8 @@
 # Check if the correct number of arguments are provided
 if [ "$#" -ne 5 ]; then
     echo "Error: Incorrect number of arguments."
-    echo "Usage: ./run_qa_tests.sh 'model1,model2' 'dataset1,dataset2' 'question_range1,question_range2' prompt_phrasing abstain_option"
+    echo "Usage format: ./run_qa_tests.sh model1,model2 dataset1,dataset2,dataset3 question_range1,question_range2 prompt_phrasing abstain_option"
+    echo "Example usage: ./run_qa_tests.sh Mistral,Llama-13b,Llama-70b arc,truthfulqa 0-500,500-1000 0 False"
     exit 1
 fi
 
@@ -60,6 +61,9 @@ get_batch_size() {
 
     echo "$batch_size"
 }
+
+# Create logs directory if it doesn't exist
+mkdir -p logs
 
 # Loop through each combination of model, dataset, and question_range
 for question_range in "${question_ranges[@]}"

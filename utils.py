@@ -1,7 +1,7 @@
 import sys
 
 def parse_file_name(file_name, collapse_prompts=False):
-    # filename looks like <dataset>_<model>-q<startq>to<endq>_<group>.txt. Assume endq ends with 0   
+    # filename looks like <dataset>_<model>-q<startq>to<endq>_<group>.txt  
     second_half = file_name[file_name.find('to'):]
     parts = file_name.split('_')
     dataset = parts[0]
