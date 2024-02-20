@@ -71,7 +71,7 @@ For example,
 ```
 ./run_qa_tests.sh 'Mistral,Llama-13b,Llama-70b' 'arc,truthfulqa' '0-500,500-1000' 1 False
 ```
-2. do_post_processing.sh, which calls plot_data.py and copy_important_figs.py. Usage:
+2. do_post_processing.sh, which calls plot_data.py, copy_important_figs.py, and statistal_tests.py. Usage:
 ```
 ./do_post_processing <directory> <collapse_prompts> <incl_unparseable>
 ```
@@ -79,7 +79,7 @@ For example,
 ```
 ./do_post_processing results False True
 ```
-Currently, statistical_tests.py and results_analysis.ipynb are not called by the scripts and must be run separately.
+Currently, results_analysis.ipynb is not called by the scripts and must be run separately.
 
 # Resource requirements
 We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 70B) taking up 129 GB. With our setup, it took about 2 weeks to run all of the experiments from start to finish: ten models X five datasets X 6000 questions X two prompt phrasings X {no abstain option, yes abstain option}.

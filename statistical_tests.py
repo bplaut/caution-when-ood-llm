@@ -15,10 +15,8 @@ ALL_MODELS = ["Falcon-7b", "Falcon-40b", "Llama-7b", "Llama-13b", "Llama-70b", "
 ALL_PROMPTS = ["first_prompt", "second_prompt"]
 ALL_VALUES = ["raw_logits", "norm_logits"]
 
-
 def test_large_sample(data, threshold = 30):
     return len(data), len(data) >= threshold
-
 
 def test_normality(data, mode = "ks", threshold = 0.05):
     """
@@ -31,7 +29,6 @@ def test_normality(data, mode = "ks", threshold = 0.05):
         p_value = stats.kstest(data, "norm").pvalue
     return p_value, p_value > threshold
 
-
 def test_equal_variance(data1, data2, mode = "bartlett", threshold = 0.05):
     """
     Levene: less sensitive
@@ -43,27 +40,22 @@ def test_equal_variance(data1, data2, mode = "bartlett", threshold = 0.05):
         p_value = stats.bartlett(data1, data2).pvalue
     return p_value, p_value > threshold
 
-
 def mann_whitney(data1, data2, threshold = 0.05):
     u_statistic, u_p_value = stats.mannwhitneyu(data1, data2)
     return u_p_value, u_statistic, u_p_value < threshold
-
 
 def unpaired_z(data1, data2, threshold = 0.05):
     z_statistic, z_p_value = stats.ttest_ind(data1, data2, equal_var = True)
     return z_p_value, z_statistic, z_p_value < threshold
 
-
 def one_sample_t(data, expected_mean, alternative = "two-sided", threshold = 0.05):
     test_result = stats.ttest_1samp(data, expected_mean, alternative = alternative)
     return test_result.pvalue, test_result.statistic, test_result.df, test_result.pvalue < threshold
-
 
 def wilcoxon(data, expected_mean, alternative = "two-sided", threshold = 0.05):
     diffs = list(map(lambda x: x - expected_mean, data))
     test_result = stats.wilcoxon(diffs, alternative = alternative)
     return test_result.pvalue, test_result.statistic, test_result.pvalue < threshold
-
 
 def test_assumptions(data1, data2):
     _, sample1_large = test_large_sample(data1)
@@ -75,7 +67,6 @@ def test_assumptions(data1, data2):
     equal_variance = test_equal_variance(data1, data2)
     return (large_sample or normal) and equal_variance
 
-
 def build_confidence_interval(data, alpha = 0.05):
     lower_percentile = alpha * 50
     upper_percentile = 100 - lower_percentile
@@ -83,27 +74,24 @@ def build_confidence_interval(data, alpha = 0.05):
     upper_bound = np.percentile(data, upper_percentile)
     return lower_bound, upper_bound
 
-
-def _collect_model_and_dataset_data(incl_unparseable):
+def _collect_model_and_dataset_data(incl_unparseable, input_dir):
     # index data by data[prompt][value][dataset][model]
     all_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: ([], [], 0)))))
     for prompt in ALL_PROMPTS:
-        results_dir = f"./results_{prompt}/"
-        all_results = os.listdir(results_dir)
+        all_results = os.listdir(input_dir)
         for value in ALL_VALUES:
             for dataset in ALL_DATASETS:
                 for model in ALL_MODELS:
-                    results_pattern = fr"{dataset}_{model}-.*_no_abst_{value}.txt"
-                    relevant_files = [file for file in all_results if re.match(results_pattern, file)]
-                    for file in relevant_files:
-                        labels, conf_levels, total_qs = parse_data(results_dir + file, incl_unparseable)
+                    results_pattern = fr"{dataset}_{model}-.*_no_abst_{value}_{prompt}.txt"
+                    relevant_files = [filename for filename in all_results if re.match(results_pattern, filename)]
+                    for filename in relevant_files:
+                        labels, conf_levels, total_qs = parse_data(os.path.join(input_dir, filename), incl_unparseable)
                         old_labels, old_conf_levels, old_total_qs = all_data[prompt][value][dataset][model]
                         all_data[prompt][value][dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
     return all_data
 
-
-def conduct_mann_whitney_tests(incl_unparseable):
-    all_data = _collect_model_and_dataset_data(incl_unparseable)
+def conduct_mann_whitney_tests(incl_unparseable, input_dir):
+    all_data = _collect_model_and_dataset_data(incl_unparseable, input_dir)
     test_data = {"prompt": [], "value": [], "dataset": [], "model": [], "p_value": [], "u_stat": [], "reject": []}
     for prompt in ALL_PROMPTS:
         for value in ALL_VALUES:
@@ -127,9 +115,8 @@ def conduct_mann_whitney_tests(incl_unparseable):
                         print(f"Missing data for {prompt}, {dataset}, {model}, {value}")
     pd.DataFrame(test_data).to_csv("./results_stat_tests/mann_whitney.csv", index = False)
 
-
-def construct_confidence_intervals(incl_unparseable):
-    all_data = _collect_model_and_dataset_data(incl_unparseable)
+def construct_confidence_intervals(incl_unparseable, input_dir):
+    all_data = _collect_model_and_dataset_data(incl_unparseable, input_dir)
     test_data = {"prompt": [], "value": [], "dataset": [], "model": [], "sample_auroc": [], "ci_lb": [], "ci_ub": []}
     for prompt in ALL_PROMPTS:
         for value in ALL_VALUES:
@@ -160,9 +147,8 @@ def construct_confidence_intervals(incl_unparseable):
                         print(f"Missing data for {prompt}, {dataset}, {model}, {value}")
     pd.DataFrame(test_data).to_csv("./results_stat_tests/confidence_intervals.csv", index = False)
 
-
-def conduct_model_summary_tests(incl_unparseable):
-    all_data = _collect_model_and_dataset_data(incl_unparseable)
+def conduct_model_summary_tests(incl_unparseable, input_dir):
+    all_data = _collect_model_and_dataset_data(incl_unparseable, input_dir)
     test_data = {"model": [], "prompt": [], "value": [], "p_value": [], "t_stat": [], "t_dof": [], "w_stat": [], "reject": []}
     for prompt in ALL_PROMPTS:
         for value in ALL_VALUES:
@@ -196,7 +182,6 @@ def conduct_model_summary_tests(incl_unparseable):
                 test_data["value"].append(value)
     pd.DataFrame(test_data).to_csv("./results_stat_tests/summary_tests.csv", index = False)
 
-
 def collate_paired_t_test_data(all_data):
     test_data = {"prompt": [], "value": [], "dataset": [], "model": [], "num_questions": [], "num_base_correct": [], "num_base_wrong": []}
     for prompt in ALL_PROMPTS:
@@ -216,10 +201,9 @@ def collate_paired_t_test_data(all_data):
                         print(f"Missing data for {prompt}, {dataset}, {model}, {value}")
     return test_data
 
-
-def conduct_paired_t_tests(incl_unparseable):
+def conduct_paired_t_tests(incl_unparseable, input_dir):
     # wait recompute thresholds? and how to split up?
-    # all_data = _collect_model_and_dataset_data(incl_unparseable)
+    # all_data = _collect_model_and_dataset_data(incl_unparseable, input_dir)
     # t_test_data = collate_paired_t_test_data(all_data)
     score_types = ["base", "msp", "max_logit"]
     balanced = {st: [] for st in score_types}
@@ -238,10 +222,9 @@ def conduct_paired_t_tests(incl_unparseable):
             print("Comparing based with", st, round(p_val, 5))
         print()
 
-
-def conduct_auroc_t_test(incl_unparseable):
+def conduct_auroc_t_test(incl_unparseable, input_dir):
     # testing if MSP aurocs > max logit aurocs
-    all_data = _collect_model_and_dataset_data(incl_unparseable)
+    all_data = _collect_model_and_dataset_data(incl_unparseable, input_dir)
     value_aurocs = {v: [] for v in ALL_VALUES}
     for prompt in ALL_PROMPTS:
         for value in ALL_VALUES:
@@ -260,8 +243,6 @@ def conduct_auroc_t_test(incl_unparseable):
     print("MSP AUROC avg:", round(np.mean(value_aurocs["norm_logits"]), 3))
     print("Max logit AUROC avg:", round(np.mean(value_aurocs["raw_logits"]), 3))
 
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     ###
@@ -270,19 +251,23 @@ if __name__ == "__main__":
     # 1: Mann-Whitney U test on every combination of model-dataset-prompt (200)
     # 2: Summary t-tests/Wilcoxon for average AUROC across models (40)
     # 3: Paired t-test for difference in scores for model-dataset-prompt-value (200)
-    # 4: MSP vs ML aurocs battle royale
+    # 4: MSP vs Max Logit aurocs battle royale
     ###
-    parser.add_argument("--option", "-o", required = True, type = int, help = f"Choose a number from 0 to 3")
-    parser.add_argument("--incl_unparseable", "-i", action = "store_true")
+    parser.add_argument("--option", "-o", required = True, type = int, help = f"Integer from 0 to 4, determines which test to run")
+    parser.add_argument("--incl_unparseable", "-i", type = str_to_bool, required = True)
+    parser.add_argument("--input_dir", '-d', type=str, help="Input directory to read data from", required = True)
     args = parser.parse_args()
 
+    if not os.path.exists("./results_stat_tests"):
+        os.makedirs("./results_stat_tests")
+    
     if args.option == 0:
-        construct_confidence_intervals(args.incl_unparseable)
+        construct_confidence_intervals(args.incl_unparseable, args.input_dir)
     elif args.option == 1:
-        conduct_mann_whitney_tests(args.incl_unparseable)
+        conduct_mann_whitney_tests(args.incl_unparseable, args.input_dir)
     elif args.option == 2:
-        conduct_model_summary_tests(args.incl_unparseable)
+        conduct_model_summary_tests(args.incl_unparseable, args.input_dir)
     elif args.option == 3:
-        conduct_paired_t_tests(args.incl_unparseable)
+        conduct_paired_t_tests(args.incl_unparseable, args.input_dir)
     elif args.option == 4:
-        conduct_auroc_t_test(args.incl_unparseable)
+        conduct_auroc_t_test(args.incl_unparseable, args.input_dir)

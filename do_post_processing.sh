@@ -31,5 +31,5 @@ python copy_important_figs.py $output_dir paper_figs
 
 echo -e "\nDoing statistical tests...\n"
 for option in {1..4}; do
-    python3 statistical_tests.py -o $option -i
+    python statistical_tests.py -o $option -d $dir -i $incl_unparseable
 done

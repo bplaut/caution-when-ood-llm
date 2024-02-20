@@ -2,6 +2,7 @@ from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 import argparse
 import torch as t
+from utils import str_to_bool
 
 # Still need to try beam search at some point
 class Generator(object):
@@ -145,14 +146,6 @@ def parse_args():
     parser.add_argument('-a', '--abstain_option', type=str_to_bool, help='When running a Q&A test, should we add an option that says "I don\'t know"?', default=False)
     parser.add_argument('-g', '--prompt_phrasing', type=int, help='When running a Q&A test, which of the two prompt phrasings should we use? 0 or 1', default=0)
     return dict(vars(parser.parse_args())) # dictionaries are easier to manipulate sometimes
-
-def str_to_bool(s):
-    if s.lower() in ('true', 'yes', 'y', '1'):
-        return True
-    elif s.lower() in ('false', 'no', 'n', '0'):
-        return False
-    else:
-        raise Exception("Unrecognized boolean string")
 
 def t_to_str(T):
     # Get rid of a bunch of stuff in the tensor format that I don't like

@@ -95,3 +95,11 @@ def plot_style_for_group(group):
             ('gold', '^', 'black') if 'second_prompt' in group else
             ('deepskyblue', 'o', 'tab:red') if 'norm' in group else
             ('mediumpurple', 'D', 'tab:orange') if 'raw' in group else ('#1f77b4', 'o', 'red'))
+
+def str_to_bool(s):
+    if s.lower() in ('true', 'yes', 'y', '1'):
+        return True
+    elif s.lower() in ('false', 'no', 'n', '0'):
+        return False
+    else:
+        raise Exception("Unrecognized boolean string")
