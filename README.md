@@ -54,9 +54,9 @@ If incl_unparseable=True, unparseable responses are counted as wrong. Otherwise,
 
 There is also statistical_tests.py, which computes the p-values and has the following usage:
 ```
-statistical_tests.py [-h] --option OPTION [--incl_unparseable]
+python statistical_tests.py [-h] --option OPTION --incl_unparseable INCL_UNPARSEABLE --input_dir INPUT_DIR
 ```
-The OPTION parameter determines which tests are run; see the file itself for more details.
+The OPTION parameter determines which tests are run and the INPUT_DIR tells the script where the data files are. See statistical_tests.py for more details.
 
 Lastly, results_analysis.ipynb groups the p-values to create the tables in the paper.
 
