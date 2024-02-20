@@ -266,8 +266,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     ###
     # Options:
-    # 0: Mann-Whitney U test on every combination of model-dataset-prompt (200)
-    # 1: Construct confidence interval on AUROC for every combination of model-dataset-prompt (200)
+    # 0: Construct confidence interval on AUROC for every combination of model-dataset-prompt (200)
+    # 1: Mann-Whitney U test on every combination of model-dataset-prompt (200)
     # 2: Summary t-tests/Wilcoxon for average AUROC across models (40)
     # 3: Paired t-test for difference in scores for model-dataset-prompt-value (200)
     # 4: MSP vs ML aurocs battle royale
@@ -277,9 +277,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.option == 0:
-        conduct_mann_whitney_tests(args.incl_unparseable)
-    elif args.option == 1:
         construct_confidence_intervals(args.incl_unparseable)
+    elif args.option == 1:
+        conduct_mann_whitney_tests(args.incl_unparseable)
     elif args.option == 2:
         conduct_model_summary_tests(args.incl_unparseable)
     elif args.option == 3:
