@@ -9,101 +9,6 @@ from scipy.stats import linregress
 import random
 from utils import *
 
-def parse_file_name(file_name, collapse_prompts=False):
-    # filename looks like <dataset>_<model>-q<startq>to<endq>_<group>.txt. Assume endq ends with 0
-    second_half = file_name[file_name.find('to'):]
-    parts = file_name.split('_')
-    dataset = parts[0]
-    model = parts[1].split('-q')[0]
-    group = second_half[second_half.find('_')+1:-4] # remove initial underscore and .txt
-    if collapse_prompts:
-        group = group.replace('_first_prompt','').replace('_second_prompt', '')
-    return dataset, model, group
-
-def parse_group_name(group, collapse_prompts=False):
-    # Each group name has the form <yes/no>_abst_<raw/norm>_logits_<first/second>_prompt
-    # Later on, we might create some merged groups, but we'll only call this fn on initial groups
-    parts = group.split('_')
-    abst_type = parts[0] + '_' + parts[1]
-    logit_type = parts[2] + '_' + parts[3]
-    prompt_type = parts[4] + '_' + parts[5] if not collapse_prompts else None
-    return (abst_type, logit_type, prompt_type)
-
-def parse_data(file_path, incl_unparseable):
-    labels = []
-    conf_levels = []
-    total_qs = 0
-    try:
-        with open(file_path, 'r') as f:
-            for line in f:
-                parts = line.strip().split()
-                # skip header line
-                # skip Abstained answers, which don't affect the score or auc
-                # skip Unparseable lines if incl_unparseable is False
-                if parts[0] in ("Correct", "Wrong") or (incl_unparseable and parts[0] == "Unparseable"):
-                    labels.append(1 if parts[0] == "Correct" else 0)
-                    conf_levels.append(float(parts[1]))
-                if parts[0] in ("Correct", "Wrong", 'Abstained') or (incl_unparseable and parts[0] == "Unparseable"):
-                    # Abstentions don't affect the score, but we still want them for normalization
-                    total_qs += 1
-    except IOError:
-        print(f"Error opening file: {file_path}")
-        sys.exit(1)
-    return labels, conf_levels, total_qs
-
-def format_dataset_name(dataset):
-    return ('ARC-Challenge' if dataset == 'arc' else
-            'HellaSwag' if dataset == 'hellaswag' else
-            'MMLU' if dataset == 'mmlu' else
-            'PIQA' if dataset == 'piqa' else
-            'TruthfulQA' if dataset == 'truthfulqa' else
-            'WinoGrande' if dataset == 'winogrande' else dataset)
-
-def expand_model_name(name):
-    return ('Mistral 7B' if name == 'Mistral' else
-            'Mixtral 8x7B' if name == 'Mixtral' else
-            'SOLAR 10.7B' if name == 'Solar' else
-            'Llama2 13B' if name == 'Llama-13b' else
-            'Llama2 7B' if name == 'Llama-7b' else
-            'Llama2 70B' if name == 'Llama-70b' else
-            'Yi 6B' if name == 'Yi-6b' else
-            'Yi 34B' if name == 'Yi-34b' else
-            'Falcon 7B' if name == 'Falcon-7b' else
-            'Falcon 40B' if name == 'Falcon-40b' else name)
-
-def expand_label(label):
-        return ('Confidence Threshold' if label == 'conf' else
-                'Score (Balanced)' if label == 'score' else
-                'Score (Conservative)' if label == 'harsh-score' else
-                'Model Size (billions of parameters)' if label == 'size' else
-                'AUROC' if label == 'auc' else
-                'Q&A Performance' if label == 'acc' else label)
-
-def plot_style_for_group(group):
-    return (('teal', 's', 'black') if 'first_prompt' in group else
-            ('gold', '^', 'black') if 'second_prompt' in group else
-            ('deepskyblue', 'o', 'tab:red') if 'norm' in group else
-            ('mediumpurple', 'D', 'tab:orange') if 'raw' in group else ('#1f77b4', 'o', 'red'))
-
-def group_label(group):
-    logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
-    prompt = ', first phrasing' if group.endswith('first_prompt') else ', second phrasing' if group.endswith('second_prompt') else ''
-    return logit_type, prompt
-
-
-# Each model name is of the form "<model_series> <size>B. Mixtral is a slight exception
-def model_series(name):
-    return expand_model_name(name).split(' ')[0]
-
-def model_size(name):
-    full_name = expand_model_name(name)
-    size_term = full_name.split(' ')[1]
-    end_of_size_term = size_term.rfind('B')
-    return 46.7 if 'Mixtral' in name else float(size_term[:end_of_size_term])
-
-def make_pct(x):
-    return 100*x
-
 def make_and_sort_legend():
     handles, names = plt.gca().get_legend_handles_labels()
     zipped = zip(handles, names)
@@ -160,8 +65,8 @@ def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', t
     if ylabel == 'score':
         plt.xlabel('')
         plt.xticks([])
-    
-    # Commenting this out because ICML guidelines say no in-figure titles
+
+    # Don't include titles for formatting in paper
     # plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -183,6 +88,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
         texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
 
     slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
+    print("slope, r_value, p_value for", xlabel, ylabel, "is", slope, r_value, p_value)
     plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
     plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
@@ -306,11 +212,11 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         if abs(acc_msp - acc_max_logit) > 0.01:
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
         rows.append([expand_model_name(model), acc_msp, auc_msp, '', auc_max_logit, ''])
-    column_names = ['LLM', 'Q\\&A Performance', 'AUROC', '$p < 10^{-5}$', 'AUROC', '$p < 10^{-5}$']
+    column_names = ['LLM', 'Q\\&A Accuracy', 'AUROC', '$p < 10^{-5}$', 'AUROC', '$p < 10^{-5}$']
     header_row = '& & \\multicolumn{2}{c|}{MSP} & \\multicolumn{2}{c}{Max Logit} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. AUROC and Q\&A values are percentages, averaged over the two prompts. Q\&A performance is the percentage of questions the base LLM answered correctly.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
+    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. AUROC and Q\&A values are percentages, averaged over the two prompts.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
@@ -373,8 +279,8 @@ def make_dataset_table(all_data, output_dir):
     for dataset in sorted(dataset_stats.keys()):
         accs, msp_aucs, max_logit_aucs = dataset_stats[dataset]
         rows.append([format_dataset_name(dataset), np.mean(accs), np.mean(msp_aucs), np.mean(max_logit_aucs)])
-    column_names = ['Dataset', 'Q\\&A Performance', 'MSP AUROC', 'Max Logit AUROC']
-    make_results_table(column_names, rows, output_dir, caption='Average Q\\&A performance and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename='dataset.tex')
+    column_names = ['Dataset', 'Q\\&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
+    make_results_table(column_names, rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename='dataset.tex')
     
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
@@ -397,7 +303,7 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
         f.write(f'\\caption{{{caption}}}\n')
         f.write(f'\\label{{{label}}}\n')
         f.write('\\end{table*}\n')
-    print("Results able saved -->", filename)
+    print("Results table saved -->", filename)
 
 def plots_for_group(data, output_dir):
     # Split into train and test. We don't have to shuffle, since question order is already randomized

@@ -8,35 +8,39 @@ class Generator(object):
     def __init__(self, args):
         model_name_map = {'Mistral-raw':'mistralai/Mistral-7B-v0.1',
                           'Mistral':'mistralai/Mistral-7B-Instruct-v0.2',
+                          'Mixtral-raw':'mistralai/Mixtral-8x7B-v0.1',
                           'Mixtral':'mistralai/Mixtral-8x7B-Instruct-v0.1',
                           'Zephyr':'HuggingFaceH4/zephyr-7b-beta',
                           'gpt2':'gpt2',
-                          'Llama-13b-raw':'meta-llama/Llama-2-13b-hf',
-                          'Llama-13b':'meta-llama/Llama-2-13b-chat-hf',
                           'Llama-7b-raw':'meta-llama/Llama-2-7b-hf',
                           'Llama-7b':'meta-llama/Llama-2-7b-chat-hf',
+                          'Llama-13b-raw':'meta-llama/Llama-2-13b-hf',
+                          'Llama-13b':'meta-llama/Llama-2-13b-chat-hf',
+                          'Llama-70b-raw':'meta-llama/Llama-2-70b-hf',
                           'Llama-70b':'meta-llama/Llama-2-70b-chat-hf',
-                          'MPT-30b':'mosaicml/mpt-30b-instruct',
-                          'Vicuna-33b':'lmsys/vicuna-33b-v1.3',
-                          'Falcon-40b':'tiiuae/falcon-40b-instruct',
+                          'Falcon-7b-raw':'tiiuae/falcon-7b',
                           'Falcon-7b':'tiiuae/falcon-7b-instruct',
+                          'Falcon-40b-raw':'tiiuae/falcon-40b',
+                          'Falcon-40b':'tiiuae/falcon-40b-instruct',
+                          'Solar-10.7B-raw':'upstage/SOLAR-10.7B-v1.0',
                           'Solar':'upstage/SOLAR-10.7B-Instruct-v1.0',
                           'Yi-34b':'01-ai/Yi-34B-Chat',
                           'Yi-6b':'01-ai/Yi-6B-Chat',
+                          'Yi-34b-raw':'01-ai/Yi-34B',
+                          'Yi-6b-raw':'01-ai/Yi-6B',
         }
         if args['model'] not in model_name_map:
             raise Exception("Unrecognized model name. Check model_name_map")
         else:
             model_name = model_name_map[args['model']]
+        if 'raw' in args['model']:
+            args['completion_mode'] = True
         self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", load_in_4bit=True)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side="left")
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.args = args
 
-        if self.args['num_responses'] > 1 and (self.args['interactive'] or not self.args['do_sample']):
-            self.num_responses = 1
-        else:
-            self.num_responses = self.args['num_responses']
+        self.num_responses = 1 if not self.args['do_sample'] else self.args['num_responses']
             
     def min_max_logit(self, scores, response_idx, lo=0, hi=None, normalize=True):
         # scores has shape (response_length, num_responses, vocab_size)
@@ -110,7 +114,7 @@ class Generator(object):
             print('\n')
             
     def generate(self, prompts):
-        prompts = self.prepare_for_chat(prompts) if not self.args['completion_mode'] and not self.args['interactive'] else prompts # interactive mode is handled separately
+        prompts = self.prepare_for_chat(prompts) if not self.args['completion_mode'] else prompts
         model_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True).to("cuda")
 
         output = self.model.generate(**model_inputs, max_new_tokens=self.args['max_new_tokens'], do_sample=self.args['do_sample'], output_scores=True, num_return_sequences=self.num_responses, return_dict_in_generate=True, renormalize_logits=False)
@@ -135,11 +139,11 @@ def parse_args():
     parser.add_argument('-c', '--completion_mode', action="store_true", help='Use traditional auto-complete mode, rather than user-assistant chat', default=False)
     parser.add_argument('-s', '--do_sample', action="store_true", help='Should we sample from the probability distribution, or greedily pick the most likely token?', default=False)
     parser.add_argument('-r', '--num_responses', type=int, help='Number of responses to generate per prompt. This argument is ignored for greedy decoding, since that only generates one answer.', default=1)
-    parser.add_argument('-i', '--interactive', action="store_true", help='Run the LLM in interactive chat mode where you can go back and forth with the LLM indefinitely', default=False)
     parser.add_argument('-d', '--dataset', type=str, default=None, help='The name of the Hugging Face dataset (needed for experiments and such)')
     parser.add_argument('-q', '--question_range', type=str, help='When running a Q&A test, what range of questions should we test? Format is "-q startq-endq", 0 indexed. For example, "-q 0-100".', default=None)
     parser.add_argument('-b', '--batch_size', type=int, help='Maximum number of prompts to batch together. Only used for experiments', default=1)
-    parser.add_argument('--abstain_option', type=str_to_bool, help='When running a Q&A test, should we add an option that says "I don\'t know"?', default=False)
+    parser.add_argument('-a', '--abstain_option', type=str_to_bool, help='When running a Q&A test, should we add an option that says "I don\'t know"?', default=False)
+    parser.add_argument('-g', '--prompt_phrasing', type=int, help='When running a Q&A test, which of the two prompt phrasings should we use? 0 or 1', default=0)
     return dict(vars(parser.parse_args())) # dictionaries are easier to manipulate sometimes
 
 def str_to_bool(s):
@@ -175,17 +179,7 @@ def main():
     else:
         prompts = args['prompts'].split('|')
     
-    if not generator.args['interactive']:
-        generator.generate(prompts)
-    else:
-        # All the zero indices and list brackets are because the functions return lists for batching, which doesn't make sense in interactive mode, where we use a single prompt
-        prompt = generator.prepare_for_chat([prompts[0]])[0]
-        while True:
-            # Careful with typing of lists vs strs here
-            (text_outputs, _, _) = generator.generate([prompt])
-            user_prompt = generator.prepare_for_chat([input("User response: ")])[0]
-            prompt = prompt + '\n' + text_outputs[0] + '\n' + user_prompt
-            # This doesn't quite work correctly because of start/end tokens. We should really be calling the chat template with the whole transcript.
+    generator.generate(prompts)
         
 if __name__ == '__main__':
     main()

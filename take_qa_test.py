@@ -18,7 +18,6 @@ class Test(object):
                 concatenate_datasets([load_dataset('ai2_arc', 'ARC-Challenge', split=s) for s in ['train','test','validation']]) if dset_name=='arc' else
                 concatenate_datasets([load_dataset('winogrande', 'winogrande_debiased', split=s) for s in ['train','validation']]) if dset_name == 'winogrande' else 
                 load_dataset('cais/mmlu', 'all', split='test') if dset_name == 'mmlu' else
-                load_dataset('piqa', split='train') if dset_name == 'piqa' else
                 load_dataset('truthful_qa', 'multiple_choice', split='validation') if dset_name == 'truthfulqa' else None)
         if dset is None:
             raise Exception(f"Unsupported dataset name: {dset_name}")
@@ -30,20 +29,17 @@ class Test(object):
         self.get_q = (lambda x:
                       x['ctx'] if dset_name == 'hellaswag' else
                       x['question'] if dset_name in ['arc','mmlu','truthfulqa'] else
-                      x['goal'] if dset_name == 'piqa' else
                       x['sentence'] if dset_name == 'winogrande' else None)
         self.get_a = (lambda x:
                       self.make_index(x['label']) if dset_name == 'hellaswag' else
                       self.make_index(x['answerKey'],1) if dset_name == 'arc' else # nearly all ARC answers are letters, but a few are numbers with offset 1
                       self.make_index(x['answer'],1) if dset_name=='winogrande' else
                       x['answer'] if dset_name == 'mmlu' else
-                      x['label'] if dset_name == 'piqa' else
                       x['mc1_targets']['labels'].index(1) if dset_name == 'truthfulqa' else None)
         self.get_choices = (lambda x:
                             x['endings'] if dset_name == 'hellaswag' else
                             x['choices']['text'] if dset_name == 'arc' else
                             [x['option1'], x['option2']] if dset_name=='winogrande' else
-                            [x['sol1'], x['sol2']] if dset_name == 'piqa' else
                             x['choices'] if dset_name == 'mmlu' else
                             x['mc1_targets']['choices'] if dset_name == 'truthfulqa' else None)
         
@@ -61,10 +57,11 @@ class Test(object):
         dataset_str = self.args['dataset'].split("/")[-1]
         abstain_str = "_yes_abst" if self.args['abstain_option'] else "_no_abst"
         logit_strs = ["_norm_logits", "_raw_logits"]
+        prompt_str = "_first_prompt" if self.args['prompt_phrasing'] == 0 else "_second_prompt" if self.args['prompt_phrasing'] == 1 else "_unknown_prompt"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
         for (logit_str, conf_levels) in zip(logit_strs, [conf_levels_normed, conf_levels_raw]):
-            output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}.txt"
+            output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}.txt"
             print('\nWriting results to', output_filepath)
             with open(output_filepath, 'w') as f:
                 f.write("grade confidence_level\n")
@@ -82,7 +79,8 @@ class Test(object):
         return question + '\n' + '\n'.join(formatted_choices)
 
     def make_prompt(self, question_string):
-        prompt = f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
+        if self.args['prompt_phrasing'] == 0:
+            prompt = f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
 
 Question:
 
@@ -90,8 +88,17 @@ Question:
 
 Response:\n
 """
-        # For some reason the final newline makes Falcon-7b act really weird
-        return prompt if self.args['model'] != 'Falcon-7b' else prompt[:-1]
+            # For some reason the final newline makes Falcon-7b act really weird
+            return prompt if self.args['model'] != 'Falcon-7b' else prompt[:-1]
+        elif self.args['prompt_phrasing'] == 1:
+            return f"""You will be asked a multiple-choice question. Respond with the letter which corresponds to the correct answer, followed by a period. There is no need to provide an explanation, so your response should be very short. Now here is the question:
+
+{question_string}
+
+Answer:
+"""
+        else:
+            raise Exception(f"Unknown phrasing option: {self.args['prompt_phrasing']}. Must be 0 or 1.")
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
         # Find the max probability for the token which determines the answer
