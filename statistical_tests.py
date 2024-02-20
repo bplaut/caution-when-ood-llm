@@ -197,6 +197,71 @@ def conduct_model_summary_tests(incl_unparseable):
     pd.DataFrame(test_data).to_csv("./results_stat_tests/summary_tests.csv", index = False)
 
 
+def collate_paired_t_test_data(all_data):
+    test_data = {"prompt": [], "value": [], "dataset": [], "model": [], "num_questions": [], "num_base_correct": [], "num_base_wrong": []}
+    for prompt in ALL_PROMPTS:
+        for value in ALL_VALUES:
+            for dataset in ALL_DATASETS:
+                for model in ALL_MODELS:
+                    labels, conf_levels, total_qs = all_data[prompt][value][dataset][model]
+                    if len(labels) > 0:
+                        test_data["prompt"].append(prompt)
+                        test_data["value"].append(value)
+                        test_data["dataset"].append(dataset)
+                        test_data["model"].append(model)
+                        test_data["num_questions"].append(total_qs)
+                        test_data["num_base_correct"].append(np.count_nonzero(labels == 1))
+                        test_data["num_base_wrong"].append(np.count_nonzero(labels == 0))
+                    else:
+                        print(f"Missing data for {prompt}, {dataset}, {model}, {value}")
+    return test_data
+
+
+def conduct_paired_t_tests(incl_unparseable):
+    # wait recompute thresholds? and how to split up?
+    # all_data = _collect_model_and_dataset_data(incl_unparseable)
+    # t_test_data = collate_paired_t_test_data(all_data)
+    score_types = ["base", "msp", "max_logit"]
+    balanced = {st: [] for st in score_types}
+    conservative = {st: [] for st in score_types}
+    sections = {"balanced": balanced, "conservative": conservative}
+    balanced["base"] = [-40.4, -9.7, -16.9, -7.9, 18.2, 16.9, 37.6, 34.2, 2.6, 36.2]
+    balanced["msp"] = [0, 1.9, -0.2, 6.6, 24.1, 19.6, 38.1, 34.4, 12.2, 38.0]
+    balanced["max_logit"] = [0, 0.7, 0.1, 6.6, 21.4, 18.7, 38.3, 34.5, 10.2, 36.6]
+    conservative["base"] = [-108.8, -63.2, -75.1, -61.8, -22.3, -21.4, 9.5, 3.4, -43, 5.2]
+    conservative["msp"] = [0, -0.5, 0, 1.2, 9.2, 0.6, 17.3, 6.4, 4, 18.6]
+    conservative["max_logit"] = [0, 0, 0, 0.2, 4.9, 5.6, 17.2, 12.4, 1.8, 15.6]
+    for s in sections:
+        print(s)
+        for st in score_types[1:]:
+            _, p_val = stats.ttest_rel(sections[s]["base"], sections[s][st])
+            print("Comparing based with", st, round(p_val, 5))
+        print()
+
+
+def conduct_auroc_t_test(incl_unparseable):
+    # testing if MSP aurocs > max logit aurocs
+    all_data = _collect_model_and_dataset_data(incl_unparseable)
+    value_aurocs = {v: [] for v in ALL_VALUES}
+    for prompt in ALL_PROMPTS:
+        for value in ALL_VALUES:
+            for dataset in ALL_DATASETS:
+                for model in ALL_MODELS:
+                    labels, conf_levels, _ = all_data[prompt][value][dataset][model]
+                    if len(labels) > 0:
+                        fpr, tpr, __ = roc_curve(labels, conf_levels)
+                        auroc = auc(fpr, tpr)
+                        value_aurocs[value].append(auroc)
+                    else:
+                        print(f"Missing data for {prompt}, {dataset}, {model}, {value}")
+    _, p_value = stats.ttest_ind(value_aurocs["norm_logits"], value_aurocs["raw_logits"], alternative = "greater")
+    print("Testing if MSP AUROCs > max logit AUROCs")
+    print("P-value:", round(p_value, 4))
+    print("MSP AUROC avg:", round(np.mean(value_aurocs["norm_logits"]), 3))
+    print("Max logit AUROC avg:", round(np.mean(value_aurocs["raw_logits"]), 3))
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     ###
@@ -204,6 +269,8 @@ if __name__ == "__main__":
     # 0: Mann-Whitney U test on every combination of model-dataset-prompt (200)
     # 1: Construct confidence interval on AUROC for every combination of model-dataset-prompt (200)
     # 2: Summary t-tests/Wilcoxon for average AUROC across models (40)
+    # 3: Paired t-test for difference in scores for model-dataset-prompt-value (200)
+    # 4: MSP vs ML aurocs battle royale
     ###
     parser.add_argument("--option", "-o", required = True, type = int, help = f"Choose a number from 0 to 3")
     parser.add_argument("--incl_unparseable", "-i", action = "store_true")
@@ -215,3 +282,7 @@ if __name__ == "__main__":
         construct_confidence_intervals(args.incl_unparseable)
     elif args.option == 2:
         conduct_model_summary_tests(args.incl_unparseable)
+    elif args.option == 3:
+        conduct_paired_t_tests(args.incl_unparseable)
+    elif args.option == 4:
+        conduct_auroc_t_test(args.incl_unparseable)
