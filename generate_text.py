@@ -23,7 +23,7 @@ class Generator(object):
                           'Falcon-7b':'tiiuae/falcon-7b-instruct',
                           'Falcon-40b-raw':'tiiuae/falcon-40b',
                           'Falcon-40b':'tiiuae/falcon-40b-instruct',
-                          'Solar-10.7B-raw':'upstage/SOLAR-10.7B-v1.0',
+                          'Solar-raw':'upstage/SOLAR-10.7B-v1.0',
                           'Solar':'upstage/SOLAR-10.7B-Instruct-v1.0',
                           'Yi-34b':'01-ai/Yi-34B-Chat',
                           'Yi-6b':'01-ai/Yi-6B-Chat',
