@@ -8,7 +8,7 @@ def parse_file_name(file_name, collapse_prompts=False):
     model = parts[1].split('-q')[0]
     group = second_half[second_half.find('_')+1:-4] # remove initial underscore and .txt
     if collapse_prompts:
-        group = group.replace('_first_prompt','').replace('_second_prompt', '')
+        group = group.replace('_first_prompt','').replace('_second_prompt', '').replace('_third_prompt', '')
     return dataset, model, group
 
 def parse_data(file_path, incl_unparseable):
@@ -67,7 +67,7 @@ def model_size(name):
 
 def group_label(group):
     logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
-    prompt = ', first phrasing' if group.endswith('first_prompt') else ', second phrasing' if group.endswith('second_prompt') else ''
+    prompt = ', first phrasing' if group.endswith('first_prompt') else ', second phrasing' if group.endswith('second_prompt') else ', third phrasing' if group.endswith('third_prompt') else ''
     return logit_type, prompt
 
 def make_pct(x):
