@@ -2,13 +2,15 @@ import os
 import sys
 from collections import defaultdict
 
-def count_data_points(directory):
+def count_data_points(directory, filter_string=None):
     data_points_per_model = defaultdict(int)
     unparseable_per_model = defaultdict(int)
 
     # Iterate over each file in the directory
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
+        if filter_string is not None and filter_string not in filename:
+            continue
 
         # Check if it's a file and not a directory
         if os.path.isfile(file_path) and 'no_abst' in filename and 'norm' in filename:
@@ -28,14 +30,14 @@ def count_data_points(directory):
 
     return data_points_per_model, unparseable_per_model
 
-# Get directory path from command line argument
-if len(sys.argv) != 2:
-    print("Usage: python script.py <directory_path>")
+# Get directory path from command line argument, and possibly a string to filter the filenames
+if len(sys.argv) not in [2, 3]:
+    print("Usage: python script.py <directory_path> [filter string]")
     sys.exit(1)
-
 directory_path = sys.argv[1]
-data_points, unparseable = count_data_points(directory_path)
-print(f"Num data points, num unparseable, percentage unparseable: {sum(data_points.values())}, {sum(unparseable.values())}, {100 * round(sum(unparseable.values())/sum(data_points.values()),4)}")
+filter_string = sys.argv[2] if len(sys.argv) == 3 else None
+data_points, unparseable = count_data_points(directory_path, filter_string)
+print(f"Total: {sum(data_points.values())} data points, {sum(unparseable.values())} unparseable, {100* round(sum(unparseable.values())/sum(data_points.values()),4)} percentage unparseable")
 
 # Print the number of data points and unparseable data points for each model
 for model, count in data_points.items():
