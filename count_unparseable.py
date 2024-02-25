@@ -39,6 +39,6 @@ filter_string = sys.argv[2] if len(sys.argv) == 3 else None
 data_points, unparseable = count_data_points(directory_path, filter_string)
 print(f"Total: {sum(data_points.values())} data points, {sum(unparseable.values())} unparseable, {100* round(sum(unparseable.values())/sum(data_points.values()),4)} percentage unparseable")
 
-# Print the number of data points and unparseable data points for each model
-for model, count in data_points.items():
+# Print the number of data points and unparseable data points for each model, sorted by model name
+for model, count in sorted(data_points.items()):
     print(f"{model}: {count} data points, {unparseable[model]} unparseable, {100* round(unparseable[model]/count,4)} percentage unparseable")
