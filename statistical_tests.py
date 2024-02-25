@@ -113,7 +113,7 @@ def conduct_mann_whitney_tests(incl_unparseable, input_dir):
                         test_data["reject"].append(verdict)
                     else:
                         print(f"Missing data for {prompt}, {dataset}, {model}, {value}")
-    pd.DataFrame(test_data).to_csv("./results_stat_tests/mann_whitney.csv", index = False)
+    pd.DataFrame(test_data).to_csv("./stat_tests_output/mann_whitney.csv", index = False)
 
 def construct_confidence_intervals(incl_unparseable, input_dir):
     all_data = _collect_model_and_dataset_data(incl_unparseable, input_dir)
@@ -145,7 +145,7 @@ def construct_confidence_intervals(incl_unparseable, input_dir):
                         test_data["ci_ub"].append(upper_bound)
                     else:
                         print(f"Missing data for {prompt}, {dataset}, {model}, {value}")
-    pd.DataFrame(test_data).to_csv("./results_stat_tests/confidence_intervals.csv", index = False)
+    pd.DataFrame(test_data).to_csv("./stat_tests_output/confidence_intervals.csv", index = False)
 
 def conduct_model_summary_tests(incl_unparseable, input_dir):
     all_data = _collect_model_and_dataset_data(incl_unparseable, input_dir)
@@ -180,7 +180,7 @@ def conduct_model_summary_tests(incl_unparseable, input_dir):
                 test_data["model"].append(model)
                 test_data["prompt"].append(prompt)
                 test_data["value"].append(value)
-    pd.DataFrame(test_data).to_csv("./results_stat_tests/summary_tests.csv", index = False)
+    pd.DataFrame(test_data).to_csv("./stat_tests_output/summary_tests.csv", index = False)
 
 def collate_paired_t_test_data(all_data):
     test_data = {"prompt": [], "value": [], "dataset": [], "model": [], "num_questions": [], "num_base_correct": [], "num_base_wrong": []}
@@ -258,8 +258,8 @@ if __name__ == "__main__":
     parser.add_argument("--input_dir", '-d', type=str, help="Input directory to read data from", required = True)
     args = parser.parse_args()
 
-    if not os.path.exists("./results_stat_tests"):
-        os.makedirs("./results_stat_tests")
+    if not os.path.exists("./stat_tests_output"):
+        os.makedirs("./stat_tests_output")
     
     if args.option == 0:
         construct_confidence_intervals(args.incl_unparseable, args.input_dir)
