@@ -1,4 +1,4 @@
-from generate_text import Generator, t_to_str, pars_args
+from generate_text import Generator, t_to_str, parse_args
 from openai_generate import OpenAIGenerator
 import os
 from datasets import load_dataset, concatenate_datasets
