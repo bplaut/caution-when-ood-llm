@@ -64,7 +64,7 @@ def model_size(name):
     full_name = expand_model_name(name)
     size_term = full_name.split(' ')[1]
     end_of_size_term = size_term.rfind('B')
-    return 46.7 if 'Mixtral' in name else -1 if 'GPT' in name else float(size_term[:end_of_size_term])
+    return 46.7 if 'Mixtral' in name else -1 if 'gpt' in name.lower() else float(size_term[:end_of_size_term])
 
 def group_label(group):
     logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
