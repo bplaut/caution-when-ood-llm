@@ -1,4 +1,5 @@
-import generate_text
+from generate_text import Generator, t_to_str, pars_args
+from openai_generate import OpenAIGenerator
 import os
 from datasets import load_dataset, concatenate_datasets
 import random
@@ -8,7 +9,7 @@ class Test(object):
     def __init__(self, args):
         bounds = args['question_range'].split('-')
         (self.start_q, self.end_q) = (int(bounds[0]), int(bounds[1]))
-        self.model = generate_text.Generator(args)
+        self.model = OpenAIGenerator(args) if args['model'] in ['gpt-3.5-turbo'] else Generator(args)
         self.args = args
 
         dset_name = args['dataset'].lower()
@@ -188,7 +189,7 @@ Response:
             print(f"LLM output: {llm_output}")
             (answer_output, grade) = self.grade_answer(choices[i], correct_answers[i], llm_output)
             print(f"LLM answer: {answer_output}\n")
-            conf_str = lambda x: 0 if generate_text.t_to_str(x)=='' else generate_text.t_to_str(x)
+            conf_str = lambda x: 0 if t_to_str(x)=='' else t_to_str(x)
             # Sometimes we get "" because of how t_to_str works
             print(f"Confidence level normalized: {conf_str(confidence_levels_normed[i])}\n")
             print(f"Confidence level raw: {conf_str(confidence_levels_raw[i])}\n")
@@ -197,7 +198,7 @@ Response:
 
 def main():
     random.seed(2549900867) # We'll randomize the order of questions and of answer choices, but we want every run to have the same randomization
-    args = generate_text.parse_args()
+    args = parse_args()
     test = Test(args)
     all_grades, all_conf_levels_normed, all_conf_levels_raw = [], [], []
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
