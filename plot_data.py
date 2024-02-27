@@ -432,7 +432,7 @@ def main():
     print(f"Reading from {len(file_paths)} files...")
     datasets_to_analyze = sys.argv[4].split(',')
     if any([dataset not in ('arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande') for dataset in datasets_to_analyze]):
-        raise Exception(f'Third argument must be a comma-separated subset of [arc, hellaswag, mmlu, truthfulqa, winogrande]. Instead it was:', sys.argv[4])
+        raise Exception(f'Fourth argument must be a comma-separated subset of [arc, hellaswag, mmlu, truthfulqa, winogrande]. Instead it was:', sys.argv[4])
 
     # Data aggregation. We want all_data[group][dataset][model] = (labels, conf_levels, total_qs)
     all_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: ([], [], 0))))
