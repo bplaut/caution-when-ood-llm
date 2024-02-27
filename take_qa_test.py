@@ -54,16 +54,19 @@ class Test(object):
         else:
             raise Exception(f"Unknown answer format: {answer}")
 
-    def write_output(self, grades, conf_levels_normed, conf_levels_raw):
+    def get_output_filepath(self, logit_str):
         dataset_str = self.args['dataset'].split("/")[-1]
         abstain_str = "_yes_abst" if self.args['abstain_option'] else "_no_abst"
-        logit_strs = ["_norm_logits", "_raw_logits"]
         prompt_name = {0: "first", 1: "second", 2: "third"}[self.args['prompt_phrasing']]
         prompt_str = f"_{prompt_name}_prompt"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
+        return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}.txt"
+        
+    def write_output(self, grades, conf_levels_normed, conf_levels_raw):
+        logit_strs = ["_norm_logits", "_raw_logits"]
         for (logit_str, conf_levels) in zip(logit_strs, [conf_levels_normed, conf_levels_raw]):
-            output_filepath = f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}.txt"
+            output_filepath = self.get_output_filepath(logit_str)
             print('\nWriting results to', output_filepath)
             with open(output_filepath, 'w') as f:
                 f.write("grade confidence_level\n")
@@ -200,6 +203,13 @@ def main():
     random.seed(2549900867) # We'll randomize the order of questions and of answer choices, but we want every run to have the same randomization
     args = parse_args()
     test = Test(args)
+
+    # Exit if the results file already exists. Can use either normed or raw logits for the check since they're both written at the same time
+    output_filepath = test.get_output_filepath("_norm_logits")
+    if os.path.exists(output_filepath):
+        print(f"Results file {output_filepath} already exists. Exiting.")
+        return
+    
     all_grades, all_conf_levels_normed, all_conf_levels_raw = [], [], []
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
         end_q = min(start_q + args['batch_size'], test.end_q)
