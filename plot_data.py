@@ -280,7 +280,9 @@ def make_dataset_table(all_data, output_dir):
         accs, msp_aucs, max_logit_aucs = dataset_stats[dataset]
         rows.append([format_dataset_name(dataset), np.mean(accs), np.mean(msp_aucs), np.mean(max_logit_aucs)])
     column_names = ['Dataset', 'Q\\&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
-    make_results_table(column_names, rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename='dataset.tex')
+    # pick any group from all_data and see if 'no_abst' is in it
+    filename = ('no' if 'no_abst' in list(all_data.keys())[0] else 'yes') + '_abst_dataset.tex'
+    make_results_table(column_names, rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename=filename)
     
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
