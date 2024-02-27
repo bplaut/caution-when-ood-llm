@@ -36,7 +36,7 @@ def compute_auroc(all_data, output_dir, dataset):
     # Make output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.pdf")
+    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.png")
     plt.savefig(output_path)
     plt.close()
     print(f"ROC curve for {dataset} saved --> {output_path}")
@@ -44,14 +44,14 @@ def compute_auroc(all_data, output_dir, dataset):
     
 def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', texts=[]):
     # Consistent axes
-    if xlabel == 'acc':
-        plt.xlim([28, 72])
-    if ylabel == 'auc':
-        plt.ylim([50, 71])
-    if ylabel == 'score':
-        plt.ylim([-15, 65])
-    if ylabel == 'harsh-score':
-        plt.ylim([-15, 25])
+    # if xlabel == 'acc':
+    #     plt.xlim([28, 72])
+    # if ylabel == 'auc':
+    #     plt.ylim([50, 71])
+    # if ylabel == 'score':
+    #     plt.ylim([-15, 65])
+    # if ylabel == 'harsh-score':
+    #     plt.ylim([-15, 25])
 
     adjust_text(texts) # Must do this after setting ylim and xlim
 
@@ -59,18 +59,18 @@ def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', t
     plt.ylabel(expand_label(ylabel))
 
     # Remove some axes based on the way figs are organized in the paper
-    if 'raw' in output_dir:
-        plt.ylabel('')
-        plt.yticks([])
-    if ylabel == 'score':
-        plt.xlabel('')
-        plt.xticks([])
+    # if 'raw' in output_dir:
+    #     plt.ylabel('')
+    #     plt.yticks([])
+    # if ylabel == 'score':
+    #     plt.xlabel('')
+    #     plt.xticks([])
 
     # Don't include titles for formatting in paper
-    # plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
+    plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.pdf")
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.png")
     
     plt.savefig(output_path, bbox_inches='tight')
     plt.close()
@@ -405,7 +405,7 @@ def cross_group_plots(group_data, output_dir):
         title_suffix = ': ' + logit_type + ', prompt comparison'
     else:
         title_suffix = ': ' + ' and '.join([group_label(group)[0] for group in group_data])
-    plt.legend(loc='lower right')
+    plt.legend()
     finalize_plot(output_dir, 'acc', 'auc', file_suffix=file_suffix, title_suffix=title_suffix, texts=texts)
     
     # Second plot: AUC vs accuracy, averaged across groups
