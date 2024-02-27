@@ -87,14 +87,18 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
     for i in range(len(model_names)):
         texts.append(plt.text(xs[i], ys[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
 
-    slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
-    print("slope, r_value, p_value for", xlabel, ylabel, "is", slope, r_value, p_value)
-    plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
+    try:
+        slope, intercept, r_value, p_value, std_err = linregress(xs, ys)
+        print("slope, r_value, p_value for", xlabel, ylabel, "is", slope, r_value, p_value)
+        plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
-    plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
-    plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
-    file_suffix = f"_{dataset}_{plot_name.replace(' ','_').replace(',','')}"
-    finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=file_suffix, texts=texts)
+        plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
+        plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
+        file_suffix = f"_{dataset}_{plot_name.replace(' ','_').replace(',','')}"
+        finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=file_suffix, texts=texts)
+    except ValueError as e:
+        print("ValueError when running linear regression on", xlabel, ylabel, ":", e)
+        
            
 def auc_acc_plots(data, all_aucs, output_dir):
     model_aucs, model_accs = defaultdict(list), defaultdict(list)
