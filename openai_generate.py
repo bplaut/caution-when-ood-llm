@@ -32,7 +32,7 @@ class OpenAIGenerator(Generator):
         return text_output, token_output, scores
 
     def print_output(self, prompts, text_outputs, token_outputs, scores):
-        print("PROMPT:", prompts[0])
+        print(f'PROMPT: "{prompts[0]}"')
         max_token_idx_len = len(str(len(token_outputs))) # most number of digits for token idx
         for j in range(len(token_outputs)):
             token = token_outputs[j]
