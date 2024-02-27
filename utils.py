@@ -44,6 +44,8 @@ def expand_model_name(name):
                      'Yi 6B' if base == 'Yi-6b' else
                      'Yi 34B' if base == 'Yi-34b' else
                      'GPT3.5 Turbo' if base == 'gpt-3.5-turbo' else
+                     'GPT4 Turbo' if base == 'gpt-4-turbo' else
+                     'GPT4' if base == 'gpt-4' else
                      'Falcon 7B' if base == 'Falcon-7b' else
                      'Falcon 40B' if base == 'Falcon-40b' else base)
     return base_expanded + ' Raw' if name.endswith('-raw') else base_expanded
@@ -61,10 +63,15 @@ def model_series(name):
     return expand_model_name(name).split(' ')[0]
 
 def model_size(name):
-    full_name = expand_model_name(name)
-    size_term = full_name.split(' ')[1]
-    end_of_size_term = size_term.rfind('B')
-    return 46.7 if 'Mixtral' in name else -1 if 'gpt' in name.lower() else float(size_term[:end_of_size_term])
+    if 'Mixtral' in name:
+        return 46.7
+    elif 'gpt' in name.lower():
+        return -1
+    else:
+        full_name = expand_model_name(name)
+        size_term = full_name.split(' ')[1]
+        end_of_size_term = size_term.rfind('B')
+    return float(size_term[:end_of_size_term])
 
 def group_label(group):
     logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
