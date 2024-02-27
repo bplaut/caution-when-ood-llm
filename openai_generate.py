@@ -14,8 +14,12 @@ class OpenAIGenerator(Generator):
 
     def generate(self, prompts):
         assert len(prompts) == 1 # for now
+        full_name = ('gpt-3.5-turbo-0125' if self.args['model'] == 'gpt-3.5-turbo' else
+                     'gpt-4-0613' if self.args['model'] == 'gpt-4' else
+                     'gpt-4-0125-preview' if self.args['model'] == 'gpt-4-turbo' else
+                     self.args['model'])
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=full_name,
             top_logprobs=5,
             seed=2549900867,
             top_p=0,
