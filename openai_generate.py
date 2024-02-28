@@ -33,9 +33,10 @@ class OpenAIGenerator(Generator):
         token_output = [[token.token for token in response.choices[0].logprobs.content]]
         scores = [math.exp(token.logprob) for token in response.choices[0].logprobs.content]
         self.print_output(prompts, text_output, token_output, scores)
+        self.verify_greedy_decoding(response.choices[0])
+        assert(text_output[0] == ''.join(token_output[0])) # Tokens should join to form the text
+
         
-        # Tokens should always join to form the text
-        assert(text_output[0] == ''.join(token_output[0]))
         return text_output, token_output, scores
 
     def print_output(self, prompts, text_outputs, token_outputs, scores):
@@ -47,6 +48,15 @@ class OpenAIGenerator(Generator):
             score = scores[j]
             idx_str = str(j).zfill(max_token_idx_len) # pad with 0s for prettiness
             print(f"Token {idx_str} | {round(score, 4)} | {token}")
+            
+    def verify_greedy_decoding(self, output):
+        # Check that we're doing greedy decoding
+        chosen_token = output.logprobs.content[0]
+        top_token = chosen_token.top_logprobs[0]
+        if chosen_token.token != top_token.token:
+            print (f"Warning: Greedy decoding not used. Chosen token: {chosen_token.token}, top token: {top_token.token}")
+        if abs(chosen_token.logprob - top_token.logprob) > 0.0001:
+            print (f"Warning: logprobs don't match up. Chosen token logprob: {chosen_token.logprob}, top token logprob: {top_token.logprob}")
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
         simple_result = self.compute_conf_levels_simple(text_outputs, token_outputs, scores, choices, normalize)
