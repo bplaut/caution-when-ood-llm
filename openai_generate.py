@@ -60,6 +60,7 @@ class OpenAIGenerator(Generator):
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
         simple_result = self.compute_conf_levels_simple(text_outputs, token_outputs, scores, choices, normalize)
+        result = None
         # All the lists/0-indices are because the types are lists to support batching
         if not normalize: # OpenAI api only gives us normalized probabilities
             result = [0]
@@ -70,12 +71,13 @@ class OpenAIGenerator(Generator):
             if tokens[i].strip() in targets1 and tokens[i + 1] == '.':
                 # strip just in case the token is e.g. ' A' instead of 'A'
                 result = [scores[i]]
+                break
 
         # If we failed, find a token corresponding to A/B/C etc or the text of a choice
         targets2 = choices[0] + targets1
         remaining_text = text_outputs[0]
         token_idx = 0
-        while token_idx < len(tokens):
+        while token_idx < len(tokens) and result is None:
             # If the remaining text starts with a target (excl whitespace), return the score of the current token. Otherwise, remove the current token from the remaining text and go to next token
             if any([remaining_text.strip().startswith(target) for target in targets2]):
                 result = [scores[token_idx]]
@@ -89,6 +91,7 @@ class OpenAIGenerator(Generator):
                     
         if result != simple_result:
             print("Confidence level mismatch between simple and complete methods")
+        return result
 
     def compute_conf_levels_simple(self, text_outputs, token_outputs, scores, choices, normalize=True):
         # Only look for A./B./C. etc
