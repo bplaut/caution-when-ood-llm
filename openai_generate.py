@@ -62,16 +62,15 @@ class OpenAIGenerator(Generator):
         simple_result = self.compute_conf_levels_simple(text_outputs, token_outputs, scores, choices, normalize)
         result = None
         # All the lists/0-indices are because the types are lists to support batching
-        if not normalize: # OpenAI api only gives us normalized probabilities
+        if not normalize: # OpenAI api only gives us normalized probabilities, not raw logits
             result = [0]
         targets1 = [c for c in ascii_uppercase][:len(choices[0])]
         tokens = token_outputs[0]
         # First, try to find a token corresponding A./B./C. etc
         for i in range(len(tokens) - 1):
-            if tokens[i].strip() in targets1 and tokens[i + 1] == '.':
+            if tokens[i].strip() in targets1 and tokens[i + 1] == '.' and result is None:
                 # strip just in case the token is e.g. ' A' instead of 'A'
                 result = [scores[i]]
-                break
 
         # If we failed, find a token corresponding to A/B/C etc or the text of a choice
         targets2 = choices[0] + targets1
@@ -89,8 +88,8 @@ class OpenAIGenerator(Generator):
                     print("Error in computing confidence levels: remaining text doesn't match tokens")
                     result = [0]
                     
-        if result != simple_result:
-            print("Confidence level mismatch between simple and complete methods")
+        if abs(simple_result[0] - result[0]) > 0.0001:
+            print(f"Confidence level mismatch between simple and complete methods: {simple_result[0]} vs {result[0]}")
         return result
 
     def compute_conf_levels_simple(self, text_outputs, token_outputs, scores, choices, normalize=True):
@@ -99,8 +98,9 @@ class OpenAIGenerator(Generator):
             return [0]
         targets = [c for c in ascii_uppercase][:len(choices[0])]
         tokens = token_outputs[0]
+        # First, try to find a token corresponding A./B./C. etc
         for i in range(len(tokens) - 1):
             if tokens[i] in targets and tokens[i + 1] == '.':
                 return [scores[i]]
-
+        return [0]
 
