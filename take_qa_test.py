@@ -221,6 +221,8 @@ def main():
         all_conf_levels_raw += conf_levels_raw
     if len(all_grades) > 0: # E.g. if the dataset only has 817 qs but you ask to run qs 1000-1500
         test.write_output(all_grades, all_conf_levels_normed, all_conf_levels_raw)
+    else:
+        print("The question range you provided is empty. This could either be because endq < startq or because the dataset is too small.")
 
 if __name__ == '__main__':
     main()
