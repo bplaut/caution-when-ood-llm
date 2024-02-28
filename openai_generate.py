@@ -40,24 +40,26 @@ class OpenAIGenerator(Generator):
 
     def print_output(self, prompts, text_outputs, token_outputs, scores):
         print(f'PROMPT: "{prompts[0]}"')
-        max_token_idx_len = len(str(len(token_outputs))) # most number of digits for token idx
-        for j in range(len(token_outputs)):
-            token = token_outputs[j]
+        tokens = token_outputs[0]
+        max_token_idx_len = len(str(len(tokens))) # most number of digits for token idx
+        for j in range(len(tokens)):
+            token = tokens[j]
             score = scores[j]
             idx_str = str(j).zfill(max_token_idx_len) # pad with 0s for prettiness
             print(f"Token {idx_str} | {round(score, 4)} | {token}")
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
+        simple_result = self.compute_conf_levels_simple(text_outputs, token_outputs, scores, choices, normalize)
         # All the lists/0-indices are because the types are lists to support batching
         if not normalize: # OpenAI api only gives us normalized probabilities
-            return [0]
+            result = [0]
         targets1 = [c for c in ascii_uppercase][:len(choices[0])]
         tokens = token_outputs[0]
         # First, try to find a token corresponding A./B./C. etc
         for i in range(len(tokens) - 1):
             if tokens[i].strip() in targets1 and tokens[i + 1] == '.':
                 # strip just in case the token is e.g. ' A' instead of 'A'
-                return [scores[i]]
+                result = [scores[i]]
 
         # If we failed, find a token corresponding to A/B/C etc or the text of a choice
         targets2 = choices[0] + targets1
@@ -66,14 +68,17 @@ class OpenAIGenerator(Generator):
         while token_idx < len(tokens):
             # If the remaining text starts with a target (excl whitespace), return the score of the current token. Otherwise, remove the current token from the remaining text and go to next token
             if any([remaining_text.strip().startswith(target) for target in targets2]):
-                return [scores[token_idx]]
+                result = [scores[token_idx]]
             else:
                 if remaining_text.startswith(tokens[token_idx]):
                     remaining_text = remaining_text[len(tokens[token_idx]):]
                     token_idx += 1
                 else:
                     print("Error in computing confidence levels: remaining text doesn't match tokens")
-                    return [0]
+                    result = [0]
+                    
+        if result != simple_result:
+            print("Confidence level mismatch between simple and complete methods")
 
     def compute_conf_levels_simple(self, text_outputs, token_outputs, scores, choices, normalize=True):
         # Only look for A./B./C. etc
@@ -82,7 +87,7 @@ class OpenAIGenerator(Generator):
         targets = [c for c in ascii_uppercase][:len(choices[0])]
         tokens = token_outputs[0]
         for i in range(len(tokens) - 1):
-            if tokens[i] in targets1 and tokens[i + 1] == '.':
+            if tokens[i] in targets and tokens[i + 1] == '.':
                 return [scores[i]]
 
 
