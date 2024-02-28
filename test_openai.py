@@ -11,7 +11,6 @@ def test_compute_confidence_levels(generator):
         text_outputs = ["This is a test, bye"]
         token_outputs = [["This", " is", " a", " test", ",", " bye"]]
         scores = [5, 3, 1, 10, 11, 12]
-        print(generator.compute_confidence_levels(text_outputs, token_outputs, scores, choices))
         assert(generator.compute_confidence_levels(text_outputs, token_outputs, scores, choices) == [12])
         text_outputs = ["The answer is B, hello"]
         token_outputs = [["The", " answer", " is", " B", " ,", " hello"]]
@@ -30,9 +29,13 @@ def test_compute_confidence_levels(generator):
         token_outputs = [["The", " answer", " is", " Freddie", " Mercury", ",", " or", " B"]]
         scores = [5, 3, 1, 10, 11, 12, 13, 14]
         assert(generator.compute_confidence_levels(text_outputs, token_outputs, scores, choices) == [10])
-        text_outputs = ["The answer is Freddie Mercury, or B."]
+        text_outputs = ["The answer is Freddie Mercury, not B."]
         token_outputs = [["The", " answer", " is", " Freddie", " Mercury", ",", " or", " B", "."]]
         scores = [5, 3, 1, 10, 11, 12, 13, 14, 15]
+        assert(generator.compute_confidence_levels(text_outputs, token_outputs, scores, choices) == [14])
+        text_outputs = ["The answer is Freddie Mercury, not B. or C."]
+        token_outputs = [["The", " answer", " is", " Freddie", " Mercury", ",", " not", " B", ".", " or", " C", "."]]
+        scores = [5, 3, 1, 10, 11, 12, 13, 14, 15, 16, 17, 18]
         assert(generator.compute_confidence_levels(text_outputs, token_outputs, scores, choices) == [14])
         print("All tests passed")
 
