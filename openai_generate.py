@@ -30,9 +30,12 @@ class OpenAIGenerator(Generator):
         print("System fingerprint:", response.system_fingerprint, '\n')
         # The output types are lists to support batching (which we'll hopefully add for these models, and which the non-OpenAI models already support)
         text_output = [response.choices[0].message.content]
-        token_output = [token.token for token in response.choices[0].logprobs.content]
+        token_output = [[token.token for token in response.choices[0].logprobs.content]]
         scores = [math.exp(token.logprob) for token in response.choices[0].logprobs.content]
         self.print_output(prompts, text_output, token_output, scores)
+        
+        # Tokens should always join to form the text
+        assert(text_output[0] == ''.join(token_output[0]))
         return text_output, token_output, scores
 
     def print_output(self, prompts, text_outputs, token_outputs, scores):
@@ -45,13 +48,41 @@ class OpenAIGenerator(Generator):
             print(f"Token {idx_str} | {round(score, 4)} | {token}")
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
+        # All the lists/0-indices are because the types are lists to support batching
         if not normalize: # OpenAI api only gives us normalized probabilities
             return [0]
-        targets = [c for c in ascii_uppercase][:len(choices[0])] # 0 index because it's a list for batching
-        # Find the token idx corresponding to a target (A./B./C. etc)
-        token_idx = None
-        for i in range(len(token_outputs) - 1):
-            if token_outputs[i] in targets and token_outputs[i + 1] == '.':
-                token_idx = i
-                break
-        return [scores[token_idx]] if token_idx is not None else [0]
+        targets1 = [c for c in ascii_uppercase][:len(choices[0])]
+        tokens = token_outputs[0]
+        # First, try to find a token corresponding A./B./C. etc
+        for i in range(len(tokens) - 1):
+            if tokens[i].strip() in targets1 and tokens[i + 1] == '.':
+                # strip just in case the token is e.g. ' A' instead of 'A'
+                return [scores[i]]
+
+        # If we failed, find a token corresponding to A/B/C etc or the text of a choice
+        targets2 = choices[0] + targets1
+        remaining_text = text_outputs[0]
+        token_idx = 0
+        while token_idx < len(tokens):
+            # If the remaining text starts with a target (excl whitespace), return the score of the current token. Otherwise, remove the current token from the remaining text and go to next token
+            if any([remaining_text.strip().startswith(target) for target in targets2]):
+                return [scores[token_idx]]
+            else:
+                if remaining_text.startswith(tokens[token_idx]):
+                    remaining_text = remaining_text[len(tokens[token_idx]):]
+                    token_idx += 1
+                else:
+                    print("Error in computing confidence levels: remaining text doesn't match tokens")
+                    return [0]
+
+    def compute_conf_levels_simple(self, text_outputs, token_outputs, scores, choices, normalize=True):
+        # Only look for A./B./C. etc
+        if not normalize:
+            return [0]
+        targets = [c for c in ascii_uppercase][:len(choices[0])]
+        tokens = token_outputs[0]
+        for i in range(len(tokens) - 1):
+            if tokens[i] in targets1 and tokens[i + 1] == '.':
+                return [scores[i]]
+
+
