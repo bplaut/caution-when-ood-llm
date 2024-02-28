@@ -59,7 +59,7 @@ class OpenAIGenerator(Generator):
             print (f"Warning: logprobs don't match up. Chosen token logprob: {chosen_token.logprob}, top token logprob: {top_token.logprob}")
 
     def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
-        simple_result = self.compute_conf_levels_simple(text_outputs, token_outputs, scores, choices, normalize)
+        simple_result = self.compute_conf_levels_simple(text_outputs, token_outputs, scores, choices, normalize) # We'll compare this against the actual result for logging
         result = None
         # All the lists/0-indices are because the types are lists to support batching
         if not normalize: # OpenAI api only gives us normalized probabilities, not raw logits
@@ -87,6 +87,10 @@ class OpenAIGenerator(Generator):
                 else:
                     print("Error in computing confidence levels: remaining text doesn't match tokens")
                     result = [0]
+
+        if result is None:
+            print("Error in computing confidence levels: couldn't find a target in the remaining text")
+            result = [0]
                     
         if abs(simple_result[0] - result[0]) > 0.0001:
             print(f"Confidence level mismatch between simple and complete methods: {simple_result[0]} vs {result[0]}")
