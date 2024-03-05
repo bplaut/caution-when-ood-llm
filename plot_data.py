@@ -9,6 +9,11 @@ from scipy.stats import linregress
 import random
 from utils import *
 
+# We want to assign a style to each model globally, even when some models are missing from some groups (i.e., OpenAI models only have MSP, not Max Logit)
+linestyles = ['-', ':', (0, (3, 1, 1, 1, 1, 1)), (0, (0.5,0.5,0.5,0.5,2)),(0, (5, 10)),(0, (5.5, 1)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1)), (0, (0.5, 0.5)), (0,(1,1,1,3.5)), (0, (0.5,0.5,0.5,2)), (0,(2,1,2,2))]
+colors = ['pink', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', 'teal', '#bcbd22', 'black', '#17becf']
+style_per_model = dict()
+
 def make_and_sort_legend():
     handles, names = plt.gca().get_legend_handles_labels()
     zipped = zip(handles, names)
@@ -136,11 +141,13 @@ def compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty=1, normal
 def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dict(), yscale='linear'):
     plt.figure()
     plt.yscale(yscale)
-    # define 10 unique linestyles, using custom patterns after the first 4
-    linestyles = ['-', ':', (0, (3, 1, 1, 1, 1, 1)), (0, (0.5,0.5,0.5,0.5,2)),(0, (5, 10)),(0, (5, 1)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1)), (0, (0.5, 0.5)), (0,(1,1,1,3)), '-', '-']
+    # define twelve unique styles
 
     result_thresholds, result_scores, base_scores = dict(), dict(), dict()
     for (model, xs, ys) in data:
+        if model not in style_per_model:
+            style_per_model[model] = (linestyles.pop(0), colors.pop(0))
+        (linestyle, color) = style_per_model[model]
         # Mark the provided threshold if given, else mark the threshold with the best score
         if model in thresholds_to_mark:
             thresh_to_mark = thresholds_to_mark[model]
@@ -154,7 +161,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
         plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # We added -1 to the front for base score, see plot_score_vs_thresholds
         xs, ys = xs[1:], ys[1:] # Remove the -1 for plotting
-        plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyles.pop(0), linewidth=2)
+        plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyle, linewidth=2, color=color)
         result_thresholds[model] = thresh_to_mark
         base_scores[model] = base_score
         result_scores[model] = score_to_mark
