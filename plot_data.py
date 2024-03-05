@@ -44,14 +44,14 @@ def compute_auroc(all_data, output_dir, dataset):
     
 def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', texts=[]):
     # Consistent axes
-    # if xlabel == 'acc':
-    #     plt.xlim([28, 72])
-    # if ylabel == 'auc':
-    #     plt.ylim([50, 71])
-    # if ylabel == 'score':
-    #     plt.ylim([-15, 65])
-    # if ylabel == 'harsh-score':
-    #     plt.ylim([-15, 25])
+    if xlabel == 'acc':
+        plt.xlim([28, 89])
+    if ylabel == 'auc':
+        plt.ylim([50, 88])
+    if ylabel == 'score':
+        plt.ylim([-15, 75])
+    if ylabel == 'harsh-score':
+        plt.ylim([-15, 68])
 
     adjust_text(texts) # Must do this after setting ylim and xlim
 
@@ -59,18 +59,18 @@ def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', t
     plt.ylabel(expand_label(ylabel))
 
     # Remove some axes based on the way figs are organized in the paper
-    # if 'raw' in output_dir:
-    #     plt.ylabel('')
-    #     plt.yticks([])
-    # if ylabel == 'score':
-    #     plt.xlabel('')
-    #     plt.xticks([])
+    if 'raw' in output_dir:
+        plt.ylabel('')
+        plt.yticks([])
+    if ylabel == 'score':
+        plt.xlabel('')
+        plt.xticks([])
 
     # Don't include titles for formatting in paper
-    plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
+    # plt.title(f'{expand_label(ylabel)} vs {expand_label(xlabel)}{title_suffix}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.png")
+    output_path = os.path.join(output_dir, f"{ylabel}_vs_{xlabel}{file_suffix.replace(' ', '_')}.pdf")
     
     plt.savefig(output_path, bbox_inches='tight')
     plt.close()
@@ -78,6 +78,11 @@ def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', t
 
 def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all datasets'):
     plt.figure()
+    # If we're plotting size, exclude GPT models (because we don't know their size)
+    if xlabel == 'size':
+        xs = [xs[i] for i in range(len(xs)) if 'gpt' not in model_names[i].lower()]
+        ys = [ys[i] for i in range(len(ys)) if 'gpt' not in model_names[i].lower()]
+        model_names = [name for name in model_names if 'gpt' not in name.lower()]
     xs, ys = np.array(xs), np.array(ys)
     group = output_dir[output_dir.rfind('/')+1:]
     mark_color, marker, line_color = plot_style_for_group(group)
@@ -132,7 +137,7 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plt.figure()
     plt.yscale(yscale)
     # define 10 unique linestyles, using custom patterns after the first 4
-    linestyles = ['-', ':', (0, (3, 1, 1, 1, 1, 1)), (0, (0.5,0.5,0.5,0.5,2)),(0, (5, 10)),(0, (5, 1)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1)), (0, (0.5, 0.5)), (0,(1,1,1,3)), '-', '-', '-', '-']
+    linestyles = ['-', ':', (0, (3, 1, 1, 1, 1, 1)), (0, (0.5,0.5,0.5,0.5,2)),(0, (5, 10)),(0, (5, 1)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1)), (0, (0.5, 0.5)), (0,(1,1,1,3)), '-', '-']
 
     result_thresholds, result_scores, base_scores = dict(), dict(), dict()
     for (model, xs, ys) in data:
@@ -211,8 +216,9 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     rows = []
     # Sort the rows by model series, then by model size
     for model in sorted(model_results_msp.keys(), key=lambda x: (model_series(x), model_size(x))):
-        (auc_msp, acc_msp, _) = model_results_msp[model]
-        (auc_max_logit, acc_max_logit, _) = model_results_max_logit[model]
+        # Default is (0, 0, {}) if we don't have results for that model. This can happen with e.g. GPT models where we only have MSP results, not raw logits
+        (auc_msp, acc_msp, _) = model_results_msp.get(model, (0, 0, {}))
+        (auc_max_logit, acc_max_logit, _) = model_results_max_logit.get(model, (0, 0, {}))
         if abs(acc_msp - acc_max_logit) > 0.01:
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
         rows.append([expand_model_name(model), acc_msp, auc_msp, '', auc_max_logit, ''])
@@ -228,12 +234,13 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     rows = []
     # Sort the rows by model series, then by model size
     for model in sorted(model_results_msp.keys(), key=lambda x: (model_series(x), model_size(x))):
-        (_, _, score_data_msp) = model_results_msp[model]
-        (_, _, score_data_max_logit) = model_results_max_logit[model]
+        # Default is (0, 0, {}) if we don't have results for that model
+        (_, _, score_data_msp) = model_results_msp.get(model, (0, 0, {}))
+        (_, _, score_data_max_logit) = model_results_max_logit.get(model, (0, 0, {}))
         rows.append([expand_model_name(model)])
         for wrong_penalty in score_data_msp:
-            (_, score_msp, base_score_msp) = score_data_msp[wrong_penalty]
-            (_, score_max_logit, base_score_max_logit) = score_data_max_logit[wrong_penalty]
+            (_, score_msp, base_score_msp) = score_data_msp.get(wrong_penalty, (0, 0, 0))
+            (_, score_max_logit, base_score_max_logit) = score_data_max_logit.get(wrong_penalty, (0, 0, 0))
             if abs(base_score_msp - base_score_max_logit) > 0.01:
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
@@ -403,7 +410,7 @@ def cross_group_plots(group_data, output_dir):
         # accuracy is x-axis, auc is y-axis
         plt.scatter(accs, aucs, label=logit_type+prompt, c=mark_color, marker=marker)
         for i in range(len(model_names)):
-            texts.append(plt.text(accs[i], aucs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7))
+            texts.append(plt.text(accs[i], aucs[i], expand_model_name(model_names[i]), ha='right', va='bottom', alpha=0.7, fontsize='small'))
 
     file_suffix = '-' + '-'.join(group_data.keys())
     if 'prompt' in file_suffix:
