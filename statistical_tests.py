@@ -11,7 +11,7 @@ from collections import defaultdict
 
 
 ALL_DATASETS = ["arc", "hellaswag", "mmlu", "truthfulqa", "winogrande"]
-ALL_MODELS = ["Falcon-7b", "Falcon-40b", "Llama-7b", "Llama-13b", "Llama-70b", "Mistral", "Mixtral", "Solar", "Yi-6b", "Yi-34b"]
+ALL_MODELS = ["Falcon-7b", "Falcon-40b", "gpt-3.5-turbo", "gpt-4-turbo", "Llama-7b", "Llama-13b", "Llama-70b", "Mistral", "Mixtral", "Solar", "Yi-6b", "Yi-34b"]
 ALL_PROMPTS = ["first_prompt", "second_prompt"]
 ALL_VALUES = ["raw_logits", "norm_logits"]
 
