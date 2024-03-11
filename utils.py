@@ -56,6 +56,8 @@ def expand_label(label):
                 'Score (Conservative)' if label == 'harsh-score' else
                 'Model Size (billions of parameters)' if label == 'size' else
                 'AUROC' if label == 'auc' else
+                'Fraction Correct' if label == 'frac-correct' else
+                'MSP' if label == 'msp' else
                 'Q&A Accuracy' if label == 'acc' else label)
 
 # Each model name is of the form "<model_series> <size>B. Mixtral is a slight exception 

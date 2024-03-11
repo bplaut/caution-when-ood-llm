@@ -40,6 +40,8 @@ def main():
     file_list = [cross_group_dir + suffix for suffix in suffixes] + [input_dir + '/main_figs/' + suffix for suffix in suffixes]
     file_list += [input_dir + '/main_figs/no_abst_dataset']
     file_list += [input_dir + '/main_figs/conf_distribution']
+    file_list += [input_dir + '/main_figs/frac-correct_vs_msp_uniform']
+    file_list += [input_dir + '/main_figs/frac-correct_vs_msp_quantile']
     datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande', 'piqa', 'no_winogrande']
     middle_dirs = ['_abst_norm_logits_first_prompt', '_abst_norm_logits_second_prompt', '_abst_raw_logits_first_prompt', '_abst_raw_logits_second_prompt', '_abst_norm_logits', '_abst_raw_logits']
     for middle_dir in middle_dirs:

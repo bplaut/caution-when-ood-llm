@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
+from sklearn.calibration import calibration_curve
 import sys
 import os
 from collections import defaultdict
@@ -255,6 +256,22 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header_row=header_row)
 
+def calibration_plots(data, output_dir, strategy='uniform'):
+    plt.figure()
+    for model in data:
+        if model not in style_per_model:
+            style_per_model[model] = (linestyles.pop(0), colors.pop(0))
+        (linestyle, color) = style_per_model[model]
+
+        labels, conf_levels, _ = data[model]
+        pct_correct, msp = calibration_curve(labels, conf_levels, n_bins=20, strategy=strategy)
+        plt.plot(msp, pct_correct, label=expand_model_name(model), linestyle=linestyle, linewidth=2, color=color)
+    # Add black line on the diagonal to represent perfect calibration
+    plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='-')
+    make_and_sort_legend()
+    plt.legend()
+    finalize_plot(output_dir, 'msp', 'frac-correct', title_suffix=': Calibration', file_suffix=f'_{strategy}')
+    
 def make_percentile_conf_table(data, output_dir, dataset=''):
     rows = []
     percentiles = [10,50,90]
@@ -469,6 +486,8 @@ def main():
     # Non-group based plots
     make_dataset_table(all_data, output_dir)
     make_percentile_conf_table(collapse_data_to_model(all_data), output_dir)
+    calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='uniform')
+    calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='quantile')
 
     # Single group plots
     group_data = dict()
