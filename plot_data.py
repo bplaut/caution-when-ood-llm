@@ -379,7 +379,6 @@ def merge_groups(group_data):
                 all_score_data[wrong_penalty][1][model].append(our_scores[model])
                 all_score_data[wrong_penalty][2][model].append(base_scores[model])
 
-    plt.figure()
     avg_aucs, avg_accs, model_names = [], [], []
     for model_name, (aucs, accs) in all_auc_acc_data.items():
         avg_aucs.append(np.mean(aucs))
