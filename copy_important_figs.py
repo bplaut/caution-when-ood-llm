@@ -36,11 +36,10 @@ def main():
                 '/no_abst_norm_logits/auc_vs_acc-no_abst_norm_logits_second_prompt-no_abst_norm_logits_first_prompt',
                 '/no_abst_raw_logits/auc_vs_acc_all_datasets_Max_Logit',
                 '/no_abst_raw_logits/auc_vs_acc-no_abst_raw_logits_second_prompt-no_abst_raw_logits_first_prompt',
-                '/no_abst_norm_logits/conf_distribution',
-                '/no_abst_raw_logits/conf_distribution',
                  ]
     file_list = [cross_group_dir + suffix for suffix in suffixes] + [input_dir + '/main_figs/' + suffix for suffix in suffixes]
     file_list += [input_dir + '/main_figs/no_abst_dataset']
+    file_list += [input_dir + '/main_figs/conf_distribution']
     datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande', 'piqa', 'no_winogrande']
     middle_dirs = ['_abst_norm_logits_first_prompt', '_abst_norm_logits_second_prompt', '_abst_raw_logits_first_prompt', '_abst_raw_logits_second_prompt', '_abst_norm_logits', '_abst_raw_logits']
     for middle_dir in middle_dirs:
