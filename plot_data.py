@@ -53,10 +53,8 @@ def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', t
         plt.xlim([28, 89])
     if ylabel == 'auc':
         plt.ylim([50, 88])
-    if ylabel == 'score':
+    if ylabel in ('score', 'harsh-score'):
         plt.ylim([-15, 75])
-    if ylabel == 'harsh-score':
-        plt.ylim([-15, 68])
 
     adjust_text(texts) # Must do this after setting ylim and xlim
 
