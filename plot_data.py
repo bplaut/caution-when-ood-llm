@@ -255,19 +255,13 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header_row=header_row)
 
-def percentile_conf_level(data, model, percentiles):
-    conf_levels = []
-    for dataset in data:
-        conf_levels.extend(data[dataset][model][1])
-    return np.percentile(conf_levels, percentiles)
-
 def make_percentile_conf_table(data, output_dir, dataset=''):
     rows = []
     percentiles = [10,50,90]
-    models = data[list(data.keys())[0]].keys() # All datasets have the same list of models
-    for model in sorted(models, key=lambda x: (model_series(x), model_size(x))):
-        confs = [make_pct(x) for x in percentile_conf_level(data, model, percentiles)]
-        rows.append([expand_model_name(model)] + confs)
+    for model in sorted(list(data.keys()), key=lambda x: (model_series(x), model_size(x))):
+        (labels, conf_levels, _) = data[model]
+        percentile_vals = [make_pct(x) for x in np.percentile(conf_levels, percentiles)]
+        rows.append([expand_model_name(model)] + percentile_vals)
     column_names = ['LLM'] + [f'{x}th' for x in percentiles]
     header_row = '& \\multicolumn{3}{c}{Confidence level percentiles} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
@@ -349,10 +343,22 @@ def plots_for_group(data, output_dir):
     plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=2)
     # Maps each wrong_penalty to (train_thresholds, test_scores, base_test_scores)
     score_data = {1: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1), 2: train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=2)}
-    make_percentile_conf_table(data, output_dir)
 
     aucs, accs, model_names = auc_acc_plots(data, all_aucs, output_dir)
     return score_data, aucs, accs, model_names
+
+def collapse_data_to_model(data, logit_type='norm_logits'):
+    # Input: dict of the form data[group][dataset][model] = (labels, conf_levels, total_qs)
+    # Output: dict of the form data[model] = (labels, conf_levels, total_qs)
+    collapsed = defaultdict(lambda: ([], [], 0))
+    for group in data:
+        if logit_type in group:
+            for dataset in data[group]:
+                for model in data[group][dataset]:
+                    (labels, conf_levels, total_qs) = data[group][dataset][model]
+                    old_labels, old_conf_levels, old_total_qs = collapsed[model]
+                    collapsed[model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
+    return collapsed
 
 def merge_groups(group_data):
     # Merge to a single "group" based on the means across groups
@@ -460,8 +466,10 @@ def main():
             labels, conf_levels, total_qs = parse_data(file_path, incl_unparseable)
             old_labels, old_conf_levels, old_total_qs = all_data[group][dataset][model]
             all_data[group][dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
-
+            
+    # Non-group based plots
     make_dataset_table(all_data, output_dir)
+    make_percentile_conf_table(collapse_data_to_model(all_data), output_dir)
 
     # Single group plots
     group_data = dict()
