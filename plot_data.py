@@ -42,7 +42,7 @@ def compute_auroc(all_data, output_dir, dataset):
     # Make output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.png")
+    output_path = os.path.join(output_dir, f"roc_curve_{dataset}.pdf")
     plt.savefig(output_path)
     plt.close()
     print(f"ROC curve for {dataset} saved --> {output_path}")
@@ -264,7 +264,7 @@ def calibration_plots(data, output_dir, strategy='uniform'):
         (linestyle, color) = style_per_model[model]
 
         labels, conf_levels, _ = data[model]
-        pct_correct, msp = calibration_curve(labels, conf_levels, n_bins=20, strategy=strategy)
+        pct_correct, msp = calibration_curve(labels, conf_levels, n_bins=10, strategy=strategy)
         plt.plot(msp, pct_correct, label=expand_model_name(model), linestyle=linestyle, linewidth=2, color=color)
     # Add black line on the diagonal to represent perfect calibration
     plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='-')
@@ -285,10 +285,11 @@ def make_percentile_conf_table(data, output_dir, dataset=''):
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     make_results_table(column_names, rows, output_dir, caption=f'Percentile confidence levels{dataset_for_caption}.', label=f'tab:{dataset_for_label}percentile_conf', filename=f'{dataset_for_label}conf_distribution.tex', header_row=header_row)
 
-def make_dataset_table(all_data, output_dir):
-    # one row per dataset, one column for avg acc, one for avg MSP auc, one for avg max logit auc
+def make_dataset_plots(all_data, output_dir):
+    # one entry per dataset, containing avg acc, avg MSP auc, and avg max logit auc
     # all_data[group][dataset][model] = (labels, conf_levels, total_qs)
     dataset_stats = defaultdict(lambda: ([], [], []))
+    # First collect all the data for each dataset
     for group in all_data:
         for dataset in all_data[group]:
             for model in all_data[group][dataset]:
@@ -301,15 +302,42 @@ def make_dataset_table(all_data, output_dir):
                     dataset_stats[dataset][1].append(auc_val)
                 elif 'raw' in group:
                     dataset_stats[dataset][2].append(auc_val)
-
+    # Then average the data for each dataset
+    for dataset in dataset_stats:
+        accs, msp_aucs, max_logit_aucs = dataset_stats[dataset]
+        dataset_stats[dataset] = (np.mean(accs), np.mean(msp_aucs), np.mean(max_logit_aucs))
+        
+    # Make table
     rows = []
     for dataset in sorted(dataset_stats.keys()):
-        accs, msp_aucs, max_logit_aucs = dataset_stats[dataset]
-        rows.append([format_dataset_name(dataset), np.mean(accs), np.mean(msp_aucs), np.mean(max_logit_aucs)])
+        avg_acc, msp_auc, max_logit_auc = dataset_stats[dataset]
+        rows.append([format_dataset_name(dataset), avg_acc, msp_auc, max_logit_auc])
     column_names = ['Dataset', 'Q\\&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
-    # pick any group from all_data and see if 'no_abst' is in it
-    filename = ('no' if 'no_abst' in list(all_data.keys())[0] else 'yes') + '_abst_dataset.tex'
+    prefix = ('no' if 'no_abst' in list(all_data.keys())[0] else 'yes') + '_abst'
+    filename = prefix + '_dataset.tex'
     make_results_table(column_names, rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename=filename)
+
+    # Make bar graph. Three segments on the x-axis: Q&A accuracy, MSP AUROC, Max Logit AUROC. Within each segment, one bar per dataset. So there should be three segments, each with 5 bars
+    labels = ['Q&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
+    n_groups = len(labels)
+    fig, ax = plt.subplots()
+    index = np.arange(n_groups)
+    bar_width = 0.15
+
+    for i, dataset in enumerate(sorted(dataset_stats.keys())):
+        means = list(dataset_stats[dataset])
+        plt.bar(index + i*bar_width, means, bar_width, label=format_dataset_name(dataset))
+
+    plt.ylabel('Percentage')
+    plt.xticks(index + 2*bar_width, labels)
+    plt.ylim([0, 90])
+    plt.legend()
+
+    plt.tight_layout()
+    filepath = os.path.join(output_dir, f'{prefix}_dataset_bar.pdf')
+    plt.savefig(filepath)
+    print("Dataset bar graph saved -->", filepath)
+    plt.close()
     
 def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
     filename = os.path.join(output_dir, filename)
@@ -484,7 +512,7 @@ def main():
             all_data[group][dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
             
     # Non-group based plots
-    make_dataset_table(all_data, output_dir)
+    make_dataset_plots(all_data, output_dir)
     make_percentile_conf_table(collapse_data_to_model(all_data), output_dir)
     calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='uniform')
     calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='quantile')
