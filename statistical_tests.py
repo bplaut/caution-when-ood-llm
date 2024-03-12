@@ -162,24 +162,25 @@ def conduct_model_summary_tests(incl_unparseable, input_dir):
                         model_aurocs.append(auroc)
                     else:
                         print(f"Missing data for {prompt}, {dataset}, {model}, {value}")
-                _, is_normal = test_normality(model_aurocs)
-                if is_normal:
-                    p_val, stat, df, verdict = one_sample_t(model_aurocs, 0.5, alternative = "greater")
-                    test_data["p_value"].append(p_val)
-                    test_data["t_stat"].append(stat)
-                    test_data["t_dof"].append(df)
-                    test_data["w_stat"].append(np.nan)
-                    test_data["reject"].append(verdict)
-                else:
-                    p_val, stat, verdict = wilcoxon(model_aurocs, 0.5, alternative = "greater")
-                    test_data["p_value"].append(p_val)
-                    test_data["t_stat"].append(np.nan)
-                    test_data["t_dof"].append(np.nan)
-                    test_data["w_stat"].append(stat)
-                    test_data["reject"].append(verdict)
-                test_data["model"].append(model)
-                test_data["prompt"].append(prompt)
-                test_data["value"].append(value)
+                if len(model_aurocs) > 0:
+                    _, is_normal = test_normality(model_aurocs)
+                    if is_normal:
+                        p_val, stat, df, verdict = one_sample_t(model_aurocs, 0.5, alternative = "greater")
+                        test_data["p_value"].append(p_val)
+                        test_data["t_stat"].append(stat)
+                        test_data["t_dof"].append(df)
+                        test_data["w_stat"].append(np.nan)
+                        test_data["reject"].append(verdict)
+                    else:
+                        p_val, stat, verdict = wilcoxon(model_aurocs, 0.5, alternative = "greater")
+                        test_data["p_value"].append(p_val)
+                        test_data["t_stat"].append(np.nan)
+                        test_data["t_dof"].append(np.nan)
+                        test_data["w_stat"].append(stat)
+                        test_data["reject"].append(verdict)
+                    test_data["model"].append(model)
+                    test_data["prompt"].append(prompt)
+                    test_data["value"].append(value)
     pd.DataFrame(test_data).to_csv("./stat_tests_output/summary_tests.csv", index = False)
 
 def collate_paired_t_test_data(all_data):
