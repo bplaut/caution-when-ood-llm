@@ -16,7 +16,8 @@ echo -e "collapse_prompts: $collapse_prompts, incl_unparseable: $incl_unparseabl
 output_dir="figs_collapse-prompts-${collapse_prompts}_incl-unparseable-${incl_unparseable}"
 echo -e "\nMaking figures...\n"
 
-for abstain in "no_abst" "yes_abst"; do
+# We decided to not use the data where we give the LLM the option to abstain
+for abstain in "no_abst"; do    
     python plot_data.py $output_dir/main_figs $incl_unparseable $collapse_prompts arc,hellaswag,mmlu,truthfulqa,winogrande $dir/*${abstain}*.txt
     python plot_data.py $output_dir/arc $incl_unparseable $collapse_prompts arc $dir/*${abstain}*.txt
     python plot_data.py $output_dir/hellaswag $incl_unparseable $collapse_prompts hellaswag $dir/*${abstain}*.txt

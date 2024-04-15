@@ -220,41 +220,45 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     model_results_msp = make_model_dict(*msp_group_data)
     model_results_max_logit = make_model_dict(*max_logit_group_data)
     rows = []
-    # Sort the rows by model series, then by model size
-    for model in sorted(model_results_msp.keys(), key=lambda x: (model_series(x), model_size(x))):
-        # Default is (0, 0, {}) if we don't have results for that model. This can happen with e.g. GPT models where we only have MSP results, not raw logits
-        (auc_msp, acc_msp, _) = model_results_msp.get(model, (0, 0, {}))
-        (auc_max_logit, acc_max_logit, _) = model_results_max_logit.get(model, (0, 0, {}))
-        if abs(acc_msp - acc_max_logit) > 0.01:
+    # Sort the rows by model series, then by model size. Also put gpt models at the end
+    for model in sort_models(model_results_msp.keys()):
+        # Default is (0, '--', {}) if we don't have results for that model. This can happen with e.g. GPT models where we only have MSP results, not raw logits. The '--' will actually end up in the table in those cases
+        (auc_msp, acc_msp, _) = model_results_msp.get(model, ('--', 0, {}))
+        (auc_max_logit, acc_max_logit, _) = model_results_max_logit.get(model, ('--', 0, {}))
+        if abs(acc_msp - acc_max_logit) > 0.01 and 'gpt' not in model:
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
-        rows.append([expand_model_name(model), acc_msp, auc_msp, '', auc_max_logit, ''])
-    column_names = ['LLM', 'Q\\&A Accuracy', 'AUROC', '$p < 10^{-5}$', 'AUROC', '$p < 10^{-5}$']
-    header_row = '& & \\multicolumn{2}{c|}{MSP} & \\multicolumn{2}{c}{Max Logit} \\\\ \n'
-    dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
+        rows.append([expand_model_name(model), acc_msp, auc_msp, '2/2', auc_max_logit, '2/2'])
+    column_names = ['LLM', 'Q\\&A Accuracy', 'AUROC', '$p < 10^{-4}$', 'AUROC', '$p < 10^{-4}$']
+    header = ('& & \\multicolumn{2}{c}{MSP} & \\multicolumn{2}{c}{Max Logit} \\\\ \n'
+              + ' & '.join(column_names) + ' \\\\ \n'
+              + '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\cmidrule(lr){3-4} \\cmidrule(lr){5-6} \n')
+    caption = 'AUROC results for %s. See Table~\\ref{tab:arc_auroc} for more explanation.' % {format_dataset_name(dataset)}
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'AUROC results{dataset_for_caption}. AUROC and Q\&A values are percentages, averaged over the two prompts.', label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header_row=header_row)
+    make_results_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header=header)
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
     model_results_max_logit = make_model_dict(*max_logit_group_data)
     rows = []
-    # Sort the rows by model series, then by model size
-    for model in sorted(model_results_msp.keys(), key=lambda x: (model_series(x), model_size(x))):
+    for model in sort_models(model_results_msp.keys()):
         # Default is (0, 0, {}) if we don't have results for that model
         (_, _, score_data_msp) = model_results_msp.get(model, (0, 0, {}))
         (_, _, score_data_max_logit) = model_results_max_logit.get(model, (0, 0, {}))
         rows.append([expand_model_name(model)])
         for wrong_penalty in score_data_msp:
-            (_, score_msp, base_score_msp) = score_data_msp.get(wrong_penalty, (0, 0, 0))
-            (_, score_max_logit, base_score_max_logit) = score_data_max_logit.get(wrong_penalty, (0, 0, 0))
-            if abs(base_score_msp - base_score_max_logit) > 0.01:
+            # The '--' will actually end up in the table in some cases
+            (_, score_msp, base_score_msp) = score_data_msp.get(wrong_penalty, (0, '--', 0))
+            (_, score_max_logit, base_score_max_logit) = score_data_max_logit.get(wrong_penalty, (0, '--', 0))
+            if abs(base_score_msp - base_score_max_logit) > 0.01 and 'gpt' not in model:
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
             rows[-1].extend([base_score_msp, score_msp, score_max_logit])
     column_names = ['LLM', 'Base LLM', 'MSP', 'Max Logit', 'Base LLM', 'MSP', 'Max Logit']
-    header_row = '& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
-    dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
+    header = ('& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
+              + ' & '.join(column_names) + ' \\\\ \n'
+              + '\\cmidrule(lr){1-1}\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}\\ \\ \n')
+    caption = 'Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' % format_dataset_name(dataset)
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'Score results{dataset_for_caption}. All values are percentages. ``Balanced" and ``conservative" correspond to -1 and -2 points per wrong answer, respectively. Correct answers and abstentions are always worth +1 and 0 points, respectively. The total number of points is divided by the total number of questions to obtain the percentages shown in the table.', label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header_row=header_row)
+    make_results_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header=header)
 
 def calibration_plots(data, output_dir, strategy='uniform'):
     plt.figure()
@@ -275,15 +279,15 @@ def calibration_plots(data, output_dir, strategy='uniform'):
 def make_percentile_conf_table(data, output_dir, dataset=''):
     rows = []
     percentiles = [10,50,90]
-    for model in sorted(list(data.keys()), key=lambda x: (model_series(x), model_size(x))):
+    for model in sort_models(list(data.keys())):
         (labels, conf_levels, _) = data[model]
         percentile_vals = [make_pct(x) for x in np.percentile(conf_levels, percentiles)]
         rows.append([expand_model_name(model)] + percentile_vals)
     column_names = ['LLM'] + [f'{x}th' for x in percentiles]
-    header_row = '& \\multicolumn{3}{c}{Confidence level percentiles} \\\\ \n'
+    header = '& \\multicolumn{3}{c}{Confidence level percentiles} \\\\ \n'
     dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(column_names, rows, output_dir, caption=f'Percentile confidence levels{dataset_for_caption}.', label=f'tab:{dataset_for_label}percentile_conf', filename=f'{dataset_for_label}conf_distribution.tex', header_row=header_row)
+    make_results_table(len(column_names), rows, output_dir, caption=f'Percentile confidence levels{dataset_for_caption}.', label=f'tab:{dataset_for_label}percentile_conf', filename=f'{dataset_for_label}conf_distribution.tex', header=header)
 
 def make_dataset_plots(all_data, output_dir):
     # one entry per dataset, containing avg acc, avg MSP auc, and avg max logit auc
@@ -315,7 +319,10 @@ def make_dataset_plots(all_data, output_dir):
     column_names = ['Dataset', 'Q\\&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
     prefix = ('no' if 'no_abst' in list(all_data.keys())[0] else 'yes') + '_abst'
     filename = prefix + '_dataset.tex'
-    make_results_table(column_names, rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename=filename)
+    header = (' & & MSP & Max Logit \\\\ \n'
+              + ' & '.join(column_names[1:]) + ' \\\\ \n'
+              '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\cmidrule(lr){3-3} \\cmidrule(lr){4-4} \\\\ \n')
+    make_results_table(len(column_names), rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename=filename)
 
     # Make bar graph. Three segments on the x-axis: Q&A accuracy, MSP AUROC, Max Logit AUROC. Within each segment, one bar per dataset. So there should be three segments, each with 5 bars
     labels = ['Q&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
@@ -339,7 +346,7 @@ def make_dataset_plots(all_data, output_dir):
     print("Dataset bar graph saved -->", filepath)
     plt.close()
     
-def make_results_table(column_names, rows, output_dir, caption='', label='', filename='table.tex', header_row=''):
+def make_results_table(num_cols, rows, output_dir, caption='', label='', filename='table.tex', header=''):
     filename = os.path.join(output_dir, filename)
     # Create directory if it doesn't exist
     if not os.path.exists(output_dir):
@@ -347,18 +354,18 @@ def make_results_table(column_names, rows, output_dir, caption='', label='', fil
     with open(filename, 'w') as f:
         f.write('\\begin{table*}\n')
         f.write('\\centering\n')
-        f.write('\\begin{tabular}{' + 'c|' * (len(column_names) - 1) + 'c}\n')
-        f.write(header_row)
-        f.write(' & '.join(column_names) + '\\\\ \\hline\n')
+        f.write(f'\\caption{{{caption}}}\n')
+        f.write(f'\\label{{{label}}}\n')
+        f.write('\\begin{tabular}{' + 'l' + 'c' * (num_cols - 1) + '}\n')
+        f.write('\\toprule\n')
+        f.write(header)
         for row in rows:
             # round floats to 1 decimal place, but if it's -0.0, make it 0.0
             row = [str(round(x, 1)) if isinstance(x, float) else str(x) for x in row]
             row = [x.replace('-0.0', '0.0') for x in row]
             f.write(' & '.join(row) + '\\\\\n')
-        f.write('\\hline\n')
+        f.write('\\bottomrule\n')
         f.write('\\end{tabular}\n')
-        f.write(f'\\caption{{{caption}}}\n')
-        f.write(f'\\label{{{label}}}\n')
         f.write('\\end{table*}\n')
     print("Results table saved -->", filename)
 

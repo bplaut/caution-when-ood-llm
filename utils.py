@@ -75,6 +75,10 @@ def model_size(name):
         end_of_size_term = size_term.rfind('B')
     return float(size_term[:end_of_size_term])
 
+def sort_models(models):
+    # Sort the rows by model series, then by model size. Also put OpenAI gpt models at the end
+    return sorted(models, key=lambda x: ('gpt' in x, model_series(x), model_size(x)))
+
 def group_label(group):
     logit_type = 'MSP' if group.startswith('no_abst_norm_logits') else 'Max Logit' if group.startswith('no_abst_raw_logits') else group
     prompt = ', first phrasing' if group.endswith('first_prompt') else ', second phrasing' if group.endswith('second_prompt') else ', third phrasing' if group.endswith('third_prompt') else ''
