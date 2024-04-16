@@ -232,7 +232,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     header = ('& & \\multicolumn{2}{c}{MSP} & \\multicolumn{2}{c}{Max Logit} \\\\ \n'
               + ' & '.join(column_names) + ' \\\\ \n'
               + '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\cmidrule(lr){3-4} \\cmidrule(lr){5-6} \n')
-    caption = 'AUROC results for %s. See Table~\\ref{tab:arc_auroc} for more explanation.' % {format_dataset_name(dataset)}
+    caption = 'AUROC results for %s. See Table~\\ref{tab:arc_auroc} for more explanation.' % format_dataset_name(dataset)
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     make_results_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header=header)
 
