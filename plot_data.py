@@ -142,8 +142,8 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     plt.yscale(yscale)
     # define twelve unique styles
 
-    result_thresholds, result_scores, base_scores = dict(), dict(), dict()
-    for (model, xs, ys) in data:
+    result_thresholds, result_scores, base_scores, pcts_abstained = dict(), dict(), dict(), dict()
+    for (model, xs, ys, pct_abstained_all_threshes) in data:
         if model not in style_per_model:
             style_per_model[model] = (linestyles.pop(0), colors.pop(0))
         (linestyle, color) = style_per_model[model]
@@ -151,11 +151,11 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
         if model in thresholds_to_mark:
             thresh_to_mark = thresholds_to_mark[model]
             thresh_idx = np.where(xs == thresh_to_mark)[0][0] # First zero idx is because np.where returns a tuple, second zero idx is because we only want the first index (although there should only be one)
-            score_to_mark = ys[thresh_idx]
         else:
-            thresh_to_mark_idx = np.argmax(ys)
-            thresh_to_mark = xs[thresh_to_mark_idx]
-            score_to_mark = max(ys)
+            thresh_idx = np.argmax(ys)
+            thresh_to_mark = xs[thresh_idx]
+        score_to_mark = ys[thresh_idx]
+        pct_abstained = pct_abstained_all_threshes[thresh_idx]
         # zorder determines which objects are on top
         plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # We added -1 to the front for base score, see plot_score_vs_thresholds
@@ -164,13 +164,14 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
         result_thresholds[model] = thresh_to_mark
         base_scores[model] = base_score
         result_scores[model] = score_to_mark
+        pcts_abstained[model] = pct_abstained
 
     make_and_sort_legend()
     plt.legend(handlelength=2.5)
     plot_name = 'MSP' if 'norm' in output_dir else 'Max Logit' if 'raw' in output_dir else 'unknown'
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
-    return result_thresholds, result_scores, base_scores
+    return result_thresholds, result_scores, base_scores, pcts_abstained
     
 def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresholds_to_mark=dict()):
     # Inner max is for one model + dataset, middle max is for one dataset, outer max is overall
@@ -184,27 +185,33 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
     # Add all keys in thresholds_to_mark to thresholds, and sort
     thresholds = np.sort(np.unique(np.append(thresholds, list(thresholds_to_mark.values()))))
 
-    # For each model and dataset, compute the score for each threshold
-    results = defaultdict(lambda: defaultdict(list))        
+    # For each model and dataset, compute the score and pct abstained for each threshold
+    all_scores = defaultdict(lambda: defaultdict(list))
+    all_pcts_abstained = defaultdict(lambda: defaultdict(list))
     for dataset in datasets:
         for model, (labels, conf_levels, total_qs) in data[dataset].items():
             scores  = []
-            scores_harsh = []
+            pcts_abstained = []
             for thresh in thresholds:
-                score = compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty)
-                scores.append(score)
-            results[model][dataset] = scores
+                scores.append(compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty))
+                pcts_abstained.append(np.mean([1 if conf < thresh else 0 for conf in conf_levels]))
+            all_scores[model][dataset] = scores
+            all_pcts_abstained[model][dataset] = pcts_abstained
             
-    # Now for each model and threshold, average the scores across datasets
+    # Now for each model and threshold, average the score and the pct abstained across datasets
     overall_results = []
-    for model in results:
-        results_for_model = []
+    for model in all_scores:
+        scores_for_model = []
+        pcts_abstained_for_model = []
         for i in range(len(thresholds)):
             # Some models might not have results for all datasets (although eventually they should)
-            scores_for_thresh = [results[model][dataset][i] for dataset in results[model]]
+            scores_for_thresh = [all_scores[model][dataset][i] for dataset in all_scores[model]]
             avg_score = np.mean(scores_for_thresh)
-            results_for_model.append(avg_score)
-        overall_results.append((model, thresholds, results_for_model))
+            pct_abstained_per_dataset = np.mean([all_pcts_abstained[model][dataset][i] for dataset in all_pcts_abstained[model]])
+            avg_pct_abstained = np.mean(pct_abstained_per_dataset)
+            scores_for_model.append(avg_score)
+            pcts_abstained_for_model.append(avg_pct_abstained)
+        overall_results.append((model, thresholds, scores_for_model, pcts_abstained_for_model))
             
     dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
     ylabel = 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else f'Wrong penalty of {wrong_penalty}'
@@ -212,9 +219,9 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
 
 def train_and_test_score_plots(test_data, train_data, output_dir, datasets, wrong_penalty=1):
     # Get optimal thresholds for train data, use those to compute scores for test data
-    (optimal_train_thresholds, _, _) = plot_score_vs_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty)
-    (_, test_scores, base_test_scores) = plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=optimal_train_thresholds)
-    return optimal_train_thresholds, test_scores, base_test_scores
+    (optimal_train_thresholds, _, _, _) = plot_score_vs_thresholds(train_data, os.path.join(output_dir, 'train'), datasets, wrong_penalty=wrong_penalty)
+    (_, test_scores, base_test_scores, pcts_abstained) = plot_score_vs_thresholds(test_data, os.path.join(output_dir, 'test'), datasets, wrong_penalty=wrong_penalty, thresholds_to_mark=optimal_train_thresholds)
+    return optimal_train_thresholds, test_scores, base_test_scores, pcts_abstained
 
 def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
     model_results_msp = make_model_dict(*msp_group_data)
@@ -236,29 +243,34 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     make_results_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header=header)
 
-def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset=''):
+def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='', pct_abstained=False):
+    # If pct_abstained=True, we'll write the pct_abstained instead of the score
     model_results_msp = make_model_dict(*msp_group_data)
-    model_results_max_logit = make_model_dict(*max_logit_group_data)
+    model_results_ml = make_model_dict(*max_logit_group_data)
     rows = []
     for model in sort_models(model_results_msp.keys()):
         # Default is (0, 0, {}) if we don't have results for that model
         (_, _, score_data_msp) = model_results_msp.get(model, (0, 0, {}))
-        (_, _, score_data_max_logit) = model_results_max_logit.get(model, (0, 0, {}))
+        (_, _, score_data_ml) = model_results_ml.get(model, (0, 0, {}))
         rows.append([expand_model_name(model)])
         for wrong_penalty in score_data_msp:
             # The '--' will actually end up in the table in some cases
-            (_, score_msp, base_score_msp) = score_data_msp.get(wrong_penalty, (0, '--', 0))
-            (_, score_max_logit, base_score_max_logit) = score_data_max_logit.get(wrong_penalty, (0, '--', 0))
-            if abs(base_score_msp - base_score_max_logit) > 0.01 and 'gpt' not in model:
-                print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_max_logit}")
-            rows[-1].extend([base_score_msp, score_msp, score_max_logit])
-    column_names = ['LLM', 'Base LLM', 'MSP', 'Max Logit', 'Base LLM', 'MSP', 'Max Logit']
+            (_, score_msp, base_score_msp, pct_abstained_msp) = score_data_msp.get(wrong_penalty, (0, '--', 0, '--'))
+            (_, score_ml, base_score_ml, pct_abstained_ml) = score_data_ml.get(wrong_penalty, (0, '--', 0, '--'))
+            if abs(base_score_msp - base_score_ml) > 0.01 and 'gpt' not in model:
+                print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_ml}")
+            if pct_abstained:
+                rows[-1].extend([0, pct_abstained_msp, pct_abstained_ml])
+            else:
+                rows[-1].extend([base_score_msp, score_msp, score_ml])
+    column_names = ['LLM', 'Base', 'MSP', 'Max Logit', 'Base', 'MSP', 'Max Logit']
     header = ('& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
               + ' & '.join(column_names) + ' \\\\ \n'
               + '\\cmidrule(lr){1-1}\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}\\ \\ \n')
     caption = 'Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' % format_dataset_name(dataset)
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}score', filename=f'{dataset_for_label}score_table.tex', header=header)
+    filename = dataset_for_label + ('pct_abstained' if pct_abstained else 'score') + '_table.tex'
+    make_results_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}score', filename=filename, header=header)
 
 def calibration_plots(data, output_dir, strategy='uniform'):
     plt.figure()
@@ -402,7 +414,7 @@ def collapse_data_to_model(data, logit_type='norm_logits'):
 def merge_groups(group_data):
     # Merge to a single "group" based on the means across groups
     all_auc_acc_data = defaultdict(lambda: ([], []))
-    all_score_data = defaultdict(lambda: (defaultdict(list), defaultdict(list), defaultdict(list)))
+    all_score_data = defaultdict(lambda: (defaultdict(list), defaultdict(list), defaultdict(list), defaultdict(list)))
     for group in group_data:
         (score_data, aucs, accs, model_names) = group_data[group]
         for i, model_name in enumerate(model_names):
@@ -412,11 +424,12 @@ def merge_groups(group_data):
             
         for wrong_penalty in score_data:
             # Same idea here, except these are each dicts with model name as the key
-            (thresholds, our_scores, base_scores) = score_data[wrong_penalty]
+            (thresholds, our_scores, base_scores, pcts_abstained) = score_data[wrong_penalty]
             for model in thresholds:
                 all_score_data[wrong_penalty][0][model].append(thresholds[model])
                 all_score_data[wrong_penalty][1][model].append(our_scores[model])
                 all_score_data[wrong_penalty][2][model].append(base_scores[model])
+                all_score_data[wrong_penalty][3][model].append(pcts_abstained[model])
 
     avg_aucs, avg_accs, model_names = [], [], []
     for model_name, (aucs, accs) in all_auc_acc_data.items():
@@ -424,14 +437,15 @@ def merge_groups(group_data):
         avg_accs.append(np.mean(accs))
         model_names.append(model_name)
 
-    new_score_data = defaultdict(lambda: (dict(), dict(), dict()))
-    for wrong_penalty, (thresholds, our_scores, base_scores) in all_score_data.items():
+    new_score_data = defaultdict(lambda: (dict(), dict(), dict(), dict()))
+    for wrong_penalty, (thresholds, our_scores, base_scores, pcts_abstained) in all_score_data.items():
         for model in thresholds:
-            thresh_list, our_scores_list, base_scores_list = thresholds[model], our_scores[model], base_scores[model]
-            new_thresh, new_our_score, new_base_score = np.mean(thresh_list), np.mean(our_scores_list), np.mean(base_scores_list)
+            thresh_list, our_scores_list, base_scores_list, pct_abstained_list = thresholds[model], our_scores[model], base_scores[model], pcts_abstained[model]
+            new_thresh, new_our_score, new_base_score, new_pct_abstained = np.mean(thresh_list), np.mean(our_scores_list), np.mean(base_scores_list), np.mean(pct_abstained_list)
             new_score_data[wrong_penalty][0][model] = new_thresh
             new_score_data[wrong_penalty][1][model] = new_our_score
             new_score_data[wrong_penalty][2][model] = new_base_score
+            new_score_data[wrong_penalty][3][model] = new_pct_abstained
     return new_score_data, avg_aucs, avg_accs, model_names
 
 def make_model_dict(score_data, aucs, accs, model_names):
@@ -440,9 +454,9 @@ def make_model_dict(score_data, aucs, accs, model_names):
     for i, model_name in enumerate(model_names):
         model_score_data = dict()
         for wrong_penalty in score_data:
-            thresholds, our_scores, base_scores = score_data[wrong_penalty]
-            thresh, our_score, base_score = thresholds[model_name], our_scores[model_name], base_scores[model_name]
-            model_score_data[wrong_penalty] = (thresh, our_score, base_score)
+            thresholds, our_scores, base_scores, pcts_abstained = score_data[wrong_penalty]
+            thresh, our_score, base_score, pct_abstained = thresholds[model_name], our_scores[model_name], base_scores[model_name], pcts_abstained[model_name]
+            model_score_data[wrong_penalty] = (thresh, our_score, base_score, pct_abstained)
         model_results[model_name] = (aucs[i], accs[i], model_score_data)
     return model_results
 
@@ -535,6 +549,7 @@ def main():
                         dset = '' if len(datasets_to_analyze) > 1 else datasets_to_analyze[0]
                         make_auroc_table(msp_group, max_logit_group, new_output_dir, dataset=dset)
                         make_score_table(msp_group, max_logit_group, new_output_dir, dataset=dset)
+                        make_score_table(msp_group, max_logit_group, new_output_dir, dataset=dset, pct_abstained=True)
                         
     # Finally, compare normed vs raw logits, averaged over the two prompts
     try:
@@ -550,6 +565,7 @@ def main():
         dset = '' if len(datasets_to_analyze) > 1 else datasets_to_analyze[0]
         make_auroc_table(new_group1, new_group2, new_output_dir, dset)
         make_score_table(new_group1, new_group2, new_output_dir, dset)
+        make_score_table(new_group1, new_group2, new_output_dir, dset, pct_abstained=True)
     except KeyError:
         print("\nCouldn't find the right groups for the overall average plot, skipping.\n")
 
