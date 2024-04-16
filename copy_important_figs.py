@@ -53,6 +53,7 @@ def main():
         file_list += [cross_group_dir + f'/no_abst_{overall_cross_group_dir}/pct_abstained_table']
         file_list += [f'{input_dir}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_auroc_table' for dataset in datasets]
         file_list += [f'{input_dir}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_score_table' for dataset in datasets]
+        file_list += [f'{input_dir}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_pct_abstained_table' for dataset in datasets]
     copy_files(output_dir, file_list)
 
 main()

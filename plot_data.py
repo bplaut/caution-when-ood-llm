@@ -194,7 +194,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
             pcts_abstained = []
             for thresh in thresholds:
                 scores.append(compute_score(labels, conf_levels, total_qs, thresh, wrong_penalty))
-                pcts_abstained.append(np.mean([1 if conf < thresh else 0 for conf in conf_levels]))
+                pcts_abstained.append(make_pct(np.mean([1 if conf < thresh else 0 for conf in conf_levels])))
             all_scores[model][dataset] = scores
             all_pcts_abstained[model][dataset] = pcts_abstained
             
@@ -241,7 +241,7 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
               + '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\cmidrule(lr){3-4} \\cmidrule(lr){5-6} \n')
     caption = 'AUROC results for %s. See Table~\\ref{tab:arc_auroc} for more explanation.' % format_dataset_name(dataset)
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header=header)
+    make_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}auroc', filename=f'{dataset_for_label}auroc_table.tex', header=header)
 
 def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='', pct_abstained=False):
     # If pct_abstained=True, we'll write the pct_abstained instead of the score
@@ -270,7 +270,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     caption = 'Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' % format_dataset_name(dataset)
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     filename = dataset_for_label + ('pct_abstained' if pct_abstained else 'score') + '_table.tex'
-    make_results_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}score', filename=filename, header=header)
+    make_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}score', filename=filename, header=header)
 
 def calibration_plots(data, output_dir, strategy='uniform'):
     plt.figure()
@@ -321,7 +321,7 @@ def make_dataset_plots(all_data, output_dir):
     header = (' & & MSP & Max Logit \\\\ \n'
               + ' & '.join(column_names[1:]) + ' \\\\ \n'
               '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\cmidrule(lr){3-3} \\cmidrule(lr){4-4} \\\\ \n')
-    make_results_table(len(column_names), rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename=filename)
+    make_table(len(column_names), rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename=filename)
 
     # Make bar graph. Three segments on the x-axis: Q&A accuracy, MSP AUROC, Max Logit AUROC. Within each segment, one bar per dataset. So there should be three segments, each with 5 bars
     labels = ['Q&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
@@ -345,7 +345,7 @@ def make_dataset_plots(all_data, output_dir):
     print("Dataset bar graph saved -->", filepath)
     plt.close()
     
-def make_results_table(num_cols, rows, output_dir, caption='', label='', filename='table.tex', header=''):
+def make_table(num_cols, rows, output_dir, caption='', label='', filename='table.tex', header=''):
     filename = os.path.join(output_dir, filename)
     # Create directory if it doesn't exist
     if not os.path.exists(output_dir):
