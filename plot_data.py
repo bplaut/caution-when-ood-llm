@@ -276,19 +276,6 @@ def calibration_plots(data, output_dir, strategy='uniform'):
     plt.legend()
     finalize_plot(output_dir, 'msp', 'frac-correct', title_suffix=': Calibration', file_suffix=f'_{strategy}')
     
-def make_percentile_conf_table(data, output_dir, dataset=''):
-    rows = []
-    percentiles = [10,50,90]
-    for model in sort_models(list(data.keys())):
-        (labels, conf_levels, _) = data[model]
-        percentile_vals = [make_pct(x) for x in np.percentile(conf_levels, percentiles)]
-        rows.append([expand_model_name(model)] + percentile_vals)
-    column_names = ['LLM'] + [f'{x}th' for x in percentiles]
-    header = '& \\multicolumn{3}{c}{Confidence level percentiles} \\\\ \n'
-    dataset_for_caption = '' if dataset == '' else f' for {format_dataset_name(dataset)}'
-    dataset_for_label = '' if dataset == '' else f'{dataset}_'
-    make_results_table(len(column_names), rows, output_dir, caption=f'Percentile confidence levels{dataset_for_caption}.', label=f'tab:{dataset_for_label}percentile_conf', filename=f'{dataset_for_label}conf_distribution.tex', header=header)
-
 def make_dataset_plots(all_data, output_dir):
     # one entry per dataset, containing avg acc, avg MSP auc, and avg max logit auc
     # all_data[group][dataset][model] = (labels, conf_levels, total_qs)
@@ -520,7 +507,6 @@ def main():
             
     # Non-group based plots
     make_dataset_plots(all_data, output_dir)
-    make_percentile_conf_table(collapse_data_to_model(all_data), output_dir)
     calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='uniform')
     calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='quantile')
 
