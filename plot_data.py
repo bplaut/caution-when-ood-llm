@@ -55,7 +55,7 @@ def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', t
     if ylabel == 'auc':
         plt.ylim([50, 88])
     if ylabel in ('score', 'harsh-score'):
-        plt.ylim([-15, 75])
+        plt.ylim([-15, 80])
 
     adjust_text(texts) # Must do this after setting ylim and xlim
 
@@ -264,13 +264,14 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             else:
                 rows[-1].extend([base_score_msp, score_msp, score_ml])
     column_names = ['LLM', 'Base', 'MSP', 'Max Logit', 'Base', 'MSP', 'Max Logit']
-    header = ('& \\multicolumn{3}{c|}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
+    header = ('& \\multicolumn{3}{c}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
               + ' & '.join(column_names) + ' \\\\ \n'
               + '\\cmidrule(lr){1-1}\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}\\ \\ \n')
     caption = 'Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' % format_dataset_name(dataset)
+    label = f'tab:{dataset}_score' if not pct_abstained else f'tab:{dataset}_pct_abstained'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     filename = dataset_for_label + ('pct_abstained' if pct_abstained else 'score') + '_table.tex'
-    make_table(len(column_names), rows, output_dir, caption=caption, label=f'tab:{dataset_for_label}score', filename=filename, header=header)
+    make_table(len(column_names), rows, output_dir, caption=caption, label=label, filename=filename, header=header)
 
 def calibration_plots(data, output_dir, strategy='uniform'):
     plt.figure()
@@ -351,7 +352,7 @@ def make_table(num_cols, rows, output_dir, caption='', label='', filename='table
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     with open(filename, 'w') as f:
-        f.write('\\begin{table*}\n')
+        f.write('\\begin{table*}[h]\n')
         f.write('\\centering\n')
         f.write(f'\\caption{{{caption}}}\n')
         f.write(f'\\label{{{label}}}\n')
