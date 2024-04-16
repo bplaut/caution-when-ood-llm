@@ -32,7 +32,7 @@ def count_data_points(directory, filter_string=None):
 
 # Get directory path from command line argument, and possibly a string to filter the filenames
 if len(sys.argv) not in [2, 3]:
-    print("Usage: python script.py <directory_path> [filter string]")
+    print("Usage: python count_unparseable.py <directory_path> [filter string]")
     sys.exit(1)
 directory_path = sys.argv[1]
 filter_string = sys.argv[2] if len(sys.argv) == 3 else None
