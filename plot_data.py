@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
-from sklearn.calibration import calibration_curve
 import sys
 import os
 from collections import defaultdict
@@ -267,12 +266,38 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     header = ('& \\multicolumn{3}{c}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
               + ' & '.join(column_names) + ' \\\\ \n'
               + '\\cmidrule(lr){1-1}\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}\\ \\ \n')
-    caption = 'Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' % format_dataset_name(dataset)
+    caption = ('Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' if not pct_abstained else 'Frequency of abstention on %s in the Section~\\ref{sec:abstain} experiments.') % format_dataset_name(dataset)
     label = f'tab:{dataset}_score' if not pct_abstained else f'tab:{dataset}_pct_abstained'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
     filename = dataset_for_label + ('pct_abstained' if pct_abstained else 'score') + '_table.tex'
     make_table(len(column_names), rows, output_dir, caption=caption, label=label, filename=filename, header=header)
 
+def get_bins_bounds(conf_levels, n_bins=10, strategy='uniform'):
+    if strategy == 'uniform':
+        return np.linspace(0, 1, n_bins+1)
+    else:
+        return np.quantile(conf_levels, np.linspace(0, 1, n_bins+1))
+
+def calibration_curve(labels, conf_levels, n_bins=10, strategy='uniform'):
+    bin_bounds = get_bins_bounds(conf_levels, n_bins=n_bins, strategy=strategy)
+    (bin_bounds[0], bin_bounds[-1]) = (0, 1) # sometimes np.quantile is a bit weird
+    bin_lengths = np.array([bin_bounds[i+1] - bin_bounds[i] for i in range(len(bin_bounds)-1)])
+    bin_correct = np.zeros(n_bins)
+    bin_total = np.zeros(n_bins)
+    bin_conf_sum = np.zeros(n_bins)
+    for i in range(len(labels)):
+        for j in range(n_bins):
+            if bin_bounds[j] <= conf_levels[i] < bin_bounds[j+1]:
+                bin_total[j] += 1
+                bin_correct[j] += labels[i]
+                bin_conf_sum[j] += conf_levels[i]
+                break
+    # remove empty bins
+    bin_lengths = bin_lengths[bin_total > 0]
+    bin_pct_correct = bin_correct[bin_total > 0] / bin_total[bin_total > 0]
+    bin_avg = bin_conf_sum[bin_total > 0] / bin_total[bin_total > 0]
+    return bin_pct_correct, bin_avg, bin_lengths
+    
 def calibration_plots(data, output_dir, strategy='uniform', n_bins=10):
     plt.figure()
     for model in data:
@@ -281,8 +306,10 @@ def calibration_plots(data, output_dir, strategy='uniform', n_bins=10):
         (linestyle, color) = style_per_model[model]
 
         labels, conf_levels, _ = data[model]
-        pct_correct, msp = calibration_curve(labels, conf_levels, n_bins=n_bins, strategy=strategy)
-        plt.plot(msp, pct_correct, label=expand_model_name(model), linestyle=linestyle, linewidth=2, color=color)
+        pct_correct, avg_msp, _ = calibration_curve(labels, conf_levels, n_bins=n_bins, strategy=strategy)
+        if len(pct_correct) < n_bins:
+            print("Model", model, f"has {n_bins-len(pct_correct)} empty bins, out of {n_bins} total bins.")
+        plt.plot(avg_msp, pct_correct, label=expand_model_name(model), linestyle=linestyle, linewidth=2, color=color)
     # Add black line on the diagonal to represent perfect calibration
     plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='-')
     make_and_sort_legend()
@@ -293,11 +320,11 @@ def make_calibration_table(data, output_dir, strategy='uniform', n_bins=10):
     rows = []
     for model in sort_models(data.keys()):
         labels, conf_levels, _ = data[model]
-        pct_correct, msp = calibration_curve(labels, conf_levels, n_bins=n_bins, strategy=strategy)
-        absolute_error = np.mean(np.abs(pct_correct - msp))
-        rms_error = np.sqrt(np.mean((pct_correct - msp)**2))
-        rows.append([expand_model_name(model), absolute_error, rms_error])
-    column_names = ['LLM', 'Absolute Error', 'RMS Error']
+        pct_correct, avg_msp, bin_lengths = calibration_curve(labels, conf_levels, n_bins=n_bins, strategy=strategy)
+        absolute_error = np.sum(abs(pct_correct - avg_msp) * bin_lengths) / np.sum(bin_lengths)
+        # sum of bin lengths might not be 1 if some are empty
+        rows.append([expand_model_name(model), absolute_error])
+    column_names = ['LLM', 'Expected calibration error']
     header = (' & '.join(column_names) + ' \\\\ \n'
               '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\\\ \n')
     caption = 'Calibration Error for each model. See Table~\\ref{tab:calibration} for more explanation.'
@@ -536,10 +563,11 @@ def main():
             
     # Non-group based plots
     make_dataset_plots(all_data, output_dir)
-    calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='uniform')
-    calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='quantile')
-    make_calibration_table(collapse_data_to_model(all_data), output_dir, strategy='uniform')
-    make_calibration_table(collapse_data_to_model(all_data), output_dir, strategy='quantile')
+    n_bins = 10
+    calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='uniform', n_bins=n_bins)
+    calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='quantile', n_bins=n_bins)
+    make_calibration_table(collapse_data_to_model(all_data), output_dir, strategy='uniform', n_bins=n_bins)
+    make_calibration_table(collapse_data_to_model(all_data), output_dir, strategy='quantile', n_bins=n_bins)
 
     # Single group plots
     group_data = dict()
