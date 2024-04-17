@@ -273,7 +273,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     filename = dataset_for_label + ('pct_abstained' if pct_abstained else 'score') + '_table.tex'
     make_table(len(column_names), rows, output_dir, caption=caption, label=label, filename=filename, header=header)
 
-def calibration_plots(data, output_dir, strategy='uniform'):
+def calibration_plots(data, output_dir, strategy='uniform', n_bins=10):
     plt.figure()
     for model in data:
         if model not in style_per_model:
@@ -281,13 +281,27 @@ def calibration_plots(data, output_dir, strategy='uniform'):
         (linestyle, color) = style_per_model[model]
 
         labels, conf_levels, _ = data[model]
-        pct_correct, msp = calibration_curve(labels, conf_levels, n_bins=10, strategy=strategy)
+        pct_correct, msp = calibration_curve(labels, conf_levels, n_bins=n_bins, strategy=strategy)
         plt.plot(msp, pct_correct, label=expand_model_name(model), linestyle=linestyle, linewidth=2, color=color)
     # Add black line on the diagonal to represent perfect calibration
     plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='-')
     make_and_sort_legend()
     plt.legend()
     finalize_plot(output_dir, 'msp', 'frac-correct', title_suffix=': Calibration', file_suffix=f'_{strategy}')
+
+def make_calibration_table(data, output_dir, strategy='uniform', n_bins=10):
+    rows = []
+    for model in sort_models(data.keys()):
+        labels, conf_levels, _ = data[model]
+        pct_correct, msp = calibration_curve(labels, conf_levels, n_bins=n_bins, strategy=strategy)
+        absolute_error = np.mean(np.abs(pct_correct - msp))
+        rms_error = np.sqrt(np.mean((pct_correct - msp)**2))
+        rows.append([expand_model_name(model), absolute_error, rms_error])
+    column_names = ['LLM', 'Absolute Error', 'RMS Error']
+    header = (' & '.join(column_names) + ' \\\\ \n'
+              '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\\\ \n')
+    caption = 'Calibration Error for each model. See Table~\\ref{tab:calibration} for more explanation.'
+    make_table(len(column_names), rows, output_dir, caption=caption, label='tab:calibration', filename=f'calibration_table_{strategy}.tex', header=header, precision=2)
     
 def make_dataset_plots(all_data, output_dir):
     # one entry per dataset, containing avg acc, avg MSP auc, and avg max logit auc
@@ -346,7 +360,7 @@ def make_dataset_plots(all_data, output_dir):
     print("Dataset bar graph saved -->", filepath)
     plt.close()
     
-def make_table(num_cols, rows, output_dir, caption='', label='', filename='table.tex', header=''):
+def make_table(num_cols, rows, output_dir, caption='', label='', filename='table.tex', header='', precision=1):
     filename = os.path.join(output_dir, filename)
     # Create directory if it doesn't exist
     if not os.path.exists(output_dir):
@@ -360,8 +374,8 @@ def make_table(num_cols, rows, output_dir, caption='', label='', filename='table
         f.write('\\toprule\n')
         f.write(header)
         for row in rows:
-            # round floats to 1 decimal place, but if it's -0.0, make it 0.0
-            row = [str(round(x, 1)) if isinstance(x, float) else str(x) for x in row]
+            # round floats to {precision} decimal place, but if it's -0.0, make it 0.0
+            row = [str(round(x, precision)) if isinstance(x, float) else str(x) for x in row]
             row = [x.replace('-0.0', '0.0') for x in row]
             f.write(' & '.join(row) + '\\\\\n')
         f.write('\\bottomrule\n')
@@ -524,6 +538,8 @@ def main():
     make_dataset_plots(all_data, output_dir)
     calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='uniform')
     calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='quantile')
+    make_calibration_table(collapse_data_to_model(all_data), output_dir, strategy='uniform')
+    make_calibration_table(collapse_data_to_model(all_data), output_dir, strategy='quantile')
 
     # Single group plots
     group_data = dict()
