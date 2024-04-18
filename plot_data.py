@@ -404,7 +404,7 @@ def make_table(num_cols, rows, output_dir, caption='', label='', filename='table
             # round floats to {precision} decimal place, but if it's -0.0, make it 0.0
             row = [str(round(x, precision)) if isinstance(x, float) else str(x) for x in row]
             row = [x.replace('-0.0', '0.0') for x in row]
-            row = ['~'* (4 - len(x)) + x for x in row] # Add padding
+            row = ['~'* (4 - len(x)) + x for x in row] # Add padding. If len(x) >= 4, this adds no padding
             f.write(' & '.join(row) + '\\\\\n')
         f.write('\\bottomrule\n')
         f.write('\\end{tabular}\n')
