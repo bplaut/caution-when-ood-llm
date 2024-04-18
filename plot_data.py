@@ -263,7 +263,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             else:
                 rows[-1].extend([base_score_msp, score_msp, score_ml])
     column_names = ['LLM', 'Base', 'MSP', 'Max Logit', 'Base', 'MSP', 'Max Logit']
-    header = ('& \\multicolumn{3}{c}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
+    header = ('& \\multicolumn{3}{c}{Balanced} & \\multicolumn{3}{c}{Conservative} \\\\ \n'
               + ' & '.join(column_names) + ' \\\\ \n'
               + '\\cmidrule(lr){1-1}\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}\\ \\ \n')
     caption = ('Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' if not pct_abstained else 'Frequency of abstention on %s in the Section~\\ref{sec:abstain} experiments.') % format_dataset_name(dataset)
@@ -404,7 +404,6 @@ def make_table(num_cols, rows, output_dir, caption='', label='', filename='table
             # round floats to {precision} decimal place, but if it's -0.0, make it 0.0
             row = [str(round(x, precision)) if isinstance(x, float) else str(x) for x in row]
             row = [x.replace('-0.0', '0.0') for x in row]
-            row = ['~'* (4 - len(x)) + x for x in row] # Add padding. If len(x) >= 4, this adds no padding
             f.write(' & '.join(row) + '\\\\\n')
         f.write('\\bottomrule\n')
         f.write('\\end{tabular}\n')
