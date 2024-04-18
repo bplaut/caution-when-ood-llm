@@ -38,9 +38,9 @@ def expand_model_name(name):
     base_expanded = ('Mistral 7B' if base == 'Mistral' else
                      'Mixtral 8x7B' if base == 'Mixtral' else
                      'SOLAR 10.7B' if base == 'Solar' else
-                     'Llama2 13B' if base == 'Llama-13b' else
-                     'Llama2 7B' if base == 'Llama-7b' else
-                     'Llama2 70B' if base == 'Llama-70b' else
+                     'LLaMA 2 13B' if base == 'Llama-13b' else
+                     'LLaMA 2 7B' if base == 'Llama-7b' else
+                     'LLaMA 2 70B' if base == 'Llama-70b' else
                      'Yi 6B' if base == 'Yi-6b' else
                      'Yi 34B' if base == 'Yi-34b' else
                      'GPT3.5 Turbo' if base == 'gpt-3.5-turbo' else
@@ -71,7 +71,7 @@ def model_size(name):
         return -1
     else:
         full_name = expand_model_name(name)
-        size_term = full_name.split(' ')[1]
+        size_term = full_name.split(' ')[-1]
         end_of_size_term = size_term.rfind('B')
     return float(size_term[:end_of_size_term])
 
