@@ -404,6 +404,7 @@ def make_table(num_cols, rows, output_dir, caption='', label='', filename='table
             # round floats to {precision} decimal place, but if it's -0.0, make it 0.0
             row = [str(round(x, precision)) if isinstance(x, float) else str(x) for x in row]
             row = [x.replace('-0.0', '0.0') for x in row]
+            row = ['~'* (4 - len(x)) + x for x in row] # Add padding
             f.write(' & '.join(row) + '\\\\\n')
         f.write('\\bottomrule\n')
         f.write('\\end{tabular}\n')
@@ -421,9 +422,10 @@ def plots_for_group(data, output_dir):
             combined = list(zip(labels, conf_levels))
             random.shuffle(combined)
             labels, conf_levels = zip(*combined)
-            n = len(labels)
-            train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2], total_qs/2)
-            test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:], total_qs/2)
+            # total_qs can differ from len(labels) == len(conf_levels) if we allowed the base LLM to abstain, because total_qs counts abstentions but len(labels) doesn't. But we're just using no-abstention data, so we can ignore this.
+            num_train = 20
+            train_data[dataset][model] = (labels[:num_train], conf_levels[:num_train], num_train)
+            test_data[dataset][model] = (labels[num_train:], conf_levels[num_train:], total_qs - num_train)
             
     # ROC plots (also collecting auc data)
     all_aucs = dict()
