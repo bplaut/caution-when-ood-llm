@@ -263,7 +263,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             else:
                 rows[-1].extend([base_score_msp, score_msp, score_ml])
     column_names = ['LLM', 'Base', 'MSP', 'Max Logit', 'Base', 'MSP', 'Max Logit']
-    header = ('& \\multicolumn{3}{c}{Balanced Score} & \\multicolumn{3}{c}{Conservative Score} \\\\ \n'
+    header = ('& \\multicolumn{3}{c}{Balanced} & \\multicolumn{3}{c}{Conservative} \\\\ \n'
               + ' & '.join(column_names) + ' \\\\ \n'
               + '\\cmidrule(lr){1-1}\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}\\ \\ \n')
     caption = ('Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' if not pct_abstained else 'Frequency of abstention on %s in the Section~\\ref{sec:abstain} experiments.') % format_dataset_name(dataset)
@@ -421,9 +421,10 @@ def plots_for_group(data, output_dir):
             combined = list(zip(labels, conf_levels))
             random.shuffle(combined)
             labels, conf_levels = zip(*combined)
-            n = len(labels)
-            train_data[dataset][model] = (labels[:n//2], conf_levels[:n//2], total_qs/2)
-            test_data[dataset][model] = (labels[n//2:], conf_levels[n//2:], total_qs/2)
+            # total_qs can differ from len(labels) == len(conf_levels) if we allowed the base LLM to abstain, because total_qs counts abstentions but len(labels) doesn't. But we're just using no-abstention data, so we can ignore this.
+            num_train = 20
+            train_data[dataset][model] = (labels[:num_train], conf_levels[:num_train], num_train)
+            test_data[dataset][model] = (labels[num_train:], conf_levels[num_train:], total_qs - num_train)
             
     # ROC plots (also collecting auc data)
     all_aucs = dict()
