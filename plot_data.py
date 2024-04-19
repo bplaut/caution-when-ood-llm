@@ -54,7 +54,7 @@ def finalize_plot(output_dir, xlabel, ylabel, title_suffix='', file_suffix='', t
     if ylabel == 'auc':
         plt.ylim([50, 88])
     if ylabel in ('score', 'harsh-score'):
-        plt.ylim([-15, 80])
+        plt.ylim([-15, 78])
 
     adjust_text(texts) # Must do this after setting ylim and xlim
 
@@ -321,7 +321,7 @@ def make_calibration_table(data, output_dir, strategy='uniform', n_bins=10):
     for model in sort_models(data.keys()):
         labels, conf_levels, _ = data[model]
         pct_correct, avg_msp, bin_lengths = calibration_curve(labels, conf_levels, n_bins=n_bins, strategy=strategy)
-        absolute_error = np.sum(abs(pct_correct - avg_msp) * bin_lengths) / np.sum(bin_lengths)
+        absolute_error = np.mean(abs(pct_correct - avg_msp))
         # sum of bin lengths might not be 1 if some are empty
         rows.append([expand_model_name(model), absolute_error])
     column_names = ['LLM', 'Expected calibration error']
