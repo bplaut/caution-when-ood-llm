@@ -307,9 +307,10 @@ def calibration_plots(data, output_dir, strategy='uniform', n_bins=10):
 
         labels, conf_levels, _ = data[model]
         pct_correct, avg_msp, _ = calibration_curve(labels, conf_levels, n_bins=n_bins, strategy=strategy)
+        absolute_error = f'{np.mean(abs(pct_correct - avg_msp)):.2f}'
         if len(pct_correct) < n_bins:
             print("Model", model, f"has {n_bins-len(pct_correct)} empty bins, out of {n_bins} total bins.")
-        plt.plot(avg_msp, pct_correct, label=expand_model_name(model), linestyle=linestyle, linewidth=2, color=color)
+        plt.plot(avg_msp, pct_correct, label=f'{expand_model_name(model)}: {absolute_error}', linestyle=linestyle, linewidth=2, color=color)
     # Add black line on the diagonal to represent perfect calibration
     plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='-')
     make_and_sort_legend()
