@@ -265,7 +265,7 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     column_names = ['LLM', 'Base', 'MSP', 'Max Logit', 'Base', 'MSP', 'Max Logit']
     header = ('& \\multicolumn{3}{c}{Balanced} & \\multicolumn{3}{c}{Conservative} \\\\ \n'
               + ' & '.join(column_names) + ' \\\\ \n'
-              + '\\cmidrule(lr){1-1}\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}\\ \\ \n')
+              + '\\cmidrule(lr){1-1}\\cmidrule(lr){2-4}\\cmidrule(lr){5-7} \n')
     caption = ('Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' if not pct_abstained else 'Frequency of abstention on %s in the Section~\\ref{sec:abstain} experiments.') % format_dataset_name(dataset)
     label = f'tab:{dataset}_score' if not pct_abstained else f'tab:{dataset}_pct_abstained'
     dataset_for_label = '' if dataset == '' else f'{dataset}_'
@@ -326,7 +326,7 @@ def make_calibration_table(data, output_dir, strategy='uniform', n_bins=10):
         rows.append([expand_model_name(model), absolute_error])
     column_names = ['LLM', 'Expected calibration error']
     header = (' & '.join(column_names) + ' \\\\ \n'
-              '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\\\ \n')
+              '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \n')
     caption = 'Calibration Error for each model. See Table~\\ref{tab:calibration} for more explanation.'
     make_table(len(column_names), rows, output_dir, caption=caption, label='tab:calibration', filename=f'calibration_table_{strategy}.tex', header=header, precision=2)
     
@@ -362,7 +362,7 @@ def make_dataset_plots(all_data, output_dir):
     filename = prefix + '_dataset.tex'
     header = (' & & MSP & Max Logit \\\\ \n'
               + ' & '.join(column_names[1:]) + ' \\\\ \n'
-              '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\cmidrule(lr){3-3} \\cmidrule(lr){4-4} \\\\ \n')
+              '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\cmidrule(lr){3-3} \\cmidrule(lr){4-4}\n')
     make_table(len(column_names), rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename=filename)
 
     # Make bar graph. Three segments on the x-axis: Q&A accuracy, MSP AUROC, Max Logit AUROC. Within each segment, one bar per dataset. So there should be three segments, each with 5 bars
