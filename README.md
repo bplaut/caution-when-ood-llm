@@ -70,10 +70,11 @@ Finally, it is tedious to call these python files individually for all the combi
 ```
 ./run_qa_tests.sh <comma-separated model names> <comma-separated dataset names> <comma-separated question ranges> prompt_phrasing abstain_option
 ```
-For example,
+For example, to run all of the experiments for the first prompt phrasing, the command would be
 ```
-./run_qa_tests.sh Mistral,Llama-13b,Llama-70b arc,truthfulqa 0-500,500-1000 0 False
+./run_qa_tests.sh Llama-7b,Llama-13b,Llama-70b,Falcon-7b,Falcon-40b,Mistral,Mixtral,Solar,Yi-6b,Yi-34b,gpt-3.5-turbo,gpt-4-turbo arc,hellaswag,mmlu,truthfulqa,winogrande 0-1000,1000-2000,2000-3000,3000-4000,4000-5000,5000-6000 0 False
 ```
+To run the second prompt, one would replace the final 0 with 1. Note that although we enabled the ability to include an "I don't know" option in the answer choices, the final experiments all have abstain_option=False.
 2. do_post_processing.sh, which calls plot_data.py, copy_important_figs.py, and statistal_tests.py. Usage:
 ```
 ./do_post_processing <directory> <collapse_prompts> <incl_unparseable>
@@ -85,4 +86,4 @@ For example,
 Currently, results_analysis.ipynb is not called by the scripts and must be run separately.
 
 # Resource requirements
-We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 70B) taking up 129 GB. With three A6000 GPUs, it took us about 2 weeks to run all of the experiments from start to finish: ten models X five datasets X 6000 questions X two prompt phrasings X {no abstain option, yes abstain option}.
+We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 70B) taking up 129 GB. With two A6000 GPUs, it took us about two weeks to run all of the experiments from start to finish: twelve models X five datasets X 6000 questions X two prompt phrasings.
