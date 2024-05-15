@@ -75,6 +75,7 @@ For example, to run all of the experiments for the first prompt phrasing, the co
 ./run_qa_tests.sh Llama-7b,Llama-13b,Llama-70b,Falcon-7b,Falcon-40b,Mistral,Mixtral,Solar,Yi-6b,Yi-34b,gpt-3.5-turbo,gpt-4-turbo arc,hellaswag,mmlu,truthfulqa,winogrande 0-1000,1000-2000,2000-3000,3000-4000,4000-5000,5000-6000 0 False
 ```
 To run the second prompt, one would replace the final 0 with 1. Note that although we enabled the ability to include an "I don't know" option in the answer choices, the final experiments all have abstain_option=False.
+
 2. do_post_processing.sh, which calls plot_data.py, copy_important_figs.py, and statistal_tests.py. Usage:
 ```
 ./do_post_processing <directory> <collapse_prompts> <incl_unparseable>
@@ -83,6 +84,8 @@ For example,
 ```
 ./do_post_processing results False True
 ```
+The final analysis was run with collapse_prompts=False and incl_unparseable=True. These choices are discussed in the paper.
+
 Currently, results_analysis.ipynb is not called by the scripts and must be run separately.
 
 # Resource requirements
