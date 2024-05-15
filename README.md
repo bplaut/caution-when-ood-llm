@@ -87,3 +87,6 @@ Currently, results_analysis.ipynb is not called by the scripts and must be run s
 
 # Resource requirements
 We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 70B) taking up 129 GB. With two A6000 GPUs, it took us about two weeks to run all of the experiments from start to finish: twelve models X five datasets X 6000 questions X two prompt phrasings.
+
+# Output files
+In addition to the code required to run the experiments, we have also included the output files: the main_results directory contains the raw results and the stat_tests_output contains the results of the statistical analysis.
