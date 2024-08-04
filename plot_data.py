@@ -100,13 +100,15 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
         print("slope, r_value, p_value for", xlabel, ylabel, "is", slope, r_value, p_value)
         plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
-        plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else group
+        plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else '' if group == 'main_figs' else group
         plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
         file_suffix = f"_{dataset}_{plot_name.replace(' ','_').replace(',','')}"
+        if file_suffix.endswith('_'):
+            file_suffix = file_suffix[:-1]
         finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=file_suffix, texts=texts)
     except ValueError as e:
         print("ValueError when running linear regression on", xlabel, ylabel, ":", e)
-        
+
            
 def auc_acc_plots(data, all_aucs, output_dir):
     model_aucs, model_accs = defaultdict(list), defaultdict(list)
@@ -298,8 +300,9 @@ def calibration_curve(labels, conf_levels, n_bins=10, strategy='uniform'):
     bin_pct_correct = bin_correct[bin_total > 0] / bin_total[bin_total > 0]
     bin_avg = bin_conf_sum[bin_total > 0] / bin_total[bin_total > 0]
     return bin_pct_correct, bin_avg, bin_lengths
-    
-def calibration_plots(data, output_dir, strategy='uniform', n_bins=10):
+
+def calibration_plot(data, output_dir, strategy='quantile', n_bins=10):
+    # strategy is either 'quantile' or 'uniform'
     plt.figure()
     for model in sort_models(data.keys()):
         if model not in style_per_model:
@@ -318,7 +321,7 @@ def calibration_plots(data, output_dir, strategy='uniform', n_bins=10):
     plt.legend()
     finalize_plot(output_dir, 'msp', 'frac-correct', title_suffix=': Calibration', file_suffix=f'_{strategy}')
 
-def make_calibration_table(data, output_dir, strategy='uniform', n_bins=10):
+def make_calibration_table(data, output_dir, strategy='quantile', n_bins=10):
     rows = []
     for model in sort_models(data.keys()):
         labels, conf_levels, _ = data[model]
@@ -331,6 +334,32 @@ def make_calibration_table(data, output_dir, strategy='uniform', n_bins=10):
               '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \n')
     caption = 'Calibration Error for each model. See Table~\\ref{tab:calibration} for more explanation.'
     make_table(len(column_names), rows, output_dir, caption=caption, label='tab:calibration', filename=f'calibration_table_{strategy}.tex', header=header, precision=2)
+
+def calibration_acc_plot(data, output_dir, strategy='uniform', n_bins=10):
+    model_data = defaultdict(lambda: [])
+    for group in data:
+        if 'norm' in group:
+            for dataset in data[group]:
+                for model in data[group][dataset]:
+                    labels, conf_levels, _ = data[group][dataset][model]
+                    pct_correct, avg_msp, _ = calibration_curve(labels, conf_levels, n_bins=n_bins, strategy=strategy)
+                    absolute_error = np.mean(abs(pct_correct - avg_msp))
+                    accuracy = make_pct(np.mean(labels))
+                    model_data[model].append((accuracy, absolute_error))
+
+    avg_accs, avg_calib_errors, model_names = [], [], []
+    for model in sort_models(model_data.keys()):
+        (accs, calib_errors) = zip(*model_data[model])
+        avg_acc = np.mean(accs)
+        avg_calib_error = np.mean(calib_errors)
+        avg_accs.append(avg_acc)
+        avg_calib_errors.append(avg_calib_error)
+        model_names.append(model)
+
+    dataset_name = 'all datasets'
+    model_sizes = [model_size(model) for model in model_names]
+    scatter_plot(avg_accs, avg_calib_errors, output_dir, model_names, 'acc', 'calib', dataset_name)
+    scatter_plot(model_sizes, avg_calib_errors, output_dir, model_names, 'size', 'calib', dataset_name)
     
 def make_dataset_plots(all_data, output_dir):
     # one entry per dataset, containing avg acc, avg MSP auc, and avg max logit auc
@@ -566,11 +595,9 @@ def main():
             
     # Non-group based plots
     make_dataset_plots(all_data, output_dir)
-    n_bins = 10
-    calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='uniform', n_bins=n_bins)
-    calibration_plots(collapse_data_to_model(all_data), output_dir, strategy='quantile', n_bins=n_bins)
-    make_calibration_table(collapse_data_to_model(all_data), output_dir, strategy='uniform', n_bins=n_bins)
-    make_calibration_table(collapse_data_to_model(all_data), output_dir, strategy='quantile', n_bins=n_bins)
+    calibration_plot(collapse_data_to_model(all_data), output_dir)
+    make_calibration_table(collapse_data_to_model(all_data), output_dir)
+    calibration_acc_plot(all_data, output_dir)
 
     # Single group plots
     group_data = dict()

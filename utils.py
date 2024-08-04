@@ -58,6 +58,7 @@ def expand_label(label):
                 'AUROC' if label == 'auc' else
                 'Fraction Correct' if label == 'frac-correct' else
                 'MSP' if label == 'msp' else
+                'Calibration Error' if label == 'calib' else
                 'Q&A Accuracy' if label == 'acc' else label)
 
 # Each model name is of the form "<model_series> <size>B. Mixtral is a slight exception, as are base (non-finetuned) models
