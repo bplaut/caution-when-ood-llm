@@ -48,7 +48,7 @@ def expand_model_name(name):
                      'GPT4' if base == 'gpt-4' else
                      'Falcon 7B' if base == 'Falcon-7b' else
                      'Falcon 40B' if base == 'Falcon-40b' else base)
-    return base_expanded + ' Raw' if name.endswith('-raw') else base_expanded
+    return base_expanded + ' base' if name.endswith('-raw') else base_expanded
 
 def expand_label(label):
         return ('Confidence Threshold' if label == 'conf' else
@@ -60,7 +60,7 @@ def expand_label(label):
                 'MSP' if label == 'msp' else
                 'Q&A Accuracy' if label == 'acc' else label)
 
-# Each model name is of the form "<model_series> <size>B. Mixtral is a slight exception 
+# Each model name is of the form "<model_series> <size>B. Mixtral is a slight exception, as are base (non-finetuned) models
 def model_series(name):
     return expand_model_name(name).split(' ')[0]
 
@@ -71,9 +71,10 @@ def model_size(name):
         return -1
     else:
         full_name = expand_model_name(name)
-        size_term = full_name.split(' ')[-1]
-        end_of_size_term = size_term.rfind('B')
-    return float(size_term[:end_of_size_term])
+        end_of_size_term = full_name.rfind('B')
+        main_name = full_name[:end_of_size_term]
+        size_term = main_name.split(' ')[-1]
+        return float(size_term)
 
 def sort_models(models):
     # Sort the rows by model series, then by model size. Also put OpenAI gpt models at the end

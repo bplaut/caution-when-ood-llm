@@ -142,7 +142,8 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
     # define twelve unique styles
 
     result_thresholds, result_scores, base_scores, pcts_abstained = dict(), dict(), dict(), dict()
-    for (model, xs, ys, pct_abstained_all_threshes) in data:
+    for model in sort_models(data.keys()):
+        (xs, ys, pct_abstained_all_threshes) = data[model]
         if model not in style_per_model:
             style_per_model[model] = (linestyles.pop(0), colors.pop(0))
         (linestyle, color) = style_per_model[model]
@@ -198,7 +199,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
             all_pcts_abstained[model][dataset] = pcts_abstained
             
     # Now for each model and threshold, average the score and the pct abstained across datasets
-    overall_results = []
+    overall_results = dict()
     for model in all_scores:
         scores_for_model = []
         pcts_abstained_for_model = []
@@ -210,7 +211,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
             avg_pct_abstained = np.mean(pct_abstained_per_dataset)
             scores_for_model.append(avg_score)
             pcts_abstained_for_model.append(avg_pct_abstained)
-        overall_results.append((model, thresholds, scores_for_model, pcts_abstained_for_model))
+        overall_results[model] = (thresholds, scores_for_model, pcts_abstained_for_model)
             
     dataset_name = 'all datasets' if len(datasets) > 1 else datasets[0]
     ylabel = 'score' if wrong_penalty == 1 else 'harsh-score' if wrong_penalty == 2 else f'Wrong penalty of {wrong_penalty}'
@@ -300,7 +301,7 @@ def calibration_curve(labels, conf_levels, n_bins=10, strategy='uniform'):
     
 def calibration_plots(data, output_dir, strategy='uniform', n_bins=10):
     plt.figure()
-    for model in data:
+    for model in sort_models(data.keys()):
         if model not in style_per_model:
             style_per_model[model] = (linestyles.pop(0), colors.pop(0))
         (linestyle, color) = style_per_model[model]
