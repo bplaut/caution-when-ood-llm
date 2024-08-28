@@ -95,15 +95,18 @@ class Test(object):
 
     def make_prompt(self, question_string, i):
         if self.args['few_shot_number'] > 0:
-            # Prepend this number of examples to the prompt
+            # add this number of examples to the prompt
             valid_example_indices = [j for j in range(len(self.questions)) if j != i]
             example_indices = random.sample(valid_example_indices, self.args['few_shot_number'])
             example_questions = [self.make_question(j) for j in example_indices]
+            few_shot_qs = ''.join([f"Example question {j+1}:\n{q}\nCorrect response: {a_letter}.\n\n" for (j, (q,_,a_letter,a_text)) in enumerate(example_questions)])
+            prefix = 'First, here are some example questions and the corresponding correct responses.' if self.args['few_shot_number'] > 1 else 'First, here is an example question and the corresponding correct response.'
+            few_shot_string = '\n\n' + prefix + '\n\n' + few_shot_qs + 'Now for the actual question:'
+        else:
+            few_shot_string = '\n\nQuestion:' if self.args['prompt_phrasing'] == 0 else 'Now here is the question:'
         if self.args['prompt_phrasing'] == 0:
-            prompt = f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
-
-Question:
-
+            prompt = f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation. {few_shot_string}
+            
 {question_string}
 
 Response:\n
@@ -111,7 +114,7 @@ Response:\n
             # For some reason the final newline makes Falcon-7b act really weird
             return prompt if self.args['model'] != 'Falcon-7b' else prompt[:-1]
         elif self.args['prompt_phrasing'] == 1:
-            return f"""You will be asked a multiple-choice question. Respond with the letter which corresponds to the correct answer, followed by a period. There is no need to provide an explanation, so your response should be very short. Now here is the question:
+            return f"""You will be asked a multiple-choice question. Respond with the letter which corresponds to the correct answer, followed by a period. There is no need to provide an explanation, so your response should be very short. {few_shot_string}
 
 {question_string}
 
