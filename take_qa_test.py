@@ -77,9 +77,17 @@ class Test(object):
                              else "Unparseable")
                     f.write(f"{g_str} {c}\n")
 
-    def make_question_string(self, choices, question):
+    def make_question_string(self, i):
+        question_data = self.questions[i]
+        choices_for_q = self.get_choices(question_data)
+        question = self.get_q(question_data)            
+        random.shuffle(choices_for_q)
+        # Shuffle before adding abstain option; that should always be last
+        if self.args['abstain_option']:
+            choices_for_q = choices_for_q + ["I don't know"]
+        
         if len(choices) > 25:
-            raise Exception("We only have 26 capital letters, so you can't have more than 26 answer options (including 'I don't know'")
+            raise Exception("We only have 26 capital letters, so you can't have more than 26 answer options (including 'I don't know'. Also why do you need that many?)")
         formatted_choices = [ascii_uppercase[i] + '. ' + ch for (i,ch) in enumerate(choices)]
         return question + '\n' + '\n'.join(formatted_choices)
 
@@ -151,18 +159,9 @@ Answer:
         question_strings = [None] * (num_prompts)
         correct_answers = [None] * (num_prompts)
         for i in range(start_q, end_q):
-            question_data = self.questions[i]
-            choices_for_q = self.get_choices(question_data)
-            question = self.get_q(question_data)
             correct_answer_text = choices_for_q[self.get_a(question_data)]
-            
-            random.shuffle(choices_for_q)
-            # Shuffle before adding abstain option; that should always be last
-            if self.args['abstain_option']:
-                choices_for_q = choices_for_q + ["I don't know"]
-                
             correct_answer = ascii_uppercase[choices_for_q.index(correct_answer_text)]
-            question_string = self.make_question_string(choices_for_q, question)
+            question_string = self.make_question_string(i)
             prompt = self.make_prompt(question_string)
             prompts[i - start_q] = prompt
             choices[i - start_q] = choices_for_q
