@@ -58,10 +58,6 @@ get_batch_size() {
     if [ "$dataset_name" = "mmlu" ]; then
         batch_size=$(( (batch_size + 2) / 3 ))
     fi
-    if [ "$dataset_name" = "piqa" ]; then
-	    batch_size=$(( (batch_size + 2) / 3 ))
-    fi
-
     echo "$batch_size"
 }
 
