@@ -102,15 +102,6 @@ Response:\n
 
 Answer:
 """
-        elif self.args['prompt_phrasing'] == 2:
-            return f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
-
-Question:
-
-{question_string}
-
-Response:
-"""
         else:
             raise Exception(f"Unknown phrasing option: {self.args['prompt_phrasing']}. Must be 0 or 1.")
     
