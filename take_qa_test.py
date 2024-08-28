@@ -93,7 +93,12 @@ class Test(object):
         question_string = question + '\n' + '\n'.join(formatted_choices)
         return (question_string, choices_for_q, correct_answer, correct_answer_text)
 
-    def make_prompt(self, question_string):
+    def make_prompt(self, question_string, i):
+        if self.args['few_shot_number'] > 0:
+            # Prepend this number of examples to the prompt
+            valid_example_indices = [j for j in range(len(self.questions)) if j != i]
+            example_indices = random.sample(valid_example_indices, self.args['few_shot_number'])
+            example_questions = [self.make_question(j) for j in example_indices]
         if self.args['prompt_phrasing'] == 0:
             prompt = f"""Below is a multiple-choice question. Choose the letter which best answers the question. Keep your response as brief as possible; just state the letter corresponding to your answer, followed by a period, with no explanation.
 
@@ -162,7 +167,7 @@ Answer:
         correct_answers = [None] * (num_prompts)
         for i in range(start_q, end_q):
             (question_string, choices_for_q, correct_answer, correct_answer_text) = self.make_question(i)
-            prompt = self.make_prompt(question_string)
+            prompt = self.make_prompt(question_string, i)
             prompts[i - start_q] = prompt
             choices[i - start_q] = choices_for_q
             question_strings[i - start_q] = question_string
