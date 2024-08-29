@@ -59,6 +59,7 @@ class Test(object):
         abstain_str = "_yes_abst" if self.args['abstain_option'] else "_no_abst"
         prompt_name = {0: "first", 1: "second", 2: "third"}[self.args['prompt_phrasing']]
         prompt_str = f"_{prompt_name}_prompt"
+        few_shot_str = '' if self.args['few_shot_number'] == 0 else f"_few_shot_{self.args['few_shot_number']}"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
         return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}.txt"
