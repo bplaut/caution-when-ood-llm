@@ -62,7 +62,7 @@ class Test(object):
         few_shot_str = '' if self.args['few_shot_number'] == 0 else f"_few_shot_{self.args['few_shot_number']}"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
-        return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}.txt"
+        return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}{few_shot_str}.txt"
         
     def write_output(self, grades, conf_levels_normed, conf_levels_raw):
         logit_strs = ["_norm_logits", "_raw_logits"]
