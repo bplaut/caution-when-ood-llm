@@ -100,7 +100,7 @@ class Test(object):
             valid_example_indices = [j for j in range(len(self.questions)) if j != i]
             example_indices = random.sample(valid_example_indices, self.args['few_shot_number'])
             example_questions = [self.make_question(j) for j in example_indices]
-            q_number_str = lambda x: f' x+1' if x > 1 else ''
+            q_number_str = lambda x: f' {x+1}' if x > 1 else ''
             few_shot_qs = ''.join([f"Example question{q_number_str(j)}:\n{q}\nCorrect response: {a_letter}.\n\n" for (j, (q,_,a_letter,a_text)) in enumerate(example_questions)])
             prefix = 'First, here are some example questions and the corresponding correct responses.' if self.args['few_shot_number'] > 1 else 'First, here is an example question and the corresponding correct response.'
             few_shot_string = '\n\n' + prefix + '\n\n' + few_shot_qs + 'Now for the actual question:'
