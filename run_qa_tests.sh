@@ -24,27 +24,6 @@ get_few_shot_number() {
         echo 0
     else
 	echo 1
-        # case "$dataset_name" in
-        #     "arc")
-        #         echo 25
-        #         ;;
-        #     "hellaswag")
-        #         echo 10
-        #         ;;
-        #     "mmlu")
-        #         echo 5
-        #         ;;
-        #     "truthfulqa")
-        #         echo 6
-        #         ;;
-        #     "winogrande")
-        #         echo 5
-        #         ;;
-        #     *)
-        #         echo 0
-        #         ;;
-        # esac
-    fi
 }
 
 # Function to determine batch_size based on model and dataset names
@@ -89,16 +68,10 @@ get_batch_size() {
             ;;
     esac
 
-    # For some datasets, adjust batch sizes. +2 to ensure that it doesn't go to 0
+    # For some datasets, adjust batch sizes. +3 to ensure that it doesn't go to 0
     if [ "$dataset_name" = "mmlu" ]; then
         batch_size=$(( (batch_size / 3) + 1 ))
     fi
-
-    # # Need to decrease batch size for few-shot prompting because the prompts are longer
-    # few_shot_number=$(get_few_shot_number "$dataset" "$few_shot")
-    # if [ "$few_shot" = "True" ]; then
-    # 		batch_size=$(( (4 * batch_size / few_shot_number) + 1 ))
-    # fi
 
     echo "$batch_size"
 }
