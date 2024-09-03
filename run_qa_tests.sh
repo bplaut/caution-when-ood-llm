@@ -82,7 +82,7 @@ get_batch_size() {
 	    batch_size=80
 	    ;;
         "Mistral")
-            batch_size=128
+            batch_size=102
             ;;
         *)
             batch_size=1 # Default value
@@ -97,7 +97,7 @@ get_batch_size() {
     # # Need to decrease batch size for few-shot prompting because the prompts are longer
     # few_shot_number=$(get_few_shot_number "$dataset" "$few_shot")
     # if [ "$few_shot" = "True" ]; then
-    # 		batch_size=$(( (2 * batch_size / few_shot_number) + 1 ))
+    # 		batch_size=$(( (4 * batch_size / few_shot_number) + 1 ))
     # fi
 
     echo "$batch_size"
