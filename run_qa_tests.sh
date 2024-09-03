@@ -24,6 +24,7 @@ get_few_shot_number() {
         echo 0
     else
 	echo 1
+    fi
 }
 
 # Function to determine batch_size based on model and dataset names
