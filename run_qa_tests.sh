@@ -59,10 +59,10 @@ get_batch_size() {
 	    batch_size=1
 	    ;;
         "Solar")
-	    batch_size=58
+	    batch_size=70
 	    ;;
         "Mistral")
-            batch_size=102
+            batch_size=128
             ;;
         *)
             batch_size=1 # Default value
@@ -73,6 +73,11 @@ get_batch_size() {
     if [ "$dataset_name" = "mmlu" ]; then
         batch_size=$(( (batch_size / 3) + 1 ))
     fi
+
+    # If few_shot is True, reduce batch size to 2/3 of the original value
+    if [ "$few_shot" = "True" ]; then
+		batch_size=$(( (batch_size * 2) / 3 ))
+	fi
 
     echo "$batch_size"
 }
