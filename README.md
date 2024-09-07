@@ -7,45 +7,43 @@ There are two main Python files:
 Both files support the same command line arguments (shown below), although some arguments are only relevant for one file. For example, --dataset is only used for take_qa_test.py.
 
 ```
-usage: generate_text.py/take_qa_test_<first/second>_prompt.py [-h] -m MODEL [-p PROMPTS] [-n MAX_NEW_TOKENS] [-k NUM_TOP_TOKENS] [-c] [-s]
-                        [-r NUM_RESPONSES] [-i] [-d DATASET] [-q QUESTION_RANGE] [-b BATCH_SIZE]
-                        [--abstain_option ABSTAIN_OPTION]
+usage: generate_text.py/take_qa_tests.py [-h] -m MODEL [-p PROMPTS] [-n MAX_NEW_TOKENS] [-k NUM_TOP_TOKENS] [-c] [-s]
+                       [-r NUM_RESPONSES] [-d DATASET] [-q QUESTION_RANGE] [-b BATCH_SIZE] [-a ABSTAIN_OPTION]
+                       [-g PROMPT_PHRASING] [-f FEW_SHOT_NUMBER]
 
 Perform text generation and Q&A tasks via Hugging Face models.
 
 options:
   -h, --help            show this help message and exit
   -m MODEL, --model MODEL
-                        Which LLM to use. Check this file for currently supported options and/or add
-                        your own.
+                        Which LLM to use. Check this file for currently supported options and/or add your own.
   -p PROMPTS, --prompts PROMPTS
-                        List of prompts, separated by |. For example "Hello my name is Ben|What a
-                        time to be alive". If not provided, you will be asked for a prompt by command
-                        line.
+                        List of prompts, separated by |. For example "Hello my name is Ben|What a time to be
+                        alive". If not provided, you will be asked for a prompt by command line.
   -n MAX_NEW_TOKENS, --max_new_tokens MAX_NEW_TOKENS
                         Number of new tokens to generate on top of the prompt
   -k NUM_TOP_TOKENS, --num_top_tokens NUM_TOP_TOKENS
-                        For each token, print out the top candidates considered by the model and
-                        their probabilities
+                        For each token, print out the top candidates considered by the model and their
+                        probabilities
   -c, --completion_mode
                         Use traditional auto-complete mode, rather than user-assistant chat
-  -s, --do_sample       Should we sample from the probability distribution, or greedily pick the most
-                        likely token?
+  -s, --do_sample       Should we sample from the probability distribution, or greedily pick the most likely token?
   -r NUM_RESPONSES, --num_responses NUM_RESPONSES
-                        Number of responses to generate per prompt. This argument is ignored for
-                        greedy decoding, since that only generates one answer.
+                        Number of responses to generate per prompt. This argument is ignored for greedy decoding,
+                        since that only generates one answer.
   -d DATASET, --dataset DATASET
                         The name of the Hugging Face dataset (needed for experiments and such)
   -q QUESTION_RANGE, --question_range QUESTION_RANGE
-                        When running a Q&A test, what range of questions should we test? Format is
-                        "-q startq-endq", 0 indexed. For example, "-q 0-100".
+                        When running a Q&A test, what range of questions should we test? Format is "-q startq-
+                        endq", 0 indexed. For example, "-q 0-100".
   -b BATCH_SIZE, --batch_size BATCH_SIZE
                         Maximum number of prompts to batch together. Only used for experiments
   -a ABSTAIN_OPTION, --abstain_option ABSTAIN_OPTION
                         When running a Q&A test, should we add an option that says "I don't know"?
   -g PROMPT_PHRASING, --prompt_phrasing PROMPT_PHRASING
-                        When running a Q&A test, which of the two prompt phrasings should we use? 0
-                        or 1
+                        When running a Q&A test, which of the two prompt phrasings should we use? 0 or 1
+  -f FEW_SHOT_NUMBER, --few_shot_number FEW_SHOT_NUMBER
+                        When running a Q&A test, how many in-context examples to provide?
 ```
 
 # Post-processing Q&A results
@@ -68,13 +66,15 @@ Lastly, results_analysis.ipynb groups the p-values to create the tables in the p
 Finally, it is tedious to call these python files individually for all the combinations of experiments and plots we want to run. For this reason, we have the following two scripts:
 1. run_qa_tests.sh, which calls take_qa_test.py (which in turn calls generate_text.py). Usage:
 ```
-./run_qa_tests.sh <comma-separated model names> <comma-separated dataset names> <comma-separated question ranges> prompt_phrasing abstain_option
+./run_qa_tests.sh <comma-separated model names> <comma-separated dataset names> <comma-separated question ranges> prompt_phrasing one_shot
 ```
-For example, to run all of the experiments for the first prompt phrasing, the command would be
+For example, to run all of the experiments for the first prompt phrasing and zero-shot, the command would be
 ```
 ./run_qa_tests.sh Llama-7b,Llama-13b,Llama-70b,Falcon-7b,Falcon-40b,Mistral,Mixtral,Solar,Yi-6b,Yi-34b,gpt-3.5-turbo,gpt-4-turbo arc,hellaswag,mmlu,truthfulqa,winogrande 0-1000,1000-2000,2000-3000,3000-4000,4000-5000,5000-6000 0 False
 ```
-To run the second prompt, one would replace the final 0 with 1. Note that although we enabled the ability to include an "I don't know" option in the answer choices, the final experiments all have abstain_option=False.
+To run the second prompt, one would replace the final 0 with 1.
+
+If you get an out-of-memory error, try reducing the batch sizes in run_qa_tests.sh.
 
 2. do_post_processing.sh, which calls plot_data.py, copy_important_figs.py, and statistal_tests.py. Usage:
 ```
