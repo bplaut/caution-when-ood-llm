@@ -72,7 +72,7 @@ For example, to run all of the experiments for the first prompt phrasing and zer
 ```
 ./run_qa_tests.sh Llama-7b,Llama-13b,Llama-70b,Falcon-7b,Falcon-40b,Mistral,Mixtral,Solar,Yi-6b,Yi-34b,gpt-3.5-turbo,gpt-4-turbo arc,hellaswag,mmlu,truthfulqa,winogrande 0-1000,1000-2000,2000-3000,3000-4000,4000-5000,5000-6000 0 False
 ```
-To run the second prompt, one would replace the final 0 with 1.
+To run the second prompt, one would replace the final 0 with 1. To use one-shot prompting, one would replace the False with True.
 
 If you get an out-of-memory error, try reducing the batch sizes in run_qa_tests.sh.
 
