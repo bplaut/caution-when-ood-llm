@@ -1,7 +1,10 @@
 import sys
 
 def parse_file_name(file_name, collapse_prompts=False):
-    # filename looks like <dataset>_<model>-q<startq>to<endq>_<group>.txt  
+    # filename usually looks like <dataset>_<model>-q<startq>to<endq>_<group>.txt Could also be <dataset>_<model>-q<startq>to<endq>_<group>_few_shot_<n>.txt
+    if 'few_shot' in file_name:
+        few_shot_idx = file_name.find('_few_shot')
+        file_name = file_name[:few_shot_idx] + '.txt'
     second_half = file_name[file_name.find('to'):]
     parts = file_name.split('_')
     dataset = parts[0]
