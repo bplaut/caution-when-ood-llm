@@ -65,7 +65,8 @@ class Test(object):
         return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}{few_shot_str}.txt"
         
     def write_output(self, grades, conf_levels_normed, conf_levels_raw):
-        logit_strs = ["_norm_logits", "_raw_logits"]
+        logit_strs = ["_norm_logits", "_raw_logits"] if not 'gpt' in self.args['model'] else ["_norm_logits"]
+        # OpenAI models don't have pre-softmax logits
         for (logit_str, conf_levels) in zip(logit_strs, [conf_levels_normed, conf_levels_raw]):
             output_filepath = self.get_output_filepath(logit_str)
             print('\nWriting results to', output_filepath)
