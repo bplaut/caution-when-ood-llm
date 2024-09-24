@@ -10,8 +10,8 @@ import random
 from utils import *
 
 # We want to assign a style to each model globally, even when some models are missing from some groups (i.e., OpenAI models only have MSP, not Max Logit)
-linestyles = ['-', ':', (0, (3, 1, 1, 1, 1, 1)), (0, (0.5,0.5,0.5,0.5,2)),(0, (5, 10)),(0, (5.5, 1)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1)), (0, (0.5, 0.5)), (0,(1,1,1,3.5)), (0, (0.5,0.5,0.5,2)), (0,(2,1,2,2))]
-colors = ['pink', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', 'teal', '#bcbd22', 'black', '#17becf']
+linestyles = ['-', ':', (0, (3, 1, 1, 1, 1, 1)), (0, (0.5,0.5,0.5,0.5,2)),(0, (5, 10)),(0, (5.5, 1)),(0, (3, 5, 1, 5)),(0, (3, 1, 1, 1)), (0, (0.25,0.25)), (0, (5,0.5,0.5,5)), (0, (0.5, 0.5)), (0,(1,1,1,3.5)), (0, (0.5,0.5,0.5,2)), (0,(2,1,2,2))]
+colors = ['pink', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', 'teal', 'slategray', 'indigo', '#bcbd22', 'black', '#17becf']
 style_per_model = dict()
 
 def make_and_sort_legend():
