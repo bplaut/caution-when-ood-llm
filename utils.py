@@ -44,8 +44,8 @@ def expand_model_name(name):
                      'LLaMA 2 13B' if base == 'Llama-13b' else
                      'LLaMA 2 7B' if base == 'Llama-7b' else
                      'LLaMA 2 70B' if base == 'Llama-70b' else
-                     'LLaMA3 8B' if base == 'Llama3-8b' else
-                     'LLaMA3 70B' if base == 'Llama3-70b' else
+                     'LLaMA 3 8B' if base == 'Llama3-8b' else
+                     'LLaMA 3 70B' if base == 'Llama3-70b' else
                      'Yi 6B' if base == 'Yi-6b' else
                      'Yi 34B' if base == 'Yi-34b' else
                      'GPT3.5 Turbo' if base == 'gpt-3.5-turbo' else
@@ -66,9 +66,10 @@ def expand_label(label):
                 'Calibration Error' if label == 'calib' else
                 'Q&A Accuracy' if label == 'acc' else label)
 
-# Each model name is of the form "<model_series> <size>B. Mixtral is a slight exception, as are base (non-finetuned) models
+# Each model name is of the form "<model_series> <size>B. Model series could have spaces also (e.g., Llama 2). Mixtral is a slight exception, as are base (non-finetuned) models
 def model_series(name):
-    return expand_model_name(name).split(' ')[0]
+    expanded_name = expand_model_name(name)
+    return expanded_name[:expanded_name.rfind(' ')]
 
 def model_size(name):
     if 'Mixtral' in name:
