@@ -105,7 +105,6 @@ def format_dataset_name(dataset):
     return ('ARC-Challenge' if dataset == 'arc' else
             'HellaSwag' if dataset == 'hellaswag' else
             'MMLU' if dataset == 'mmlu' else
-            'PIQA' if dataset == 'piqa' else
             'TruthfulQA' if dataset == 'truthfulqa' else
             'WinoGrande' if dataset == 'winogrande' else dataset)
 
