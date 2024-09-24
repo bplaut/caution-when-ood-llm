@@ -1,8 +1,8 @@
 import sys
 import os
-import datetime
+from datetime import datetime, timedelta
 
-def count_string_per_file(directory, string, date=None):
+def count_string_per_file(directory, string, date):
     """Returns a list of tuples containing the file name and the number of times the string appears in the file, 
     considering only files created after the specified date if provided."""
     file_list = os.listdir(directory)
@@ -10,7 +10,7 @@ def count_string_per_file(directory, string, date=None):
     for file in file_list:
         file_path = os.path.join(directory, file)
         # Make sure it's not a directory and, if a date is provided, that the file was created after that date
-        if not os.path.isdir(file_path) and (date is None or file_created_after(file_path, date)):
+        if not os.path.isdir(file_path) and file_created_after(file_path, date):
             with open(file_path, 'r') as f:
                 contents = f.read()
                 count = contents.count(string)
@@ -21,7 +21,7 @@ def count_string_per_file(directory, string, date=None):
 
 def file_created_after(file_path, date):
     """Checks if the file was created after the given date."""
-    file_creation_time = datetime.datetime.fromtimestamp(os.path.getctime(file_path))
+    file_creation_time = datetime.fromtimestamp(os.path.getctime(file_path))
     return file_creation_time > date
 
 def main():
@@ -31,12 +31,12 @@ def main():
 
     directory = sys.argv[1]
     string = sys.argv[2]
-    date = None
+    date = datetime.now() - timedelta(hours=24) # default to 24 hours ago
 
     if len(sys.argv) == 4:
         date_str = sys.argv[3]
         try:
-            date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+            date = datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
             print("Invalid date format. Please use YYYY-MM-DD.")
             sys.exit(1)
