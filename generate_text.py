@@ -29,6 +29,8 @@ class Generator(object):
                           'Yi-6b':'01-ai/Yi-6B-Chat',
                           'Yi-34b-raw':'01-ai/Yi-34B',
                           'Yi-6b-raw':'01-ai/Yi-6B',
+                          'Llama3-8b':'meta-llama/Meta-Llama-3-8B-Instruct',
+                          'Llama3-70b':'meta-llama/Meta-Llama-3-70B-Instruct',
         }
         if args['model'] not in model_name_map:
             raise Exception("Unrecognized model name. Check model_name_map")
@@ -52,6 +54,9 @@ class Generator(object):
             backup_targets = choices[i] + [c for c in ascii_uppercase][:num_choices]
             token_idx1 = self.token_idx_of_first_target(response, main_targets)
             token_idx2 = self.token_idx_of_first_target(response, backup_targets)
+            print('main targets:', main_targets)
+            print('token_idx1:', token_idx1)
+
             token_idx = token_idx1 if token_idx1 != -1 else token_idx2
             (conf, _) = self.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=normalize)
             confidence_levels[i] = conf
@@ -76,7 +81,9 @@ class Generator(object):
             # Find the index of the token that contains the character at index i
             tokens = self.tokenizer(s, return_offsets_mapping=True, add_special_tokens=False)
             for token_index, (start, end) in enumerate(tokens.offset_mapping):
-                if start <= i < end:
+                if start <= i < end and 'Llama3' not in self.args['model']:
+                    return token_index
+                elif start <= i and 'Llama3' in self.args['model']: # Llama3 models have a different offset mapping where start and end are always the same. E.g., the offset mapping will be [(0,0), (3,3)] if the first token starts at index 0 and the second at index 3
                     return token_index
         return -1
 
