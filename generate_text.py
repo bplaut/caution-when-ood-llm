@@ -54,9 +54,6 @@ class Generator(object):
             backup_targets = choices[i] + [c for c in ascii_uppercase][:num_choices]
             token_idx1 = self.token_idx_of_first_target(response, main_targets)
             token_idx2 = self.token_idx_of_first_target(response, backup_targets)
-            print('main targets:', main_targets)
-            print('token_idx1:', token_idx1)
-
             token_idx = token_idx1 if token_idx1 != -1 else token_idx2
             (conf, _) = self.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=normalize)
             confidence_levels[i] = conf
