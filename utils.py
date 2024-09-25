@@ -41,11 +41,11 @@ def expand_model_name(name):
     base_expanded = ('Mistral 7B' if base == 'Mistral' else
                      'Mixtral 8x7B' if base == 'Mixtral' else
                      'SOLAR 10.7B' if base == 'Solar' else
-                     'LLaMA 2 13B' if base == 'Llama-13b' else
-                     'LLaMA 2 7B' if base == 'Llama-7b' else
-                     'LLaMA 2 70B' if base == 'Llama-70b' else
-                     'LLaMA 3 8B' if base == 'Llama3-8b' else
-                     'LLaMA 3 70B' if base == 'Llama3-70b' else
+                     'Llama 2 13B' if base == 'Llama-13b' else
+                     'Llama 2 7B' if base == 'Llama-7b' else
+                     'Llama 2 70B' if base == 'Llama-70b' else
+                     'Llama 3 8B' if base == 'Llama3-8b' else
+                     'Llama 3 70B' if base == 'Llama3-70b' else
                      'Yi 6B' if base == 'Yi-6b' else
                      'Yi 34B' if base == 'Yi-34b' else
                      'GPT3.5 Turbo' if base == 'gpt-3.5-turbo' else
