@@ -567,22 +567,18 @@ def cross_group_plots(group_data, output_dir):
     
 def main():
     # Setup
-    if len(sys.argv) < 6:
-        print("Usage: python plot_data.py <output_directory> <incl_unparseable> <collapse_prompts> <dataset1,dataset2,...> <data_file1> [<data_file2> ...]")
+    if len(sys.argv) < 4:
+        print("Usage: python plot_data.py <output_directory> <dataset1,dataset2,...> <data_file1> [<data_file2> ...]")
         sys.exit(1)
     output_dir = sys.argv[1]
-    incl_unparseable = (False if sys.argv[2].lower() == 'false' else True if sys.argv[2].lower() == 'true' else None) # On questions where the model produced an unparseable answer, do we include it and count it as wrong, or discard it?
-    collapse_prompts = (False if sys.argv[3].lower() == 'false' else True if sys.argv[3].lower() == 'true' else None) # Do we collapse the two prompts into a single group with 12k questions per dataset?
-    
-    if incl_unparseable is None:
-        raise Exception('Second argument incl_unparseable must be a boolean (True or False). Instead it was:', sys.argv[2])
-    if collapse_prompts is None:
-        raise Exception('Third argument collapse_prompts must be a boolean (True or False). Instead it was:', sys.argv[3])
-    file_paths = sys.argv[5:]
-    print(f"Reading from {len(file_paths)} files...")
-    datasets_to_analyze = sys.argv[4].split(',')
+    datasets_to_analyze = sys.argv[2].split(',')
     if any([dataset not in ('arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande') for dataset in datasets_to_analyze]):
-        raise Exception(f'Fourth argument must be a comma-separated subset of [arc, hellaswag, mmlu, truthfulqa, winogrande]. Instead it was:', sys.argv[4])
+        raise Exception(f'Second argument must be a comma-separated subset of [arc, hellaswag, mmlu, truthfulqa, winogrande]. Instead it was:', sys.argv[4])
+    file_paths = sys.argv[3:]
+    print(f"Reading from {len(file_paths)} files...")
+    incl_unparseable = True # We've decided to always include unparseable questions, but leaving this here in case we want to change it in the future for some reason
+    collapse_prompts = False
+
 
     # Data aggregation. We want all_data[group][dataset][model] = (labels, conf_levels, total_qs)
     all_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: ([], [], 0))))

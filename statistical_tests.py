@@ -255,20 +255,20 @@ if __name__ == "__main__":
     # 4: MSP vs Max Logit aurocs battle royale
     ###
     parser.add_argument("--option", "-o", required = True, type = int, help = f"Integer from 0 to 4, determines which test to run")
-    parser.add_argument("--incl_unparseable", "-i", type = str_to_bool, required = True)
     parser.add_argument("--input_dir", '-d', type=str, help="Input directory to read data from", required = True)
     args = parser.parse_args()
+    incl_unparseable = True # We've decided to always include unparseable questions, but leaving this here in case we want to change it in the future for some reason
 
     if not os.path.exists("./stat_tests_output"):
         os.makedirs("./stat_tests_output")
     
     if args.option == 0:
-        construct_confidence_intervals(args.incl_unparseable, args.input_dir)
+        construct_confidence_intervals(incl_unparseable, args.input_dir)
     elif args.option == 1:
-        conduct_mann_whitney_tests(args.incl_unparseable, args.input_dir)
+        conduct_mann_whitney_tests(incl_unparseable, args.input_dir)
     elif args.option == 2:
-        conduct_model_summary_tests(args.incl_unparseable, args.input_dir)
+        conduct_model_summary_tests(incl_unparseable, args.input_dir)
     elif args.option == 3:
-        conduct_paired_t_tests(args.incl_unparseable, args.input_dir)
+        conduct_paired_t_tests(incl_unparseable, args.input_dir)
     elif args.option == 4:
-        conduct_auroc_t_test(args.incl_unparseable, args.input_dir)
+        conduct_auroc_t_test(incl_unparseable, args.input_dir)
