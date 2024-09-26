@@ -161,15 +161,16 @@ def score_plot(data, output_dir, xlabel, ylabel, dataset, thresholds_to_mark=dic
         # zorder determines which objects are on top
         plt.scatter([thresh_to_mark], [score_to_mark], color='black', marker='o', s=20, zorder=3)
         base_score = ys[0] # We added -1 to the front for base score, see plot_score_vs_thresholds
-        xs, ys = xs[1:], ys[1:] # Remove the -1 for plotting
         plt.plot(xs, ys, label=f"{expand_model_name(model)}", zorder=2, linestyle=linestyle, linewidth=2, color=color)
         result_thresholds[model] = thresh_to_mark
         base_scores[model] = base_score
         result_scores[model] = score_to_mark
         pcts_abstained[model] = pct_abstained
 
-    make_and_sort_legend()
-    plt.legend(handlelength=2.5)
+    if 'norm' in output_dir and ylabel == 'harsh-score':
+        # Only make legend for bottom left plot in paper
+        make_and_sort_legend()
+        plt.legend(handlelength=2.5)
     plot_name = 'MSP' if 'norm' in output_dir else 'Max Logit' if 'raw' in output_dir else 'unknown'
     plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
     finalize_plot(output_dir, xlabel, ylabel, title_suffix = f': {plot_name}', file_suffix = f'_{dataset}')
@@ -180,7 +181,7 @@ def plot_score_vs_thresholds(data, output_dir, datasets, wrong_penalty=1, thresh
     max_conf = max([max([max(conf_levels) for _, (_,conf_levels,_) in data[dataset].items()])
                     for dataset in datasets])
     thresholds = np.linspace(0, max_conf, 200) # 200 data points per plot
-    thresholds = np.append([-1], thresholds) # The base score is the score when the threshold is 0, but this could cause float issues if confidence is also exactly zero at times. So add -1
+    thresholds = np.append([-0.0001], thresholds) # The base score is the score when the threshold is 0, but this could cause float issues if confidence is also exactly zero at times. So add another data point
 
     if abs(max_conf - 1) < 0.01: # We're dealing with probabilities: add more points near 1
         thresholds = np.append(thresholds, np.linspace(0.99, 1, 100))
@@ -316,7 +317,7 @@ def calibration_plot(data, output_dir, strategy='quantile', n_bins=10):
             print("Model", model, f"has {n_bins-len(pct_correct)} empty bins, out of {n_bins} total bins.")
         plt.plot(avg_msp, pct_correct, label=f'{expand_model_name(model)}', linestyle=linestyle, linewidth=2, color=color)
     # Add black line on the diagonal to represent perfect calibration
-    plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='-')
+    plt.plot([0, 1], [0, 1], color='black', lw=1, linestyle='-')
     make_and_sort_legend()
     plt.legend()
     finalize_plot(output_dir, 'msp', 'frac-correct', title_suffix=': Calibration', file_suffix=f'_{strategy}')
