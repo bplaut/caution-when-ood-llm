@@ -567,17 +567,22 @@ def cross_group_plots(group_data, output_dir):
     
 def main():
     # Setup
-    if len(sys.argv) < 4:
-        print("Usage: python plot_data.py <output_directory> <dataset1,dataset2,...> <data_file1> [<data_file2> ...]")
+    if len(sys.argv) < 5:
+        print("Usage: python plot_data.py <output_directory> <dataset1,dataset2,...> <collapse_prompts> <data_file1> [<data_file2> ...]")
         sys.exit(1)
     output_dir = sys.argv[1]
     datasets_to_analyze = sys.argv[2].split(',')
     if any([dataset not in ('arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande') for dataset in datasets_to_analyze]):
-        raise Exception(f'Second argument must be a comma-separated subset of [arc, hellaswag, mmlu, truthfulqa, winogrande]. Instead it was:', sys.argv[4])
-    file_paths = sys.argv[3:]
+        raise Exception(f'Second argument must be a comma-separated subset of [arc, hellaswag, mmlu, truthfulqa, winogrande]. Instead it was:', sys.argv[2])
+    if sys.argv[3].lower() == 'true':
+        collapse_prompts = True
+    elif sys.argv[3].lower() == 'false':
+        collapse_prompts = False
+    else:
+        raise Exception(f'Third argument must be True or False. Instead it was:', sys.argv[3])
+    file_paths = sys.argv[4:]
     print(f"Reading from {len(file_paths)} files...")
     incl_unparseable = True # We've decided to always include unparseable questions, but leaving this here in case we want to change it in the future for some reason
-    collapse_prompts = False
 
 
     # Data aggregation. We want all_data[group][dataset][model] = (labels, conf_levels, total_qs)
