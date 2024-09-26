@@ -392,10 +392,9 @@ def make_dataset_plots(all_data, output_dir):
     column_names = ['Dataset', 'Q\\&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
     prefix = ('no' if 'no_abst' in list(all_data.keys())[0] else 'yes') + '_abst'
     filename = prefix + '_dataset.tex'
-    header = (' & & MSP & Max Logit \\\\ \n'
-              + ' & '.join(column_names[1:]) + ' \\\\ \n'
+    header = (' & ' + ' & '.join(column_names[1:]) + ' \\\\ \n'
               '\\cmidrule(lr){1-1} \\cmidrule(lr){2-2} \\cmidrule(lr){3-3} \\cmidrule(lr){4-4}\n')
-    make_table(len(column_names), rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename=filename)
+    make_table(len(column_names), rows, output_dir, caption='Average Q\\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.', label='tab:dataset', filename=filename, header=header)
 
     # Make bar graph. Three segments on the x-axis: Q&A accuracy, MSP AUROC, Max Logit AUROC. Within each segment, one bar per dataset. So there should be three segments, each with 5 bars
     labels = ['Q&A Accuracy', 'MSP AUROC', 'Max Logit AUROC']
