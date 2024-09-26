@@ -49,13 +49,13 @@ options:
 # Post-processing Q&A results
 There are also some files for post-processing. The first is plot_data.py, which has the following usage:
 ```
-python plot_data.py <output_directory> <incl_unparseable> <collapse_prompts> <dataset1,dataset2,...> <data_file1> [<data_file2> ...]
+python plot_data.py <output_directory> <dataset1,dataset2,...> <collapse_prompts> <data_file1> [<data_file2> ...]
 ```
-If incl_unparseable=True, unparseable responses are counted as wrong. Otherwise, we exclude them. If collapse_prompts=True, we group the data from the two prompt phrasings together. We set collapse_prompts=False for the AUROC analysis (because it's nonlinear), but set collapse_prompt=True for the score plots (because those are linear).
+If collapse_prompts=True, we group the data from the two prompt phrasings together. We set collapse_prompts=False for the AUROC analysis (because it's nonlinear), but set collapse_prompt=True for the score plots (because those are linear).
 
 There is also statistical_tests.py, which computes the p-values and has the following usage:
 ```
-python statistical_tests.py [-h] --option OPTION --incl_unparseable INCL_UNPARSEABLE --input_dir INPUT_DIR
+python statistical_tests.py [-h] --option OPTION --input_dir INPUT_DIR
 ```
 The OPTION parameter determines which tests are run and the INPUT_DIR tells the script where the data files are. See statistical_tests.py for more details.
 
@@ -70,7 +70,7 @@ Finally, it is tedious to call these python files individually for all the combi
 ```
 For example, to run all of the experiments for the first prompt phrasing and zero-shot, the command would be
 ```
-./run_qa_tests.sh Llama-7b,Llama-13b,Llama-70b,Falcon-7b,Falcon-40b,Mistral,Mixtral,Solar,Yi-6b,Yi-34b,gpt-3.5-turbo,gpt-4-turbo arc,hellaswag,mmlu,truthfulqa,winogrande 0-1000,1000-2000,2000-3000,3000-4000,4000-5000,5000-6000 0 False
+./run_qa_tests.sh Llama-7b,Llama-13b,Llama-70b,Llama3-8b,Llama3-70b,Falcon-7b,Falcon-40b,Mistral,Mixtral,Solar,Yi-6b,Yi-34b,gpt-3.5-turbo,gpt-4-turbo arc,hellaswag,mmlu,truthfulqa,winogrande 0-1000,1000-2000,2000-3000,3000-4000,4000-5000,5000-6000 0 False
 ```
 To run the second prompt, one would replace the final 0 with 1. To use one-shot prompting, one would replace the False with True.
 
@@ -78,18 +78,16 @@ If you get an out-of-memory error, try reducing the batch sizes in run_qa_tests.
 
 2. do_post_processing.sh, which calls plot_data.py, copy_important_figs.py, and statistal_tests.py. Usage:
 ```
-./do_post_processing <directory> <collapse_prompts> <incl_unparseable>
+./do_post_processing <directory> <collapse_prompts>
 ```
 For example,
 ```
-./do_post_processing results False True
+./do_post_processing results False
 ```
-The final analysis was run with collapse_prompts=False and incl_unparseable=True. These choices are discussed in the paper.
-
 Currently, results_analysis.ipynb is not called by the scripts and must be run separately.
 
 # Resource requirements
-We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 70B) taking up 129 GB. With two A6000 GPUs, it took us about two weeks to run all of the experiments from start to finish: twelve models X five datasets X 6000 questions X two prompt phrasings.
+We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 3 70B) taking up 132 GB. With two A6000 GPUs, it took us about three weeks to run all of the experiments from start to finish: fourteen models X five datasets X 6000 questions X two prompt phrasings.
 
 # Output files
 In addition to the code required to run the experiments, we have also included the output files: the main_results directory contains the raw results and the stat_tests_output contains the results of the statistical analysis.
