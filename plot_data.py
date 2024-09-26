@@ -105,7 +105,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
         file_suffix = f"_{dataset}_{plot_name.replace(' ','_').replace(',','')}"
         if file_suffix.endswith('_'):
             file_suffix = file_suffix[:-1]
-        finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r = {r_value:.2f})', file_suffix=file_suffix, texts=texts)
+        finalize_plot(output_dir, xlabel, ylabel, title_suffix=f': {plot_name} (r,p = {r_value:.3f},{p_value:.5f})', file_suffix=file_suffix, texts=texts)
     except ValueError as e:
         print("ValueError when running linear regression on", xlabel, ylabel, ":", e)
 
