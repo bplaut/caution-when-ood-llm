@@ -50,7 +50,7 @@ get_batch_size() {
 	    batch_size=80
 	    ;;
 	"Llama3-70b")
-	    batch_size=12
+	    batch_size=13
 	    ;;
         "Falcon-40b")
             batch_size=10
