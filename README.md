@@ -63,7 +63,7 @@ Lastly, results_analysis.ipynb groups the p-values to create the tables in the p
 
 # Batching scripts
 
-Finally, it is tedious to call these python files individually for all the combinations of experiments and plots we want to run. For this reason, we have the following two scripts:
+It is tedious to call these python files individually for all the combinations of experiments and plots we want to run. For this reason, we have the following two bash scripts:
 1. run_qa_tests.sh, which calls take_qa_test.py (which in turn calls generate_text.py). Usage:
 ```
 ./run_qa_tests.sh <comma-separated model names> <comma-separated dataset names> <comma-separated question ranges> prompt_phrasing one_shot
@@ -82,8 +82,10 @@ If you get an out-of-memory error, try reducing the batch sizes in run_qa_tests.
 ```
 For example,
 ```
-./do_post_processing results False
+./do_post_processing main_results False
 ```
+The main_results directory contains the zero-shot results (which are used for the primary analysis), and one_shot_results contains the one-shot results.
+
 Currently, results_analysis.ipynb is not called by the scripts and must be run separately.
 
 # Resource requirements
