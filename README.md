@@ -89,7 +89,4 @@ The main_results directory contains the zero-shot results (which are used for th
 Currently, results_analysis.ipynb is not called by the scripts and must be run separately.
 
 # Resource requirements
-We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 3 70B) taking up 132 GB. With two A6000 GPUs, it took us about three weeks to run all of the experiments from start to finish: fourteen models X five datasets X 6000 questions X two prompt phrasings.
-
-# Output files
-In addition to the code required to run the experiments, we have also included the output files: the main_results directory contains the raw results and the stat_tests_output contains the results of the statistical analysis.
+We used NVIDIA RTX A6000 GPUs for our experiments, which has 48GB RAM. If you are using a GPU with less RAM, you may need to reduce the batch sizes in run_qa_tests.sh. Storing the models on disk also takes a lot of space, with the smallest (Yi 6B) taking up 12 GB, and the largest (Llama 3 70B) taking up 132 GB. With two A6000 GPUs, it took us about three weeks to run all of the zero-shot experiments from start to finish: fourteen models X 21,407 questions across five datasets X two prompt phrasings. Running the analogous one-shot experiments took about four weeks.
