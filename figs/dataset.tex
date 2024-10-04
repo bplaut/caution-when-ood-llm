@@ -1,18 +1,18 @@
-\begin{table*}
-\small
+\begin{table*}[tb]
 \centering
-\caption{Q\&A accuracy and AUROCs per dataset, averaged over all models and prompt phrasings. All values are percentages. The MSP AUROCs include the two OpenAI models, while the Max Logit AUROCs do not.}
+% \small
+\caption{Average Q\&A accuracy and AUROCs per dataset. All values are percentages, averaged over the then models and two prompts.}
 \label{tab:dataset}
+\vspace{-.1 in}
 \begin{tabular}{lccc}
 \toprule
-& & MSP & Max Logit\\ 
-Dataset & Q\&A accuracy & AUROC & AUROC\\
+ & Q\&A Accuracy & MSP AUROC & Max Logit AUROC \\ 
 \cmidrule(lr){1-1} \cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4}
-ARC-Challenge & 67.0 & 69.6 & 64.5\\
-HellaSwag & 55.9 & 66.1 & 60.6\\
-MMLU & 52.3 & 66.6 & 61.6\\
-TruthfulQA & 43.8 & 65.4 & 60.9\\
-WinoGrande & 58.2 & 56.6 & 53.7\\
+ARC-Challenge & 69.5 & 71.9 & 67.2\\
+HellaSwag & 58.3 & 67.8 & 62.2\\
+MMLU & 54.4 & 68.5 & 64.1\\
+TruthfulQA & 45.8 & 66.6 & 62.0\\
+WinoGrande & 59.3 & 57.9 & 54.5\\
 \bottomrule
 \end{tabular}
 \end{table*}
