@@ -64,20 +64,20 @@ class Test(object):
         os.makedirs(out_dir, exist_ok=True)
         return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}{few_shot_str}.txt"
         
-    def write_output(self, grades, conf_levels_normed, conf_levels_raw):
+    def write_output(self, grades, conf_levels_normed, conf_levels_raw, parsing_issues):
         logit_strs = ["_norm_logits", "_raw_logits"] if not 'gpt' in self.args['model'] else ["_norm_logits"]
         # OpenAI models don't have pre-softmax logits
         for (logit_str, conf_levels) in zip(logit_strs, [conf_levels_normed, conf_levels_raw]):
             output_filepath = self.get_output_filepath(logit_str)
             print('\nWriting results to', output_filepath)
             with open(output_filepath, 'w') as f:
-                f.write("grade confidence_level\n")
-                for (g,c) in zip(grades, conf_levels):
+                f.write("grade confidence_level parsing_issue_occurred\n")
+                for (g,c,i) in zip(grades, conf_levels, parsing_issues):
                     g_str = ("Correct" if g == 1
                              else "Abstained" if g == 0
                              else "Wrong" if g == -1
                              else "Unparseable")
-                    f.write(f"{g_str} {c}\n")
+                    f.write(f"{g_str} {c} {i}\n")
 
     def make_question(self, i):
         question_data = self.questions[i]
@@ -126,41 +126,34 @@ Answer:
         else:
             raise Exception(f"Unknown phrasing option: {self.args['prompt_phrasing']}. Must be 0 or 1.")
     
-    def determine_llm_answer(self, choices, llm_output):
+    def determine_llm_answer(self, choices, llm_output): # returns the answer and the parsing status (0: starts with A./B./C. etc, 1: contains A./B./C. etc, 2: contains A/B/C etc, 3: could not parse answer)
         # Look for A./B./C. etc. 
-        targets_v1 = [c + '.' for c in ascii_uppercase][:len(choices)]
-        v1_idxs = [llm_output.find(t) for t in targets_v1 if llm_output.find(t) != -1]
+        main_targets = [c + '.' for c in ascii_uppercase][:len(choices)]
+        main_idxs = [llm_output.find(t) for t in main_targets if llm_output.find(t) != -1]
         # If that fails, look for the text of an answer. Normalize casing.
-        targets_v2 = [(i,ch.lower()) for (i,ch) in enumerate(choices)]
-        output_lower = llm_output.lower()
-        v2_result = [(i,t,output_lower.find(t)) for (i,t) in targets_v2 if output_lower.find(t) != -1]
-        # If that fails, look for just A/B/C etc
-        targets_v3 = [c for c in ascii_uppercase][:len(choices)]
-        v3_idxs = [llm_output.find(t) for t in targets_v3 if llm_output.find(t) != -1]
-        if len(v1_idxs) > 0: # found A./B./C. etc
-            return llm_output[min(v1_idxs)]
-        elif len(v2_result) > 0: # found text of answer
-            found = [(i,start_idx) for (i,t,start_idx) in v2_result
-                     if output_lower[start_idx:start_idx+len(t)] == t]
-            (i, _) = min(found, key=lambda x:x[1])
-            print("Grading note: could not find A./B./C./etc, but did find the text of an answer")
-            return ascii_uppercase[i]
-        elif len(v3_idxs) > 0: # found A/B/C etc
-            print("Grading note: could not find A./B./C./etc or the text of an answer, but did find A/B/C etc")
-            return llm_output[min(v3_idxs)]
+        backup_targets = [c for c in ascii_uppercase][:len(choices)]
+        backup_idxs = [llm_output.find(t) for t in backup_targets if llm_output.find(t) != -1]
+        if len(main_idxs) > 0: # found A./B./C. etc
+            if any([llm_output.strip().find(t) == 0 for t in main_targets]):
+                return (llm_output[min(main_idxs)], 0)
+            else:
+                return (llm_output[min(main_idxs)], 1)
+        elif len(backup_idxs) > 0: # found A/B/C etc
+            return (llm_output[min(backup_idxs)], 2)
+            print("Grading note: could not find A./B./C./etc, but did find A/B/C")
         else:
-            return "Could not parse answer"
+            return ("Could not parse answer", 3)
 
     def grade_answer(self, choices, correct_answer, llm_output):
-        llm_answer = self.determine_llm_answer(choices, llm_output)
+        (llm_answer, parsing_issue_occurred) = self.determine_llm_answer(choices, llm_output)
         if self.args['abstain_option'] and llm_answer == ascii_uppercase[len(choices)-1]:
-            return (f"{llm_answer} (uncertain)", 0)
+            return (f"{llm_answer} (uncertain)", 0, parsing_issue_occurred)
         elif llm_answer == correct_answer:
-            return (f"{llm_answer}. (correct)", 1)
+            return (f"{llm_answer}. (correct)", 1, parsing_issue_occurred)
         elif llm_answer == "Could not parse answer":
             return (f"{llm_answer}", None)
         else:
-            return (f"{llm_answer}. (incorrect {correct_answer}.)", -1)
+            return (f"{llm_answer}. (incorrect {correct_answer}.)", -1, parsing_issue_occurred)
 
     def run_test(self, start_q, end_q):
         assert(start_q < end_q)
@@ -188,17 +181,19 @@ Answer:
         # Grade outputs
         print("Grading answers...\n")
         grades = [None] * len(text_outputs)
+        parsing_issues = [None] * len(text_outputs)
         for (i, llm_output) in enumerate(text_outputs):
             print(f"Question {i+1+start_q}: {question_strings[i]}")
             print(f"LLM output: {llm_output}")
-            (answer_output, grade) = self.grade_answer(choices[i], correct_answers[i], llm_output)
+            (answer_output, grade, parsing_issue_occurred) = self.grade_answer(choices[i], correct_answers[i], llm_output)
             print(f"LLM answer: {answer_output}\n")
             conf_str = lambda x: 0 if t_to_str(x)=='' else t_to_str(x)
             # Sometimes we get "" because of how t_to_str works
             print(f"Confidence level normalized: {conf_str(confidence_levels_normed[i])}\n")
             print(f"Confidence level raw: {conf_str(confidence_levels_raw[i])}\n")
             grades[i] = grade
-        return (grades, confidence_levels_normed, confidence_levels_raw)
+            parsing_issues[i] = parsing_issue_occurred
+        return (grades, confidence_levels_normed, confidence_levels_raw, parsing_issues)
 
 def main():
     random.seed(2549900867) # We'll randomize the order of questions and of answer choices, but we want every run to have the same randomization
@@ -211,17 +206,18 @@ def main():
         print(f"Results file {output_filepath} already exists. Exiting.")
         return
     
-    all_grades, all_conf_levels_normed, all_conf_levels_raw = [], [], []
+    all_grades, all_conf_levels_normed, all_conf_levels_raw, all_parsing_issues = [], [], [], []
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
         end_q = min(start_q + args['batch_size'], test.end_q)
         if args['batch_size'] > 1:
             print(f"\nSTARTING NEW BATCH: questions {start_q} to {end_q}\n")
-        (grades, conf_levels_normed, conf_levels_raw) = test.run_test(start_q, end_q)
+        (grades, conf_levels_normed, conf_levels_raw, parsing_issues) = test.run_test(start_q, end_q)
         all_grades += grades
         all_conf_levels_normed += conf_levels_normed
         all_conf_levels_raw += conf_levels_raw
+        all_parsing_issues += parsing_issues
     if len(all_grades) > 0: # E.g. if the dataset only has 817 qs but you ask to run qs 1000-1500
-        test.write_output(all_grades, all_conf_levels_normed, all_conf_levels_raw)
+        test.write_output(all_grades, all_conf_levels_normed, all_conf_levels_raw, all_parsing_issues)
     else:
         print("The question range you provided is empty. This could either be because endq < startq or because the dataset is too small.")
 
