@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define arrays
-models=(Llama3-8b Llama3-70b Llama2-7b Llama2-13b Llama2-70b Mistral Mixtral Solar Yi-6b Yi-34b)
+models=(Llama3-8b Llama3-70b Llama-7b Llama-13b Llama-70b Mistral Mixtral Solar Yi-6b Yi-34b)
 # datasets=(arc hellaswag mmlu truthfulqa winogrande)
 # question_ranges=(0-500 500-1000 1000-1500 1500-2000 2000-2500 2500-3000 3000-3500 3500-4000 4000-4500 4500-5000 5000-5500 5500-6000)
 # prompt_phrasings=(0 1)
