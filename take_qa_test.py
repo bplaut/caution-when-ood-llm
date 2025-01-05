@@ -137,12 +137,17 @@ Answer:
             if any([llm_output.strip().find(t) == 0 for t in main_targets]):
                 return (llm_output[min(main_idxs)], 0)
             else:
+                print("Grading note: found A./B./C. etc, but not at the start of the answer")
                 return (llm_output[min(main_idxs)], 1)
         elif len(backup_idxs) > 0: # found A/B/C etc
-            return (llm_output[min(backup_idxs)], 2)
-            print("Grading note: could not find A./B./C./etc, but did find A/B/C")
+            if any([llm_output.strip().find(t) == 0 for t in backup_targets]):
+                print("Grading note: could not find A./B./C./etc, but did find A/B/C at start of answer")
+                return (llm_output[min(backup_idxs)], 2)
+            else:
+                print("Grading note: found A/B/C etc, but not at the start of the answer")
+                return (llm_output[min(backup_idxs)], 3)
         else:
-            return ("Could not parse answer", 3)
+            return ("Could not parse answer", 4)
 
     def grade_answer(self, choices, correct_answer, llm_output):
         (llm_answer, parsing_issue_occurred) = self.determine_llm_answer(choices, llm_output)
