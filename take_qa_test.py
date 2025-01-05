@@ -156,7 +156,7 @@ Answer:
         elif llm_answer == correct_answer:
             return (f"{llm_answer}. (correct)", 1, parsing_issue_occurred)
         elif llm_answer == "Could not parse answer":
-            return (f"{llm_answer}", None)
+            return (f"{llm_answer}", None, parsing_issue_occurred)
         else:
             return (f"{llm_answer}. (incorrect {correct_answer}.)", -1, parsing_issue_occurred)
 
