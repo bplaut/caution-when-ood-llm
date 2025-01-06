@@ -61,53 +61,24 @@ class OpenAIGenerator(Generator):
         if abs(chosen_token.logprob - top_token.logprob) > 0.0001:
             print (f"Warning (openai_generate.py): logprobs don't match up. Chosen token logprob: {chosen_token.logprob}, top token logprob: {top_token.logprob}")
 
-    def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
-        simple_result = self.compute_conf_levels_simple(text_outputs, token_outputs, scores, choices, normalize) # We'll compare this against the actual result for logging
-        result = None
+    def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True, product=False):
+        # If product, returns the product of all scores. Else Returns the score of the token indicating the answer
         # All the lists/0-indices are because the types are lists to support batching
         if not normalize: # OpenAI api only gives us normalized probabilities, not raw logits
-            result = [0]
-        targets1 = [c for c in ascii_uppercase][:len(choices[0])]
-        tokens = token_outputs[0]
-        # First, try to find a token corresponding A./B./C. etc
-        for i in range(len(tokens) - 1):
-            if tokens[i].strip() in targets1 and tokens[i + 1] == '.' and result is None:
-                # strip just in case the token is e.g. ' A' instead of 'A'
-                result = [scores[i]]
-
-        # If we failed, find a token corresponding to A/B/C etc or the text of a choice
-        targets2 = choices[0] + targets1
-        remaining_text = text_outputs[0]
-        token_idx = 0
-        while token_idx < len(tokens) and result is None:
-            # If the remaining text starts with a target (excl whitespace), return the score of the current token. Otherwise, remove the current token from the remaining text and go to next token
-            if any([remaining_text.strip().startswith(target) for target in targets2]):
-                result = [scores[token_idx]]
-            else:
-                if remaining_text.startswith(tokens[token_idx]):
-                    remaining_text = remaining_text[len(tokens[token_idx]):]
-                    token_idx += 1
-                else:
-                    print("Error in computing confidence levels: remaining text doesn't match tokens")
-                    result = [0]
-
-        if result is None:
-            print("Error in computing confidence levels: couldn't find a target in the remaining text")
-            result = [0]
-                    
-        if abs(simple_result[0] - result[0]) > 0.0001:
-            print(f"Confidence level mismatch between simple and complete methods: {simple_result[0]} vs {result[0]}")
-        return result
-
-    def compute_conf_levels_simple(self, text_outputs, token_outputs, scores, choices, normalize=True):
-        # Only look for A./B./C. etc
-        if not normalize:
             return [0]
+        if product:
+            print("scores:", scores)
+            return [math.prod(scores)]
         targets = [c for c in ascii_uppercase][:len(choices[0])]
         tokens = token_outputs[0]
         # First, try to find a token corresponding A./B./C. etc
         for i in range(len(tokens) - 1):
-            if tokens[i] in targets and tokens[i + 1] == '.':
+            if tokens[i].strip() in targets and tokens[i + 1] == '.':
+                # strip just in case the token is e.g. ' A' instead of 'A'
                 return [scores[i]]
-        return [0]
 
+        # If we failed, find a token corresponding to A/B/C etc
+        for i in range(len(tokens) - 1):
+            if tokens[i].strip() in targets:
+                return [scores[i]]
+        return result
