@@ -10,7 +10,7 @@ fi
 dir=$1
 collapse_prompts=$2
 
-output_dir="all_figs_collapse=$collapse_prompts"
+output_dir="all_figs_collapse_$collapse_prompts"
 echo -e "\nMaking figures...\n"
 
 python plot_data.py $output_dir/main_figs arc,hellaswag,mmlu,truthfulqa,winogrande $collapse_prompts $dir/*.txt
