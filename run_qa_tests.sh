@@ -105,7 +105,7 @@ do
             few_shot_number=$(get_few_shot_number "$dataset" "$few_shot")
 
             # Define log file name
-            log_file="logs/${model}_${dataset}_${question_range}_prompt-phrasing-${prompt_phrasing}"
+            log_file="logs/${dataset}_${model}_${question_range}_prompt-phrasing-${prompt_phrasing}"
 
             # Append "few_shot" to log file name if few_shot is True
             if [ "$few_shot" = "True" ]; then
