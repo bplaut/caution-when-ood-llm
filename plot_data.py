@@ -100,7 +100,7 @@ def scatter_plot(xs, ys, output_dir, model_names, xlabel, ylabel, dataset='all d
         print("slope, r_value, p_value for", xlabel, ylabel, "is", slope, r_value, p_value)
         plt.plot(xs, intercept + slope * xs, color=line_color, linestyle='-')
 
-        plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else '' if group == 'main_figs' else group
+        plot_name = 'MSP' if group == 'no_abst_norm_logits' else 'Max Logit' if group == 'no_abst_raw_logits' else 'Prod MSPs' if group =='no_abst_prod_probs' else '' if group == 'main_figs' else group
         plot_name = plot_name if dataset == 'all datasets' else f'{plot_name}, {dataset}'
         file_suffix = f"_{dataset}_{plot_name.replace(' ','_').replace(',','')}"
         if file_suffix.endswith('_'):
