@@ -67,7 +67,6 @@ class OpenAIGenerator(Generator):
         if not normalize: # OpenAI api only gives us normalized probabilities, not raw logits
             return [0]
         if product:
-            print("scores:", scores)
             return [math.prod(scores)]
         targets = [c for c in ascii_uppercase][:len(choices[0])]
         tokens = token_outputs[0]
