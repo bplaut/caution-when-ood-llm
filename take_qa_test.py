@@ -65,11 +65,10 @@ class Test(object):
         return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{classifier_str}{prompt_str}{few_shot_str}.txt"
         
     def write_output(self, grades, conf_levels_normed, conf_levels_raw, conf_levels_prod, parsing_issues):
-        classifier_strs = ["_norm_logits", "_prod_probs"]
-        if not 'gpt' in self.args['model']:
-            classifier_strs += ["_raw_logits"] # OpenAI models don't have pre-softmax logits
+        classifier_strs = ["_norm_logits", "_prod_probs"] if 'gpt' in self.args['model'] else ["_norm_logits", "_prod_probs", "_raw_logits"] # OpenAI models don't have pre-softmax logits
 
-        for (classifier_str, conf_levels) in zip(classifier_strs, [conf_levels_normed, conf_levels_raw]):
+        for classifier_str in classifier_strs:
+            conf_levels = conf_levels_normed if classifier_str == "_norm_logits" else conf_levels_prod if classifier_str == "_prod_probs" else conf_levels_raw
             output_filepath = self.get_output_filepath(classifier_str)
             print('\nWriting results to', output_filepath)
             with open(output_filepath, 'w') as f:
