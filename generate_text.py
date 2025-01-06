@@ -45,18 +45,24 @@ class Generator(object):
 
         self.num_responses = 1 if not self.args['do_sample'] else self.args['num_responses']
 
-    def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True):
-        # Find the max probability for the token which determines the answer      
+    def compute_confidence_levels(self, text_outputs, token_outputs, scores, choices, normalize=True, product=False):
+        # If product=False, find the max probability for the token which determines the answer. Else, find the product of the max probabilities across all tokens
         confidence_levels = [None] * len(text_outputs)
         for (i, response) in enumerate(text_outputs):
-            num_choices = len(choices[i]) if len(choices) > i else 0
-            main_targets = [c + '.' for c in ascii_uppercase][:num_choices]
-            backup_targets = choices[i] + [c for c in ascii_uppercase][:num_choices]
-            token_idx1 = self.token_idx_of_first_target(response, main_targets)
-            token_idx2 = self.token_idx_of_first_target(response, backup_targets)
-            token_idx = token_idx1 if token_idx1 != -1 else token_idx2
-            (conf, _) = self.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=normalize)
-            confidence_levels[i] = conf
+            if product:
+                confidence_levels[i] = 1
+                for j in range(len(token_outputs[i])):
+                    (conf, _) = self.min_max_logit(scores, i, lo=j, hi=j+1, normalize=normalize)
+                    confidence_levels[i] *= conf
+            else:
+                num_choices = len(choices[i]) if len(choices) > i else 0
+                main_targets = [c + '.' for c in ascii_uppercase][:num_choices]
+                backup_targets = [c for c in ascii_uppercase][:num_choices]
+                token_idx1 = self.token_idx_of_first_target(response, main_targets)
+                token_idx2 = self.token_idx_of_first_target(response, backup_targets)
+                token_idx = token_idx1 if token_idx1 != -1 else token_idx2
+                (conf, _) = self.min_max_logit(scores, i, lo=token_idx, hi=token_idx+1, normalize=normalize)
+                confidence_levels[i] = conf
         return confidence_levels
         
     def min_max_logit(self, scores, response_idx, lo=0, hi=None, normalize=True):

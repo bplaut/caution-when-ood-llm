@@ -54,7 +54,7 @@ class Test(object):
         else:
             raise Exception(f"Unknown answer format: {answer}")
 
-    def get_output_filepath(self, logit_str):
+    def get_output_filepath(self, classifier_str):
         dataset_str = self.args['dataset'].split("/")[-1]
         abstain_str = "_yes_abst" if self.args['abstain_option'] else "_no_abst"
         prompt_name = {0: "first", 1: "second", 2: "third"}[self.args['prompt_phrasing']]
@@ -62,13 +62,15 @@ class Test(object):
         few_shot_str = '' if self.args['few_shot_number'] == 0 else f"_few_shot_{self.args['few_shot_number']}"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
-        return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_str}{prompt_str}{few_shot_str}.txt"
+        return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{classifier_str}{prompt_str}{few_shot_str}.txt"
         
-    def write_output(self, grades, conf_levels_normed, conf_levels_raw, parsing_issues):
-        logit_strs = ["_norm_logits", "_raw_logits"] if not 'gpt' in self.args['model'] else ["_norm_logits"]
-        # OpenAI models don't have pre-softmax logits
-        for (logit_str, conf_levels) in zip(logit_strs, [conf_levels_normed, conf_levels_raw]):
-            output_filepath = self.get_output_filepath(logit_str)
+    def write_output(self, grades, conf_levels_normed, conf_levels_raw, conf_levels_prod, parsing_issues):
+        classifier_strs = ["_norm_logits", "_prod_probs"]
+        if not 'gpt' in self.args['model']:
+            classifier_strs += ["_raw_logits"] # OpenAI models don't have pre-softmax logits
+
+        for (classifier_str, conf_levels) in zip(classifier_strs, [conf_levels_normed, conf_levels_raw]):
+            output_filepath = self.get_output_filepath(classifier_str)
             print('\nWriting results to', output_filepath)
             with open(output_filepath, 'w') as f:
                 f.write("grade confidence_level parsing_issue_occurred\n")
@@ -180,8 +182,10 @@ Answer:
         # Batch inference
         print("Running inference...\n")
         (text_outputs, token_outputs, scores) = self.model.generate(prompts)
-        confidence_levels_normed = self.model.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=True)
-        confidence_levels_raw = self.model.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=False)
+        confidence_levels_normed = self.model.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=True, product=False)
+        confidence_levels_raw = self.model.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=False, product=False)
+        confidence_levels_product = self.model.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=False, product=True)
+        # product of logits doesn't make sense so we only do product of probs
 
         # Grade outputs
         print("Grading answers...\n")
@@ -196,9 +200,10 @@ Answer:
             # Sometimes we get "" because of how t_to_str works
             print(f"Confidence level normalized: {conf_str(confidence_levels_normed[i])}\n")
             print(f"Confidence level raw: {conf_str(confidence_levels_raw[i])}\n")
+            print(f"Confidence level product: {conf_str(confidence_levels_product[i])}\n")
             grades[i] = grade
             parsing_issues[i] = parsing_issue_occurred
-        return (grades, confidence_levels_normed, confidence_levels_raw, parsing_issues)
+        return (grades, confidence_levels_normed, confidence_levels_raw, confidence_levels_product, parsing_issues)
 
 def main():
     random.seed(2549900867) # We'll randomize the order of questions and of answer choices, but we want every run to have the same randomization
@@ -211,18 +216,19 @@ def main():
         print(f"Results file {output_filepath} already exists. Exiting.")
         return
     
-    all_grades, all_conf_levels_normed, all_conf_levels_raw, all_parsing_issues = [], [], [], []
+    all_grades, all_conf_levels_normed, all_conf_levels_raw, all_conf_levels_prod, all_parsing_issues = [], [], [], [], []
     for start_q in range(test.start_q, test.end_q, args['batch_size']):
         end_q = min(start_q + args['batch_size'], test.end_q)
         if args['batch_size'] > 1:
             print(f"\nSTARTING NEW BATCH: questions {start_q} to {end_q}\n")
-        (grades, conf_levels_normed, conf_levels_raw, parsing_issues) = test.run_test(start_q, end_q)
+        (grades, conf_levels_normed, conf_levels_raw, conf_levels_prod, parsing_issues) = test.run_test(start_q, end_q)
         all_grades += grades
         all_conf_levels_normed += conf_levels_normed
         all_conf_levels_raw += conf_levels_raw
+        all_conf_levels_prod += conf_levels_prod
         all_parsing_issues += parsing_issues
     if len(all_grades) > 0: # E.g. if the dataset only has 817 qs but you ask to run qs 1000-1500
-        test.write_output(all_grades, all_conf_levels_normed, all_conf_levels_raw, all_parsing_issues)
+        test.write_output(all_grades, all_conf_levels_normed, all_conf_levels_raw, all_conf_levels_prod, all_parsing_issues)
     else:
         print("The question range you provided is empty. This could either be because endq < startq or because the dataset is too small.")
 
