@@ -184,7 +184,7 @@ Answer:
         (text_outputs, token_outputs, scores) = self.model.generate(prompts)
         confidence_levels_normed = self.model.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=True, product=False)
         confidence_levels_raw = self.model.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=False, product=False)
-        confidence_levels_product = self.model.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=False, product=True)
+        confidence_levels_product = self.model.compute_confidence_levels(text_outputs, token_outputs, scores, choices, normalize=True, product=True)
         # product of logits doesn't make sense so we only do product of probs
 
         # Grade outputs
