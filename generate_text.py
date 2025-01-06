@@ -51,9 +51,11 @@ class Generator(object):
         for (i, response) in enumerate(text_outputs):
             if product:
                 confidence_levels[i] = 1
-                for j in range(len(token_outputs[i])-1): # -1 because the last token is always a padding token
-                    (conf, _) = self.min_max_logit(scores, i, lo=j, hi=j+1, normalize=normalize)
-                    confidence_levels[i] *= conf
+                for j in range(len(token_outputs[i])):
+                    # only count non-adding tokens
+                    if self.tokenizer.decode(token_outputs[i][j]) != self.tokenizer.pad_token:
+                        (conf, _) = self.min_max_logit(scores, i, lo=j, hi=j+1, normalize=normalize)
+                        confidence_levels[i] *= conf
             else:
                 num_choices = len(choices[i]) if len(choices) > i else 0
                 main_targets = [c + '.' for c in ascii_uppercase][:num_choices]
