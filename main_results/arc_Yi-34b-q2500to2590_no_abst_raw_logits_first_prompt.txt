@@ -1,91 +1,91 @@
-grade confidence_level
-Correct 22.703125
-Correct 22.765625
-Wrong 22.46875
-Correct 22.6875
-Correct 22.0625
-Correct 22.15625
-Correct 20.25
-Correct 24.15625
-Correct 23.984375
-Correct 21.96875
-Correct 22.859375
-Correct 22.890625
-Correct 25.203125
-Correct 21.34375
-Correct 24.3125
-Correct 21.109375
-Correct 24.265625
-Correct 23.953125
-Wrong 23.625
-Correct 24.140625
-Correct 21.3125
-Correct 24.546875
-Correct 22.890625
-Correct 19.09375
-Correct 21.953125
-Correct 24.5625
-Correct 22.34375
-Correct 20.921875
-Wrong 22.46875
-Wrong 21.3125
-Wrong 20.6875
-Correct 22.921875
-Wrong 20.53125
-Wrong 22.0625
-Correct 23.0
-Correct 23.109375
-Correct 24.75
-Correct 22.34375
-Correct 21.890625
-Correct 21.453125
-Correct 21.765625
-Wrong 19.390625
-Correct 24.8125
-Correct 22.625
-Correct 23.125
-Correct 22.328125
-Correct 22.71875
-Wrong 21.375
-Wrong 20.984375
-Correct 22.015625
-Correct 23.265625
-Correct 20.90625
-Wrong 20.640625
-Wrong 23.453125
-Correct 23.703125
-Wrong 23.65625
-Correct 21.84375
-Correct 21.6875
-Correct 20.359375
-Correct 21.84375
-Wrong 21.625
-Correct 22.34375
-Wrong 23.875
-Correct 21.078125
-Correct 22.53125
-Correct 23.0625
-Correct 24.15625
-Correct 22.25
-Correct 19.109375
-Correct 21.140625
-Wrong 22.40625
-Correct 22.15625
-Wrong 20.75
-Correct 23.78125
-Correct 21.578125
-Correct 22.0
-Correct 21.5625
-Correct 23.9375
-Correct 24.421875
-Correct 22.46875
-Correct 23.265625
-Correct 19.796875
-Wrong 19.75
-Correct 24.828125
-Correct 21.9375
-Correct 19.046875
-Correct 22.34375
-Correct 23.0625
-Correct 22.40625
-Correct 21.890625
+grade confidence_level parsing_issue_occurred
+Correct 23.453125 0
+Correct 23.296875 0
+Wrong 23.0625 2
+Correct 23.453125 0
+Correct 22.203125 2
+Correct 22.9375 0
+Correct 20.640625 1
+Correct 24.609375 2
+Correct 25.203125 2
+Correct 22.90625 2
+Correct 23.28125 0
+Correct 23.5625 0
+Correct 25.859375 2
+Correct 22.71875 1
+Correct 24.8125 2
+Correct 20.84375 1
+Correct 24.734375 2
+Correct 24.359375 0
+Wrong 23.9375 0
+Correct 24.8125 0
+Correct 20.96875 1
+Correct 25.3125 0
+Correct 23.609375 0
+Wrong 22.59375 1
+Correct 21.1875 1
+Correct 25.0625 0
+Correct 23.140625 0
+Correct 20.953125 0
+Wrong 23.1875 2
+Wrong 22.25 1
+Wrong 23.03125 1
+Correct 22.46875 1
+Wrong 21.0625 0
+Wrong 22.5625 2
+Correct 23.71875 0
+Correct 23.578125 0
+Correct 25.25 0
+Correct 22.796875 0
+Correct 21.65625 0
+Correct 21.96875 0
+Correct 22.859375 1
+Correct 22.234375 1
+Correct 25.484375 0
+Correct 23.578125 0
+Correct 23.640625 2
+Correct 22.90625 0
+Correct 23.28125 0
+Wrong 22.34375 0
+Wrong 20.015625 1
+Correct 22.609375 0
+Correct 23.703125 0
+Correct 22.625 1
+Wrong 21.1875 0
+Wrong 23.671875 2
+Correct 23.90625 0
+Wrong 23.890625 0
+Correct 22.453125 0
+Correct 22.5625 0
+Correct 20.125 1
+Correct 22.078125 0
+Wrong 23.515625 1
+Correct 25.0 1
+Wrong 24.703125 2
+Correct 22.03125 2
+Correct 22.859375 0
+Correct 23.28125 0
+Correct 23.984375 2
+Correct 20.484375 1
+Correct 21.625 1
+Correct 21.46875 1
+Wrong 22.703125 2
+Correct 22.65625 2
+Wrong 22.1875 1
+Correct 24.609375 0
+Correct 22.421875 1
+Correct 22.65625 0
+Correct 22.5625 0
+Correct 24.671875 0
+Correct 25.0 0
+Correct 22.78125 2
+Correct 23.9375 0
+Correct 21.84375 1
+Wrong 23.53125 1
+Correct 25.328125 2
+Correct 22.5625 0
+Correct 23.765625 1
+Correct 23.15625 2
+Correct 23.578125 0
+Correct 22.6875 0
+Wrong 21.671875 1

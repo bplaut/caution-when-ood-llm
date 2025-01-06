@@ -1,501 +1,501 @@
-grade confidence_level
-Correct 1.0
-Correct 1.0
-Correct 0.9747897982597351
-Correct 1.0
-Correct 0.987170934677124
-Correct 0.9587393999099731
-Correct 1.0
-Correct 0.9999998211860657
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999998211860657
-Correct 1.0
-Wrong 0.4941520690917969
-Correct 0.9999955892562866
-Correct 0.9854717254638672
-Correct 1.0
-Correct 1.0
-Correct 0.9950606822967529
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9998766183853149
-Correct 1.0
-Correct 0.9999876022338867
-Correct 0.9724602103233337
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999999403953552
-Correct 1.0
-Correct 0.9999748468399048
-Correct 0.9999997615814209
-Wrong 0.6579685807228088
-Correct 1.0
-Wrong 0.9975274205207825
-Wrong 1.0
-Correct 0.9999998807907104
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999999403953552
-Correct 0.999391496181488
-Correct 0.9777132272720337
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.999998927116394
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 0.6855974793434143
-Correct 0.9553057551383972
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999920725822449
-Wrong 0.9999945163726807
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999439716339111
-Correct 1.0
-Wrong 0.9999644756317139
-Correct 0.9999887943267822
-Correct 1.0
-Correct 0.9999999403953552
-Correct 0.9999999403953552
-Correct 0.9999974966049194
-Correct 1.0
-Correct 0.9988299012184143
-Correct 0.9999834299087524
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 0.6790886521339417
-Correct 0.5544064044952393
-Correct 0.9999961256980896
-Correct 0.9412880539894104
-Correct 1.0
-Wrong 0.5155632495880127
-Correct 1.0
-Correct 1.0
-Correct 0.9875825047492981
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9684507846832275
-Correct 1.0
-Wrong 0.9858023524284363
-Correct 1.0
-Correct 0.9999978542327881
-Correct 1.0
-Correct 1.0
-Correct 0.9274311661720276
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999996423721313
-Correct 1.0
-Correct 0.9998257160186768
-Correct 1.0
-Correct 0.9999997615814209
-Correct 0.9999999403953552
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9995110034942627
-Correct 1.0
-Correct 0.9999998211860657
-Correct 1.0
-Wrong 0.9998891353607178
-Correct 0.999996542930603
-Correct 0.9999037981033325
-Correct 1.0
-Correct 0.9999961853027344
-Correct 1.0
-Correct 0.9999998807907104
-Correct 0.9999999403953552
-Correct 1.0
-Correct 0.9992440342903137
-Correct 0.9999967813491821
-Correct 0.9999873638153076
-Correct 0.9999998807907104
-Correct 1.0
-Correct 0.999972939491272
-Correct 0.9999980926513672
-Correct 1.0
-Correct 1.0
-Correct 0.9999988675117493
-Correct 1.0
-Wrong 0.9411430358886719
-Correct 0.9999969601631165
-Correct 1.0
-Correct 0.9796960949897766
-Correct 1.0
-Correct 1.0
-Correct 0.9999999403953552
-Correct 0.9999679327011108
-Correct 0.9999924302101135
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999963641166687
-Correct 0.9999584555625916
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 0.9999999403953552
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.999998927116394
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.999995231628418
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999539256095886
-Correct 0.999811053276062
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999998807907104
-Correct 0.999999463558197
-Correct 1.0
-Correct 1.0
-Correct 0.8902783393859863
-Correct 1.0
-Correct 0.9999993443489075
-Correct 1.0
-Correct 0.9999973177909851
-Correct 1.0
-Correct 1.0
-Wrong 1.0
-Correct 0.9995108842849731
-Wrong 0.7826603651046753
-Correct 1.0
-Correct 0.9995678067207336
-Correct 1.0
-Correct 0.9999983906745911
-Correct 1.0
-Correct 0.9999985694885254
-Correct 0.9999963641166687
-Correct 1.0
-Correct 1.0
-Correct 0.9999999403953552
-Correct 1.0
-Correct 0.9999996423721313
-Correct 1.0
-Correct 0.9999996423721313
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9913002848625183
-Correct 1.0
-Wrong 0.9957067370414734
-Correct 1.0
-Wrong 0.9776105284690857
-Correct 0.9992431998252869
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9539619088172913
-Correct 0.9999998807907104
-Wrong 0.8584240674972534
-Correct 1.0
-Correct 0.9379579424858093
-Correct 0.9999988675117493
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 0.9999997019767761
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999998807907104
-Correct 0.99988853931427
-Correct 0.9999999403953552
-Correct 1.0
-Correct 0.9940618276596069
-Correct 1.0
-Correct 1.0
-Correct 0.9258800148963928
-Correct 0.9999796152114868
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 0.8311240673065186
-Wrong 0.9999868273735046
-Correct 0.9998810291290283
-Wrong 0.9999999403953552
-Correct 1.0
-Correct 1.0
-Correct 0.9999993443489075
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 0.974561333656311
-Correct 1.0
-Correct 0.9999884366989136
-Correct 1.0
-Correct 1.0
-Wrong 0.9994677305221558
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 0.9999598264694214
-Correct 1.0
-Correct 0.998274028301239
-Correct 1.0
-Correct 0.9782775044441223
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999912977218628
-Correct 0.9999988079071045
-Correct 1.0
-Correct 0.9999879002571106
-Correct 1.0
-Correct 1.0
-Wrong 1.0
-Correct 0.9944447875022888
-Correct 0.9999998807907104
-Wrong 0.9909597635269165
-Correct 0.986768901348114
-Correct 1.0
-Correct 0.9986348748207092
-Wrong 0.9248523116111755
-Correct 0.9999999403953552
-Correct 1.0
-Correct 0.9999999403953552
-Correct 0.9993513822555542
-Wrong 0.9789466261863708
-Correct 1.0
-Correct 1.0
-Correct 0.9999980330467224
-Correct 0.9999999403953552
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999668598175049
-Correct 1.0
-Correct 0.9999969601631165
-Correct 1.0
-Correct 0.7951988577842712
-Correct 1.0
-Correct 1.0
-Correct 0.9999997019767761
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999991655349731
-Correct 0.9999904632568359
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 0.9989804029464722
-Correct 0.9998601078987122
-Correct 1.0
-Correct 1.0
-Correct 0.9871283769607544
-Correct 0.9999999403953552
-Wrong 0.8201772570610046
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999997615814209
-Correct 0.9999998211860657
-Correct 1.0
-Correct 0.999958872795105
-Correct 0.97456294298172
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999852180480957
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999921321868896
-Correct 1.0
-Correct 0.9999099969863892
-Correct 1.0
-Wrong 0.9999822974205017
-Correct 0.9994290471076965
-Wrong 0.9998725652694702
-Correct 1.0
-Correct 0.9910378456115723
-Correct 1.0
-Correct 0.9999999403953552
-Correct 0.9996955990791321
-Correct 1.0
-Correct 1.0
-Correct 0.999422550201416
-Wrong 0.9999987483024597
-Correct 0.9999991655349731
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.5925756692886353
-Correct 0.9999999403953552
-Wrong 0.644197940826416
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999949336051941
-Correct 1.0
-Correct 0.9999995827674866
-Wrong 0.598436176776886
-Correct 0.592271089553833
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.999999463558197
-Correct 1.0
-Correct 1.0
-Correct 0.999640703201294
-Correct 1.0
-Correct 0.9932516813278198
-Correct 1.0
-Correct 1.0
-Correct 0.999998927116394
-Correct 1.0
-Correct 1.0
-Correct 0.9962874054908752
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9019206762313843
-Correct 0.7718215584754944
-Correct 1.0
-Wrong 1.0
-Correct 1.0
-Correct 0.7603079676628113
-Correct 1.0
-Correct 1.0
-Correct 0.9997354745864868
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Wrong 0.4197486639022827
-Correct 0.9992678165435791
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.947145938873291
-Correct 1.0
-Correct 0.9997585415840149
-Correct 1.0
-Correct 0.9999994039535522
-Correct 0.9999762177467346
-Correct 0.9987434148788452
-Wrong 0.9892308115959167
-Correct 0.9998360276222229
-Wrong 0.5301140546798706
-Correct 0.999477744102478
-Correct 0.9875680208206177
-Correct 1.0
-Correct 0.9999997615814209
-Correct 1.0
-Wrong 0.99997878074646
-Correct 1.0
-Correct 1.0
-Wrong 0.6653045415878296
-Correct 1.0
-Correct 0.9969189763069153
-Correct 0.9999995231628418
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.8339850306510925
-Correct 0.9999980330467224
-Correct 1.0
-Correct 0.9999719858169556
-Correct 1.0
-Correct 1.0
-Wrong 0.49736812710762024
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999991059303284
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9982154965400696
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.9999991059303284
-Correct 1.0
-Correct 0.9999998211860657
-Wrong 0.9927100539207458
-Correct 1.0
-Correct 1.0
-Correct 0.9999827742576599
-Correct 1.0
-Correct 1.0
-Correct 0.9930773973464966
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 1.0
-Correct 0.999586820602417
-Correct 1.0
-Correct 0.9998415112495422
-Correct 0.9999749064445496
+grade confidence_level parsing_issue_occurred
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.973208487033844 0
+Correct 1.0 0
+Correct 0.987170934677124 0
+Correct 0.9587393999099731 0
+Correct 1.0 0
+Correct 0.9999998211860657 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999998211860657 0
+Correct 1.0 0
+Wrong 0.4941460192203522 0
+Correct 0.9999955892562866 0
+Correct 0.9850181937217712 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9952201247215271 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9998766183853149 0
+Correct 1.0 0
+Correct 0.9999871850013733 0
+Correct 0.9733777642250061 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999999403953552 0
+Correct 1.0 0
+Correct 0.9999748468399048 0
+Correct 0.9999997615814209 0
+Wrong 0.6579834818840027 0
+Correct 1.0 0
+Wrong 0.9975274205207825 0
+Wrong 1.0 0
+Correct 0.9999998807907104 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999999403953552 0
+Correct 0.999391496181488 0
+Correct 0.9777132272720337 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.999998927116394 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.6922892928123474 0
+Correct 0.9553059339523315 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.999991774559021 0
+Wrong 0.9999945163726807 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999443888664246 0
+Correct 1.0 0
+Wrong 0.9999632835388184 0
+Correct 0.9999890327453613 0
+Correct 1.0 0
+Correct 0.9999999403953552 0
+Correct 0.9999999403953552 0
+Correct 0.9999974966049194 0
+Correct 1.0 0
+Correct 0.9988299012184143 0
+Correct 0.9999828338623047 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.6925512552261353 0
+Correct 0.5544047951698303 0
+Correct 0.9999960660934448 0
+Correct 0.9412880539894104 0
+Correct 1.0 0
+Wrong 0.5222193598747253 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9875825047492981 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9684507846832275 0
+Correct 1.0 0
+Wrong 0.9853250980377197 0
+Correct 1.0 0
+Correct 0.9999980330467224 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9271106123924255 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999996423721313 0
+Correct 1.0 0
+Correct 0.9998204112052917 0
+Correct 1.0 0
+Correct 0.9999997615814209 0
+Correct 0.9999999403953552 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9995110034942627 0
+Correct 1.0 0
+Correct 0.9999998211860657 0
+Correct 1.0 0
+Wrong 0.999889075756073 0
+Correct 0.9999966621398926 0
+Correct 0.9999067187309265 0
+Correct 1.0 0
+Correct 0.9999962449073792 0
+Correct 1.0 0
+Correct 0.9999998807907104 0
+Correct 0.9999999403953552 0
+Correct 1.0 0
+Correct 0.9992440342903137 0
+Correct 0.9999967813491821 0
+Correct 0.9999869465827942 0
+Correct 0.9999998807907104 0
+Correct 1.0 0
+Correct 0.9999733567237854 0
+Correct 0.999998152256012 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999988675117493 0
+Correct 1.0 0
+Wrong 0.939390242099762 0
+Correct 0.9999968409538269 0
+Correct 1.0 0
+Correct 0.9796955585479736 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999999403953552 0
+Correct 0.9999688863754272 0
+Correct 0.9999925494194031 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999963641166687 0
+Correct 0.9999577403068542 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.9999999403953552 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.999998927116394 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.999995231628418 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999532103538513 0
+Correct 0.9998124837875366 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999998807907104 0
+Correct 0.999999463558197 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.8902783393859863 0
+Correct 1.0 0
+Correct 0.9999993443489075 0
+Correct 1.0 0
+Correct 0.9999973177909851 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 1.0 0
+Correct 0.9995108842849731 0
+Wrong 0.7718414068222046 0
+Correct 1.0 0
+Correct 0.9995636343955994 0
+Correct 1.0 0
+Correct 0.9999983906745911 0
+Correct 1.0 0
+Correct 0.9999986290931702 0
+Correct 0.9999962449073792 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999999403953552 0
+Correct 1.0 0
+Correct 0.9999996423721313 0
+Correct 1.0 0
+Correct 0.9999996423721313 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9912980794906616 0
+Correct 1.0 0
+Wrong 0.9957730174064636 0
+Correct 1.0 0
+Wrong 0.9778900146484375 0
+Correct 0.9992431998252869 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9539619088172913 0
+Correct 0.9999998807907104 0
+Wrong 0.8584222793579102 0
+Correct 1.0 0
+Correct 0.9394403100013733 0
+Correct 0.9999988079071045 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.9999998211860657 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999998807907104 0
+Correct 0.9998898506164551 0
+Correct 0.9999999403953552 0
+Correct 1.0 0
+Correct 0.9936913251876831 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9237200617790222 0
+Correct 0.9999798536300659 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.8397150039672852 0
+Wrong 0.999987006187439 0
+Correct 0.9998846054077148 0
+Wrong 0.9999999403953552 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999993443489075 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.974561333656311 0
+Correct 1.0 0
+Correct 0.9999881982803345 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.9994512796401978 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.9999585151672363 0
+Correct 1.0 0
+Correct 0.9982611536979675 0
+Correct 1.0 0
+Correct 0.9789302945137024 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999912977218628 0
+Correct 0.9999988079071045 0
+Correct 1.0 0
+Correct 0.9999877214431763 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 1.0 0
+Correct 0.9946147799491882 0
+Correct 0.9999998807907104 0
+Wrong 0.9909430742263794 0
+Correct 0.9867687821388245 0
+Correct 1.0 0
+Correct 0.9986560344696045 0
+Wrong 0.9227262139320374 0
+Correct 0.9999999403953552 0
+Correct 1.0 0
+Correct 0.9999999403953552 0
+Correct 0.999331533908844 0
+Wrong 0.9789465069770813 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999980926513672 0
+Correct 0.9999999403953552 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999675750732422 0
+Correct 1.0 0
+Correct 0.9999969601631165 0
+Correct 1.0 0
+Correct 0.7939512133598328 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999997019767761 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999991655349731 0
+Correct 0.9999906420707703 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.9990060329437256 0
+Correct 0.9998685717582703 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.987519383430481 0
+Correct 0.9999999403953552 0
+Wrong 0.8213353157043457 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999997615814209 0
+Correct 0.9999998211860657 0
+Correct 1.0 0
+Correct 0.9999613761901855 0
+Correct 0.9737924337387085 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999852180480957 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999920129776001 0
+Correct 1.0 0
+Correct 0.9999127984046936 0
+Correct 1.0 0
+Wrong 0.9999821782112122 0
+Correct 0.9994465708732605 0
+Wrong 0.9998765587806702 0
+Correct 1.0 0
+Correct 0.9913118481636047 0
+Correct 1.0 0
+Correct 0.9999999403953552 0
+Correct 0.9996947050094604 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9994077086448669 0
+Wrong 0.9999987483024597 0
+Correct 0.9999991655349731 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.5925756692886353 0
+Correct 0.9999999403953552 0
+Wrong 0.6513290405273438 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999951720237732 0
+Correct 1.0 0
+Correct 0.9999995827674866 0
+Wrong 0.590965986251831 0
+Correct 0.5922755599021912 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.999999463558197 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9996293187141418 0
+Correct 1.0 0
+Correct 0.9932386875152588 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999989867210388 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9961699843406677 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.8991214036941528 0
+Correct 0.7718215584754944 0
+Correct 1.0 0
+Wrong 1.0 0
+Correct 1.0 0
+Correct 0.7603079676628113 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9997435808181763 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.42388075590133667 0
+Correct 0.9992678165435791 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.947145938873291 0
+Correct 1.0 0
+Correct 0.9997585415840149 0
+Correct 1.0 0
+Correct 0.9999994039535522 0
+Correct 0.9999762177467346 0
+Correct 0.9987434148788452 0
+Wrong 0.9892308115959167 0
+Correct 0.9998360276222229 0
+Wrong 0.5301140546798706 0
+Correct 0.9994779229164124 0
+Correct 0.9875680208206177 0
+Correct 1.0 0
+Correct 0.9999997615814209 0
+Correct 1.0 0
+Wrong 0.9999793171882629 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.6653041243553162 0
+Correct 1.0 0
+Correct 0.9969189763069153 0
+Correct 0.9999995827674866 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.8296384811401367 0
+Correct 0.9999980330467224 0
+Correct 1.0 0
+Correct 0.9999711513519287 0
+Correct 1.0 0
+Correct 1.0 0
+Wrong 0.49736812710762024 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999991655349731 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9982154965400696 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9999991059303284 0
+Correct 1.0 0
+Correct 0.9999998211860657 0
+Wrong 0.9924831390380859 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.999982476234436 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9928600788116455 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 1.0 0
+Correct 0.9995739459991455 0
+Correct 1.0 0
+Correct 0.9998462200164795 0
+Correct 0.9999760389328003 0
