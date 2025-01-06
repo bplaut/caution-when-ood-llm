@@ -41,8 +41,8 @@ def print_parsing_stats(stats_per_model):
         for i in range(6):
             overall_totals[i] += model_data[i]
 
-    # Print stats per model
-    for model_name, model_data in stats_per_model.items():
+    # Print stats per model, sorted alphabetically
+    for model_name, model_data in sorted(stats_per_model.items()):
         total = model_data[5]
         print(f"=== Stats for model {model_name} ===")
         print(f"Total data points: {total}")
