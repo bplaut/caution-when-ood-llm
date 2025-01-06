@@ -30,8 +30,7 @@ class OpenAIGenerator(Generator):
             logprobs=True,
             messages=[{"role": "user", "content": prompts[0]}]
         )
-        print("System fingerprint:", response.system_fingerprint, '\n')
-        # The output types are lists to support batching (which we'll hopefully add for these models, and which the non-OpenAI models already support)
+        # The output types are lists to support batching (which OpenAI currently doesn't actually support, but hopefully will eventually)
         text_output = [response.choices[0].message.content]
         token_output = [[token.token for token in response.choices[0].logprobs.content]]
         scores = [math.exp(token.logprob) for token in response.choices[0].logprobs.content]
