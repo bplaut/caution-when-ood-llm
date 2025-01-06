@@ -51,7 +51,7 @@ class Generator(object):
         for (i, response) in enumerate(text_outputs):
             if product:
                 confidence_levels[i] = 1
-                for j in range(len(token_outputs[i])):
+                for j in range(len(token_outputs[i])-1): # -1 because the last token is always a padding token
                     (conf, _) = self.min_max_logit(scores, i, lo=j, hi=j+1, normalize=normalize)
                     confidence_levels[i] *= conf
             else:
@@ -67,7 +67,7 @@ class Generator(object):
         
     def min_max_logit(self, scores, response_idx, lo=0, hi=None, normalize=True):
         # scores has shape (response_length, num_responses, vocab_size)
-        scores = scores[lo:hi,::] 
+        scores = scores[lo:hi,::]
         if len(scores) == 0: # For example, when we call this fn with lo=first_token_idx(x)=len(scores) if we don't find token x
             return (0, None)
         if normalize:
