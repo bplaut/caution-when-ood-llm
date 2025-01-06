@@ -9,7 +9,7 @@ class Test(object):
     def __init__(self, args):
         bounds = args['question_range'].split('-')
         (self.start_q, self.end_q) = (int(bounds[0]), int(bounds[1]))
-        self.model = OpenAIGenerator(args) if 'gpt' in args['model'] else Generator(args)
+        self.model = OpenAIGenerator(args) if 'gpt' or 'o1' in args['model'] else Generator(args)
         self.args = args
 
         dset_name = args['dataset'].lower()

@@ -16,7 +16,10 @@ class OpenAIGenerator(Generator):
         assert len(prompts) == 1 # for now
         full_name = ('gpt-3.5-turbo-0125' if self.args['model'] == 'gpt-3.5-turbo' else
                      'gpt-4-0613' if self.args['model'] == 'gpt-4' else
-                     'gpt-4-0125-preview' if self.args['model'] == 'gpt-4-turbo' else
+                     'gpt-4-turbo-2024-04-09' if self.args['model'] == 'gpt-4-turbo' else
+                     'gpt-4o-2024-11-20' if self.args['model'] == 'gpt-4o' else
+                     'o1-mini-2024-09-12' if self.args['model'] == 'o1-mini' else
+                     'o1-2024-12-17' if self.args['model'] == 'o1' else
                      self.args['model'])
         response = self.client.chat.completions.create(
             model=full_name,
