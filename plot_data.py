@@ -619,7 +619,7 @@ def main():
                     new_output_dir = os.path.join(output_dir, 'cross_group_plots', bottom_dir)
                     cross_group_plots(data, new_output_dir)
                     # For tables, need MSP data as first arg, Max Logit data as second arg
-                    if logit_type_1 != logit_type_2:
+                    if ('norm' in logit_type_1 and 'raw' in logit_type_2) or ('raw' in logit_type_1 and 'norm' in logit_type_2):
                         msp_group = group_data[group1 if 'norm' in logit_type_1 else group2]
                         max_logit_group = group_data[group1 if 'raw' in logit_type_1 else group2]
                         dset = '' if len(datasets_to_analyze) > 1 else datasets_to_analyze[0]
