@@ -48,9 +48,10 @@ def expand_model_name(name):
                      'Llama 3 70B' if base == 'Llama3-70b' else
                      'Yi 6B' if base == 'Yi-6b' else
                      'Yi 34B' if base == 'Yi-34b' else
-                     'GPT3.5 Turbo' if base == 'gpt-3.5-turbo' else
-                     'GPT4 Turbo' if base == 'gpt-4-turbo' else
-                     'GPT4' if base == 'gpt-4' else
+                     'GPT-3.5 Turbo' if base == 'gpt-3.5-turbo' else
+                     'GPT-4 Turbo' if base == 'gpt-4-turbo' else
+                     'GPT-4' if base == 'gpt-4' else
+                     'GPT-4o' if base == 'gpt-4o' else
                      'Falcon 7B' if base == 'Falcon-7b' else
                      'Falcon 40B' if base == 'Falcon-40b' else base)
     return base_expanded + ' base' if name.endswith('-raw') else base_expanded
