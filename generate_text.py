@@ -52,8 +52,9 @@ class Generator(object):
             if product:
                 confidence_levels[i] = 1
                 for j in range(len(token_outputs[i])):
-                    # only count non-adding tokens
-                    if self.tokenizer.decode(token_outputs[i][j]) != self.tokenizer.pad_token:
+                    # only count non-padding tokens
+                    print("Token %d" % j, self.tokenizer.decode(token_outputs[i][j]), self.tokenizer.pad_token)
+                    if self.tokenizer.decode(token_outputs[i][j]) not in (self.tokenizer.pad_token, "<unk>"):
                         (conf, _) = self.min_max_logit(scores, i, lo=j, hi=j+1, normalize=normalize)
                         confidence_levels[i] *= conf
             else:
