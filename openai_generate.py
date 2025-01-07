@@ -79,4 +79,4 @@ class OpenAIGenerator(Generator):
         for i in range(len(tokens) - 1):
             if tokens[i].strip() in targets:
                 return [scores[i]]
-        return result
+        return [0] # failed to parse
