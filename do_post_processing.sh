@@ -21,7 +21,7 @@ python plot_data.py $output_dir/truthfulqa truthfulqa $collapse_prompts $dir/*.t
 python plot_data.py $output_dir/winogrande winogrande $collapse_prompts $dir/*.txt
 
 echo -e "\nCopying important figures...\n"
-python copy_important_figs.py $output_dir paper_figs
+python copy_important_figs.py $output_dir important_figs_collapse_$collapse_prompts
 
 echo -e "\nDoing statistical tests...\n"
 for option in {1..4}; do
