@@ -10,7 +10,7 @@ fi
 dir=$1
 collapse_prompts=$2
 
-output_dir="all_figs_collapse_$collapse_prompts"
+output_dir="all_figs_collapse_$collapse_prompts_$dir"
 echo -e "\nMaking figures...\n"
 
 python plot_data.py $output_dir/main_figs arc,hellaswag,mmlu,truthfulqa,winogrande $collapse_prompts $dir/*.txt
@@ -21,7 +21,7 @@ python plot_data.py $output_dir/truthfulqa truthfulqa $collapse_prompts $dir/*.t
 python plot_data.py $output_dir/winogrande winogrande $collapse_prompts $dir/*.txt
 
 echo -e "\nCopying important figures...\n"
-python copy_important_figs.py $output_dir important_figs_collapse_$collapse_prompts
+python copy_important_figs.py $output_dir important_figs_collapse_$collapse_prompts_$dir
 
 echo -e "\nDoing statistical tests...\n"
 for option in {1..4}; do
