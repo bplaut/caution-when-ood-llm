@@ -20,6 +20,7 @@ class OpenAIGenerator(Generator):
                      'gpt-4o-2024-11-20' if self.args['model'] == 'gpt-4o' else
                      'o1-mini-2024-09-12' if self.args['model'] == 'o1-mini' else
                      'o1-2024-12-17' if self.args['model'] == 'o1' else
+                     'o1-preview' if self.args['model'] == 'o1-preview' else
                      self.args['model'])
         response = self.client.chat.completions.create(
             model=full_name,
