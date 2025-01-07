@@ -54,7 +54,7 @@ class Test(object):
         else:
             raise Exception(f"Unknown answer format: {answer}")
 
-    def get_output_filepath(self, classifier_str):
+    def get_output_filepath(self, logit_type):
         dataset_str = self.args['dataset'].split("/")[-1]
         abstain_str = "_yes_abst" if self.args['abstain_option'] else "_no_abst"
         prompt_name = {0: "first", 1: "second", 2: "third"}[self.args['prompt_phrasing']]
@@ -62,14 +62,14 @@ class Test(object):
         few_shot_str = '' if self.args['few_shot_number'] == 0 else f"_few_shot_{self.args['few_shot_number']}"
         out_dir = "results"
         os.makedirs(out_dir, exist_ok=True)
-        return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{classifier_str}{prompt_str}{few_shot_str}.txt"
+        return f"{out_dir}/{dataset_str}_{self.args['model']}-q{self.start_q}to{self.end_q}{abstain_str}{logit_type}{prompt_str}{few_shot_str}.txt"
         
     def write_output(self, grades, conf_levels_normed, conf_levels_raw, conf_levels_prod, parsing_issues):
-        classifier_strs = ["_norm_logits", "_prod_probs"] if 'gpt' in self.args['model'] else ["_norm_logits", "_prod_probs", "_raw_logits"] # OpenAI models don't have pre-softmax logits
+        logit_types = ["_norm_logits", "_prod_probs"] if 'gpt' in self.args['model'] else ["_norm_logits", "_prod_probs", "_raw_logits"] # OpenAI models don't have pre-softmax logits
 
-        for classifier_str in classifier_strs:
-            conf_levels = conf_levels_normed if classifier_str == "_norm_logits" else conf_levels_prod if classifier_str == "_prod_probs" else conf_levels_raw
-            output_filepath = self.get_output_filepath(classifier_str)
+        for logit_type in logit_types:
+            conf_levels = conf_levels_normed if logit_type == "_norm_logits" else conf_levels_prod if logit_type == "_prod_probs" else conf_levels_raw
+            output_filepath = self.get_output_filepath(logit_type)
             print('\nWriting results to', output_filepath)
             with open(output_filepath, 'w') as f:
                 f.write("grade confidence_level parsing_issue_occurred\n")
