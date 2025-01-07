@@ -589,7 +589,7 @@ def main():
     all_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: ([], [], 0))))
     for file_path in file_paths:
         dataset, model, group = parse_file_name(os.path.basename(file_path), collapse_prompts)
-        if dataset in datasets_to_analyze:
+        if dataset in datasets_to_analyze and 'prod_probs' not in file_path: # Started recording the product of MSPs as well but, we'll have to handle that separately
             labels, conf_levels, total_qs = parse_data(file_path, incl_unparseable)
             old_labels, old_conf_levels, old_total_qs = all_data[group][dataset][model]
             all_data[group][dataset][model] = (np.concatenate([old_labels, labels]), np.concatenate([old_conf_levels, conf_levels]), old_total_qs + total_qs)
