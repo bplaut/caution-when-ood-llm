@@ -1,6 +1,12 @@
 #!/bin/bash
 
-results_dir="../results"
+# There must be exactly one command line argument
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <results_dir>"
+  exit 1
+fi
+
+results_dir=$1
 
 # Define arrays
 models=(Falcon-7b Falcon-40b Llama3-8b Llama3-70b Llama-7b Llama-13b Llama-70b Mistral Mixtral Solar Yi-6b Yi-34b)
