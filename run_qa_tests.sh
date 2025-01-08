@@ -65,7 +65,7 @@ get_batch_size() {
 	    batch_size=1
 	    ;;
         "Solar")
-	    batch_size=28
+	    batch_size=20
 	    ;;
         "Mistral")
             batch_size=128
