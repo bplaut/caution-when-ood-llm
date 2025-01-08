@@ -1,6 +1,6 @@
 #!/bin/bash
 
-results_dir="$1"
+results_dir="../results"
 
 # Define arrays
 models=(Falcon-7b Falcon-40b Llama3-8b Llama3-70b Llama-7b Llama-13b Llama-70b Mistral Mixtral Solar Yi-6b Yi-34b)
