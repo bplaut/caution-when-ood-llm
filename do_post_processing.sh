@@ -13,8 +13,8 @@ dir=$1
 for collapse_prompts in True False
 do
     # Construct the output directory name
-    output_dir="all_figs_collapse_${collapse_prompts}_${dir}"
-    echo -e "\nMaking figures and saving them in $output_dir...\n"
+    output_dir="all_figs_${dir}/collapse_${collapse_prompts}"
+    echo -e "\nMAKING FIGURES FOR COLLAPSE_PROMPTS=${collapse_prompts}\n"
 
     python plot_data.py "$output_dir/main_figs" arc,hellaswag,mmlu,truthfulqa,winogrande "$collapse_prompts" "$dir"/*.txt
     python plot_data.py "$output_dir/arc" arc "$collapse_prompts" "$dir"/*.txt
