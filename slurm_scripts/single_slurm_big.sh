@@ -1,7 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=llm_expts
-#SBATCH --mem=78gb
-#SBATCH --gpus=1
+#SBATCH --gres=gpu:1
+#SBATCH --nodes=1
+#SBATCH --nodelist=airl.ist.berkeley.edu,sac.ist.berkeley.edu,cirl.ist.berkeley.edu,rlhf.ist.berkeley.edu
 #SBATCH --time=08:00:00
 #SBATCH --output=output_from_slurm/%j.out
 
