@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=llm_expts
 #SBATCH --mem=78gb
+#SBATCH --gpus=1
 #SBATCH --time=08:00:00
 #SBATCH --output=output_from_slurm/%j.out
 
