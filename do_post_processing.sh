@@ -9,9 +9,8 @@ fi
 # Assign the arguments to variables
 dir=$1
 collapse_prompts=$2
-
-output_dir="all_figs_collapse_$collapse_prompts_$dir"
-echo -e "\nMaking figures...\n"
+output_dir="all_figs_collapse_${collapse_prompts}_${dir}"
+echo -e "\nMaking figures and saving them in $output_dir...\n"
 
 python plot_data.py $output_dir/main_figs arc,hellaswag,mmlu,truthfulqa,winogrande $collapse_prompts $dir/*.txt
 python plot_data.py $output_dir/arc arc $collapse_prompts $dir/*.txt
