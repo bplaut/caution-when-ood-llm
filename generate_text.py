@@ -31,8 +31,6 @@ class Generator(object):
                           'Llama3-70b':'meta-llama/Meta-Llama-3-70B-Instruct',
                           'Llama3.1-8b':'meta-llama/Llama-3.1-8B-Instruct',
                           'Llama3.1-70b':'meta-llama/Llama-3.1-70B-Instruct',
-                          'Llama3.1-405b':'meta-llama/Llama-3.1-405B-Instruct',
-                          'Deepseek':'deepseek-ai/DeepSeek-V3',
         }
         if args['model'] not in model_name_map:
             raise Exception("Unrecognized model name. Check model_name_map")
