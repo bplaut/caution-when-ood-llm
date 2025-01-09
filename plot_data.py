@@ -234,9 +234,9 @@ def make_auroc_table(msp_group_data, max_logit_group_data, output_dir, dataset='
     rows = []
     # Sort the rows by model series, then by model size. Also put gpt models at the end
     for model in sort_models(model_results_msp.keys()):
-        # Default is (0, '--', {}) if we don't have results for that model. This can happen with e.g. GPT models where we only have MSP results, not raw logits. The '--' will actually end up in the table in those cases
-        (auc_msp, acc_msp, _) = model_results_msp.get(model, ('--', 0, {}))
-        (auc_max_logit, acc_max_logit, _) = model_results_max_logit.get(model, ('--', 0, {}))
+        # Default is (0, '', {}) if we don't have results for that model. This can happen with e.g. GPT models where we only have MSP results, not raw logits. The '--' will actually end up in the table in those cases
+        (auc_msp, acc_msp, _) = model_results_msp.get(model, ('', 0, {}))
+        (auc_max_logit, acc_max_logit, _) = model_results_max_logit.get(model, ('', 0, {}))
         if abs(acc_msp - acc_max_logit) > 0.01 and 'gpt' not in model:
             print(f"Warning: accuracies for {model} don't match: {acc_msp} vs {acc_max_logit}")
         rows.append([expand_model_name(model), acc_msp, auc_msp, '2/2', auc_max_logit, '2/2'])
@@ -259,9 +259,9 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
         (_, _, score_data_ml) = model_results_ml.get(model, (0, 0, {}))
         rows.append([expand_model_name(model)])
         for wrong_penalty in score_data_msp:
-            # The '--' will actually end up in the table in some cases
-            (_, score_msp, base_score_msp, pct_abstained_msp) = score_data_msp.get(wrong_penalty, (0, '--', 0, '--'))
-            (_, score_ml, base_score_ml, pct_abstained_ml) = score_data_ml.get(wrong_penalty, (0, '--', 0, '--'))
+            # '' is the default if we're missing data for a model (e.g., we're missing raw logits for OpenAI models)
+            (_, score_msp, base_score_msp, pct_abstained_msp) = score_data_msp.get(wrong_penalty, (0, '', 0, ''))
+            (_, score_ml, base_score_ml, pct_abstained_ml) = score_data_ml.get(wrong_penalty, (0, '', 0, ''))
             if abs(base_score_msp - base_score_ml) > 0.01 and 'gpt' not in model:
                 print(f"Warning: base scores for {model} don't match: {base_score_msp} vs {base_score_ml}")
             if pct_abstained:
