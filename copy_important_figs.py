@@ -26,8 +26,8 @@ def main():
         print("Usage: python copy_important_figs.py <input_dir> <output_directory>")
         sys.exit(1)
     input_dir = sys.argv[1]
-    input_subdir1 = input_dir + '/collapse_prompts_False'
-    input_subdir2 = input_dir + '/collapse_prompts_True'
+    input_subdir1 = input_dir + '/collapse_False'
+    input_subdir2 = input_dir + '/collapse_True'
     output_dir = sys.argv[2]
 
     # AUROC and calibration plots: use collapse_prompts=False
