@@ -269,8 +269,9 @@ def make_score_table(msp_group_data, max_logit_group_data, output_dir, dataset='
             else:
                 rows[-1].extend([base_score_msp, score_msp, score_ml])
     column_names = ['LLM', 'Base', 'MSP', 'Max Logit', 'Base', 'MSP', 'Max Logit']
+    formatted_column_names = ["\\multicolumn{1}{c}{" + name + "}" for name in column_names] # Wrap in multicolumn to make siuntx ignore them when aligning numerical values   
     header = ('& \\multicolumn{3}{c}{Balanced} & \\multicolumn{3}{c}{Conservative} \\\\ \n'
-              + ' & '.join(column_names) + ' \\\\ \n'
+              + ' & '.join(formatted_column_names) + ' \\\\ \n'
               + '\\cmidrule(lr){1-1}\\cmidrule(lr){2-4}\\cmidrule(lr){5-7} \n')
     caption = ('Q\\&A with abstention results for %s. See Table~\\ref{tab:score} for an explanation of the scoring scheme.' if not pct_abstained else 'Frequency of abstention on %s in the Section~\\ref{sec:abstain} experiments.') % format_dataset_name(dataset)
     label = f'tab:{dataset}_score' if not pct_abstained else f'tab:{dataset}_pct_abstained'
@@ -430,7 +431,7 @@ def make_table(num_cols, rows, output_dir, caption='', label='', filename='table
         f.write('\\centering\n')
         f.write(f'\\caption{{{caption}}}\n')
         f.write(f'\\label{{{label}}}\n')
-        f.write('\\begin{tabular}{' + 'l' + 'c' * (num_cols - 1) + '}\n')
+        f.write('\\begin{tabular}{' + 'l' + ' S[table-format=3.1]' * (num_cols - 1) + '}\n') # S[table-format=3.1] is an alignment column type from the siunitx package
         f.write('\\toprule\n')
         f.write(header)
         for row in rows:
