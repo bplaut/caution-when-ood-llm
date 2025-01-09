@@ -11,8 +11,6 @@ class Generator(object):
                           'Mistral':'mistralai/Mistral-7B-Instruct-v0.2',
                           'Mixtral-raw':'mistralai/Mixtral-8x7B-v0.1',
                           'Mixtral':'mistralai/Mixtral-8x7B-Instruct-v0.1',
-                          'Zephyr':'HuggingFaceH4/zephyr-7b-beta',
-                          'gpt2':'gpt2',
                           'Llama-7b-raw':'meta-llama/Llama-2-7b-hf',
                           'Llama-7b':'meta-llama/Llama-2-7b-chat-hf',
                           'Llama-13b-raw':'meta-llama/Llama-2-13b-hf',
@@ -31,6 +29,9 @@ class Generator(object):
                           'Yi-6b-raw':'01-ai/Yi-6B',
                           'Llama3-8b':'meta-llama/Meta-Llama-3-8B-Instruct',
                           'Llama3-70b':'meta-llama/Meta-Llama-3-70B-Instruct',
+                          'Llama3.1-8b':'meta-llama/Llama-3.1-8B-Instruct',
+                          'Llama3.1-70b':'meta-llama/Llama-3.1-70B-Instruct',
+                          'Llama3.1-405b':'meta-llama/Llama-3.1-405B-Instruct',
                           'Deepseek':'deepseek-ai/DeepSeek-V3',
         }
         if args['model'] not in model_name_map:
