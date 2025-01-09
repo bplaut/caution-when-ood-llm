@@ -26,42 +26,47 @@ def main():
         print("Usage: python copy_important_figs.py <input_dir> <output_directory>")
         sys.exit(1)
     input_dir = sys.argv[1]
-    input_subdir1 = input_dir + '/collapse_False'
-    input_subdir2 = input_dir + '/collapse_True'
+    input_subdir_False = input_dir + '/collapse_False'
+    input_subdir_True = input_dir + '/collapse_True'
     output_dir = sys.argv[2]
+    file_list = []
+    datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande']
 
     # AUROC and calibration plots: use collapse_prompts=False
-    cross_group_dir = input_subdir1 + '/main_figs/cross_group_plots'
-    suffixes = ['/no_abst_all/auc_vs_acc-no_abst_norm_logits-no_abst_raw_logits',
-                '/no_abst_norm_logits/auc_vs_size_all_datasets_MSP',
-                '/no_abst_raw_logits/auc_vs_size_all_datasets_Max_Logit',
-                '/no_abst_norm_logits/auc_vs_acc_all_datasets_MSP',
-                '/no_abst_norm_logits/auc_vs_acc-no_abst_norm_logits_second_prompt-no_abst_norm_logits_first_prompt',
-                '/no_abst_raw_logits/auc_vs_acc_all_datasets_Max_Logit',
-                '/no_abst_raw_logits/auc_vs_acc-no_abst_raw_logits_second_prompt-no_abst_raw_logits_first_prompt',
+    main_figs_dir = input_subdir_False + '/main_figs'
+    cross_group_dir = main_figs_dir + '/cross_group_plots'
+    suffixes = ['no_abst_all/auc_vs_acc-no_abst_norm_logits-no_abst_raw_logits',
+                'no_abst_norm_logits/auc_vs_size_all_datasets_MSP',
+                'no_abst_raw_logits/auc_vs_size_all_datasets_Max_Logit',
+                'no_abst_norm_logits/auc_vs_acc_all_datasets_MSP',
+                'no_abst_norm_logits/auc_vs_acc-no_abst_norm_logits_second_prompt-no_abst_norm_logits_first_prompt',
+                'no_abst_raw_logits/auc_vs_acc_all_datasets_Max_Logit',
+                'no_abst_raw_logits/auc_vs_acc-no_abst_raw_logits_second_prompt-no_abst_raw_logits_first_prompt',
                  ]
-    file_list = [cross_group_dir + suffix for suffix in suffixes] + [input_subdir1 + '/main_figs/' + suffix for suffix in suffixes]
-    file_list += [input_subdir1 + '/main_figs/no_abst_dataset']
-    file_list += [input_subdir1 + '/main_figs/frac-correct_vs_msp_uniform']
-    file_list += [input_subdir1 + '/main_figs/frac-correct_vs_msp_quantile']
-    file_list += [input_subdir1 + '/main_figs/calibration_table_uniform']
-    file_list += [input_subdir1 + '/main_figs/calibration_table_quantile']
-    file_list += [input_subdir1 + '/main_figs/calib_vs_acc_all_datasets']
-    file_list += [input_subdir1 + '/main_figs/calib_vs_size_all_datasets']
-    file_list += [input_subdir1 + '/main_figs/no_abst_dataset_bar']
-    datasets = ['arc', 'hellaswag', 'mmlu', 'truthfulqa', 'winogrande', 'piqa', 'no_winogrande']
+    file_list += [cross_group_dir + '/' + suffix for suffix in suffixes]
+    suffixes = ['no_abst_dataset',
+                'frac-correct_vs_msp_quantile',
+                'calibration_table_quantile',
+                'calib_vs_acc_all_datasets',
+                'calib_vs_size_all_datasets',
+                'no_abst_dataset_bar',
+                ]
+    file_list += [main_figs_dir + '/' + suffix for suffix in suffixes]
+    file_list.append(cross_group_dir + '/no_abst_all/auroc_table')
+    file_list.append(cross_group_dir + '/no_abst_all/auc_vs_acc-no_abst_norm_logits-no_abst_raw_logits')
+    for dataset in datasets:
+        file_list.append(f'{input_subdir_False}/{dataset}/cross_group_plots/no_abst_all/{dataset}_auroc_table')
     # Q&A with abstention plots (aka score plots): use collapse_prompts=True
-    middle_dirs = ['_norm_logits_first_prompt', '_norm_logits_second_prompt', '_raw_logits_first_prompt', '_raw_logits_second_prompt', '_norm_logits', '_raw_logits']
-    for middle_dir in middle_dirs:
-        file_list += [f'{input_subdir2}/main_figs/no_abst{middle_dir}/test/score_vs_conf_all_datasets']
-        file_list += [f'{input_subdir2}/main_figs/no_abst{middle_dir}/test/harsh-score_vs_conf_all_datasets']
-    for overall_cross_group_dir in ['all', 'None']:
-        file_list += [cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auroc_table', cross_group_dir + f'/no_abst_{overall_cross_group_dir}/auc_vs_acc-no_abst_raw_logits-no_abst_norm_logits']
-        file_list += [cross_group_dir + f'/no_abst_{overall_cross_group_dir}/score_table']
-        file_list += [cross_group_dir + f'/no_abst_{overall_cross_group_dir}/pct_abstained_table']
-        file_list += [f'{input_subdir2}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_auroc_table' for dataset in datasets]
-        file_list += [f'{input_subdir2}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_score_table' for dataset in datasets]
-        file_list += [f'{input_subdir2}/{dataset}/cross_group_plots/no_abst_{overall_cross_group_dir}/{dataset}_pct_abstained_table' for dataset in datasets]
+    logit_types = ['norm_logits', 'raw_logits']
+    score_types = ['score', 'harsh-score']
+    for logit_type in logit_types:
+        for score_type in score_types:
+            file_list.append(f'{input_subdir_True}/main_figs/no_abst_{logit_type}/{score_type}_vs_conf_all_datasets')
+    file_list.append(f'{input_subdir_True}/main_figs/cross_group_plots/no_abst_None/score_table')
+    file_list.append(f'{input_subdir_True}/main_figs/cross_group_plots/no_abst_None/pct_abstained_table')
+    for dataset in datasets:
+        file_list.append(f'{input_subdir_True}/{dataset}/cross_group_plots/no_abst_None/{dataset}_score_table')
+        file_list.append(f'{input_subdir_True}/{dataset}/cross_group_plots/no_abst_None/{dataset}_pct_abstained_table')
     copy_files(output_dir, file_list)
 
 main()
