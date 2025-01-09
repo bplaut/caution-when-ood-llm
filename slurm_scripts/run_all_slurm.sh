@@ -50,7 +50,7 @@ for model in "${models[@]}"; do
           echo "Launching job for dataset='$dataset', model='$model', range='$question_range', prompt='$prompt_str'"
 
           if [ "$model" = "Llama3.1-70b" ]; then
-            sbatch single_single_78gb.sh "$model" "$dataset" "$question_range" "$prompt_phrasing"
+            sbatch single_slurm_78gb.sh "$model" "$dataset" "$question_range" "$prompt_phrasing"
           else
             sbatch single_slurm.sh "$model" "$dataset" "$question_range" "$prompt_phrasing"
           fi
