@@ -44,8 +44,8 @@ def expand_model_name(name):
                      'Llama 2 13B' if base == 'Llama-13b' else
                      'Llama 2 7B' if base == 'Llama-7b' else
                      'Llama 2 70B' if base == 'Llama-70b' else
-                     'Llama 3 8B' if base == 'Llama3-8b' else
-                     'Llama 3 70B' if base == 'Llama3-70b' else
+                     'Llama 3 8B' if base == 'Llama3.1-8b' else
+                     'Llama 3 70B' if base == 'Llama3.1-70b' else
                      'Yi 6B' if base == 'Yi-6b' else
                      'Yi 34B' if base == 'Yi-34b' else
                      'GPT-3.5 Turbo' if base == 'gpt-3.5-turbo' else
