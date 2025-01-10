@@ -51,7 +51,7 @@ There are also some files for post-processing. The first is plot_data.py, which 
 ```
 python plot_data.py <output_directory> <dataset1,dataset2,...> <collapse_prompts> <data_file1> [<data_file2> ...]
 ```
-If collapse_prompts=True, we group the data from the two prompt phrasings together. We set collapse_prompts=False for the AUROC analysis (because it's nonlinear), but set collapse_prompt=True for the score plots (because those are linear).
+If collapse_prompts=True, we group the data from the two prompt phrasings together. We set collapse_prompts=False for the AUROC analysis (because it's nonlinear), but set collapse_prompt=True for the score plots (because those are linear). You probably don't need to worry about this because you should probably just use the bash scripts below, which will automatically use collapse_prompts=True/False in the appropriate places.
 
 There is also statistical_tests.py, which computes the p-values and has the following usage:
 ```
@@ -78,13 +78,13 @@ If you get an out-of-memory error, try reducing the batch sizes in run_qa_tests.
 
 2. do_post_processing.sh, which calls plot_data.py, copy_important_figs.py, and statistal_tests.py. Usage:
 ```
-./do_post_processing <directory> <collapse_prompts>
+./do_post_processing <input_dir> <all_figs_output_dir> <important_figs_output_dir>
 ```
-For example,
+For example, the command
 ```
-./do_post_processing main_results False
+./do_post_processing main_results all_figs important_figs
 ```
-The main_results directory contains the zero-shot results (which are used for the primary analysis), and one_shot_results contains the one-shot results.
+will take as input the results files from main_results, save all figures to the all_figs directory, and copy the important figures (which mostly means the figures used in the paper) to important_figs. The main_results directory contains the zero-shot results (which are used for the primary analysis), and one_shot_results contains the one-shot results.
 
 Currently, results_analysis.ipynb is not called by the scripts and must be run separately.
 
