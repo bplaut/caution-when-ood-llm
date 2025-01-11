@@ -48,17 +48,9 @@ for model in "${models[@]}"; do
         # Determine if we should skip or launch
         if [ ! -f "$filename" ]; then
           echo "Launching job for dataset='$dataset', model='$model', range='$question_range', prompt='$prompt_str'"
-
-          if [ "$model" = "Llama3.1-70b" ]; then
-            sbatch single_slurm_big.sh "$model" "$dataset" "$question_range" "$prompt_phrasing"
-          else
-            sbatch single_slurm.sh "$model" "$dataset" "$question_range" "$prompt_phrasing"
-          fi
-
+          sbatch single_slurm.sh "$model" "$dataset" "$question_range" "$prompt_phrasing"
         fi
-
       done
     done
-
   done
 done
